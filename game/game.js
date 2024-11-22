@@ -28,17 +28,24 @@ function toggleActiveWindowChoose(buttonId) {
 
 let selectedOrder = null;
 
+// Individuelle Intervalle für Worker
+const workerIntervals = {
+  worker1: 500,
+  worker2: 1000,
+  worker3: 2000,
+  worker4: 1000,
+  worker5: 1000,
+};
+
 const orders = Array.from({ length: 5 }, (_, i) => document.getElementById(`order${i + 1}`));
 const playerDiv = document.getElementById("player");
-const workerDiv1 = document.getElementById("worker1");
-const workerDiv2 = document.getElementById("worker2");
-const workerDiv3 = document.getElementById("worker3");
-
-let worker1Interval = null;
-let worker2Interval = null;
-let worker3Interval = null;
-let worker4Interval = null;
-let worker5Interval = null;
+const workerDivs = {
+  worker1: document.getElementById("worker1"),
+  worker2: document.getElementById("worker2"),
+  worker3: document.getElementById("worker3"),
+  worker4: document.getElementById("worker4"),
+  worker5: document.getElementById("worker5"),
+};
 
 const jobs = [
   { name: "Job 1", work: 50, payment: 50 },
@@ -46,6 +53,7 @@ const jobs = [
   { name: "Job 3", work: 100, payment: 100 },
 ];
 
+const activeIntervals = {};
 startLoading(0);
 
 function startLoading(index) {
@@ -76,6 +84,7 @@ function findNextPassiveJob() {
         if (orders[i].classList.contains("passive")) {
           startLoading(i);
           foundPassive = true;
+          clearInterval(interval);
           break;
         }
       }
@@ -106,49 +115,37 @@ function handleJobClick(order) {
 }
 
 function player() {
-  if (!selectedOrder || !selectedOrder.classList.contains("job")) {
-    alert("Du bist schon beschäftigt.");
-    return;
-  }
-  const job = extractJobData(selectedOrder);
-  playerDiv.dataset.job = JSON.stringify(job);
-  playerDiv.innerHTML = `
-    <strong>${job.name}</strong>
-    <p>Work: ${job.work}</p>
-    <p>Progress: 0/${job.work}</p>
-    <p>Payment: ${job.payment} Coins</p>
-    <div class="progress-bar">
-      <div class="progress-bar-fill" style="width: 0%;"></div>
-    </div>
-  `;
-  resetJob(selectedOrder);
-  playerDiv.addEventListener("click", handlePlayerClick);
-  document.getElementById("selector").style.display = "none";
+  assignJob(playerDiv, "player");
 }
 
 function worker1() {
-  assignJobToWorker(workerDiv1, "worker1");
+  assignJob(workerDivs.worker1, "worker1");
 }
 
 function worker2() {
-  assignJobToWorker(workerDiv2, "worker2");
+  assignJob(workerDivs.worker2, "worker2");
 }
 
 function worker3() {
-  assignJobToWorker(workerDiv3, "worker3");
+  assignJob(workerDivs.worker3, "worker3");
 }
 
 function worker4() {
-  assignJobToWorker(workerDiv4, "worker4");
+  assignJob(workerDivs.worker4, "worker4");
 }
 
 function worker5() {
-  assignJobToWorker(workerDiv5, "worker5");
+  assignJob(workerDivs.worker5, "worker5");
 }
 
-function assignJobToWorker(workerDiv, workerId) {
+function assignJob(workerDiv, workerId) {
   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
-    alert("Dieser Mitarbeiter ist schon beschäftigt.");
+    alert("Es gibt keinen ausgewählten Auftrag.");
+    return;
+  }
+
+  if (workerDiv.dataset.job) {
+    alert("Dieser Mitarbeiter ist bereits beschäftigt.");
     return;
   }
 
@@ -176,38 +173,14 @@ function assignJobToWorker(workerDiv, workerId) {
 
     if (progress >= job.work) {
       clearInterval(interval);
+      delete activeIntervals[workerId];
       coins += job.payment;
       workerDiv.dataset.job = "";
       workerDiv.innerHTML = "Mitarbeiter: Kein Job";
     }
-  }, 1000);
+  }, workerIntervals[workerId]);
 
-  if (workerId === "worker1") worker1Interval = interval;
-  if (workerId === "worker2") worker2Interval = interval;
-  if (workerId === "worker3") worker3Interval = interval;
-  if (workerId === "worker4") worker4Interval = interval;
-  if (workerId === "worker5") worker5Interval = interval;
-}
-
-function handlePlayerClick() {
-  const job = JSON.parse(playerDiv.dataset.job);
-  let progress = parseInt(job.progress) + 1;
-  job.progress = progress;
-
-  const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
-  const progressPercentage = Math.min((progress / job.work) * 100, 100);
-  progressBarFill.style.width = `${progressPercentage}%`;
-
-  playerDiv.querySelector("p:nth-of-type(2)").textContent = `Progress: ${progress}/${job.work}`;
-
-  if (progress >= job.work) {
-    coins += job.payment;
-    playerDiv.dataset.job = "";
-    playerDiv.innerHTML = "Spieler: Kein Job";
-    playerDiv.removeEventListener("click", handlePlayerClick);
-  } else {
-    playerDiv.dataset.job = JSON.stringify(job);
-  }
+  activeIntervals[workerId] = interval;
 }
 
 function resetJob(order) {
