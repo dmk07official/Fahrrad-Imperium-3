@@ -54,7 +54,6 @@ const jobs = [
 ];
 
 const activeIntervals = {};
-let coins = 0;
 
 startLoading(0);
 
