@@ -30,7 +30,7 @@ let selectedOrder = null;
 
 // Individuelle Intervalle für Worker
 const workerIntervals = {
-  worker1: 1000,
+  worker1: 100,
   worker2: 1000,
   worker3: 1000,
   worker4: 1000,
