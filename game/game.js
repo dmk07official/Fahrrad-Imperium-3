@@ -30,9 +30,9 @@ let selectedOrder = null;
 
 // Individuelle Intervalle für Worker
 const workerIntervals = {
-  worker1: 500,
+  worker1: 1000,
   worker2: 1000,
-  worker3: 2000,
+  worker3: 1000,
   worker4: 1000,
   worker5: 1000,
 };
@@ -54,6 +54,8 @@ const jobs = [
 ];
 
 const activeIntervals = {};
+let coins = 0;
+
 startLoading(0);
 
 function startLoading(index) {
@@ -115,7 +117,45 @@ function handleJobClick(order) {
 }
 
 function player() {
-  assignJob(playerDiv, "player");
+  if (!selectedOrder || !selectedOrder.classList.contains("job")) {
+    alert("Du bist schon beschäftigt.");
+    return;
+  }
+
+  const job = extractJobData(selectedOrder);
+  playerDiv.dataset.job = JSON.stringify(job);
+  playerDiv.innerHTML = `
+    <strong>${job.name}</strong>
+    <p>Work: ${job.work}</p>
+    <p>Progress: 0/${job.work}</p>
+    <p>Payment: ${job.payment} Coins</p>
+    <div class="progress-bar">
+      <div class="progress-bar-fill" style="width: 0%;"></div>
+    </div>
+  `;
+  resetJob(selectedOrder);
+  playerDiv.addEventListener("click", handlePlayerClick);
+  document.getElementById("selector").style.display = "none";
+}
+
+function handlePlayerClick() {
+  const job = JSON.parse(playerDiv.dataset.job);
+  let progress = parseInt(job.progress) || 0;
+  progress++;
+
+  const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
+  const progressPercentage = Math.min((progress / job.work) * 100, 100);
+  progressBarFill.style.width = `${progressPercentage}%`;
+  playerDiv.querySelector("p:nth-of-type(2)").textContent = `Progress: ${progress}/${job.work}`;
+
+  if (progress >= job.work) {
+    coins += job.payment;
+    playerDiv.dataset.job = "";
+    playerDiv.innerHTML = "Spieler: Kein Job";
+    playerDiv.removeEventListener("click", handlePlayerClick);
+  } else {
+    playerDiv.dataset.job = JSON.stringify({ ...job, progress });
+  }
 }
 
 function worker1() {
