@@ -17,6 +17,8 @@ function loadProgress() {
     }
   updateCoins();
 }
+
+loadProgress();
         
 
 // Basic JS
@@ -189,6 +191,8 @@ function handlePlayerClick() {
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
+    updateCoins();
+    saveProgress();
   } else {
     playerDiv.dataset.job = JSON.stringify({ ...job, progress });
   }
@@ -253,6 +257,8 @@ function assignJob(workerDiv, workerId) {
       coins += job.payment;
       workerDiv.dataset.job = "";
       workerDiv.innerHTML = "Mitarbeiter: Kein Job";
+      updateCoins();
+      saveProgress();
     }
   }, workerIntervals[workerId]);
 
