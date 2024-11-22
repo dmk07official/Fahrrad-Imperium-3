@@ -1,6 +1,24 @@
 //Speichern, Laden, Varianlen
 let coins = 0;
 
+function saveProgress() {
+      const progress = {
+        coins,
+      };
+
+    localStorage.setItem('progress', JSON.stringify(progress));
+}
+
+function loadProgress() {
+    const progress = JSON.parse(localStorage.getItem('progress'));
+    if (progress) {
+    
+    coins = progress.coins || 0;
+    }
+  updateCoins();
+}
+        
+
 // Basic JS
 function toggleActiveWindowChoose(buttonId) {
     document.querySelectorAll('.window-choose-button').forEach(button => {
@@ -23,6 +41,25 @@ function toggleActiveWindowChoose(buttonId) {
         correspondingDiv.style.display = 'block';
     }
 }
+
+function formatNumber(number) {
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'];
+    
+    let i = 0;
+    while (number >= 1e3 && i < suffixes.length - 1) {
+        number /= 1e3;
+        i++;
+    }
+
+    return (number.toFixed(2) + suffixes[i]).replace('.00', '');
+}
+
+// Update
+
+function updatCoins() {
+        
+document.getElementById('coins').textContent = formatNumber(coins);
+        }
 
 // Werkstatt
 
