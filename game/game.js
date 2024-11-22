@@ -58,7 +58,7 @@ function formatNumber(number) {
 
 // Update
 
-function updatCoins() {
+function updateCoins() {
         
 document.getElementById('coins').textContent = formatNumber(coins);
         }
