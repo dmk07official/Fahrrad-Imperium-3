@@ -289,15 +289,44 @@ let isAssignMode = false;
 function setupKeyListeners() {
   document.addEventListener("keydown", (event) => {
     const key = event.key;
+
+    // Überprüfen, ob das Werkstatt-Window aktiv ist
+    const werkstattActive = document.getElementById("werkstatt").style.display === "block";
+
+    if (!werkstattActive) return; // Ignoriere Eingaben, wenn die Werkstatt nicht sichtbar ist
+
+    if (key.toLowerCase() === "s") {
+      isAssignMode = true; // S gedrückt halten aktiviert den Zuweisungsmodus
+    }
+
     if (!isNaN(key) && key >= 1 && key <= orders.length) {
       const index = key - 1;
       const order = orders[index];
+
       if (order && order.classList.contains("job")) {
-        handleJobClick(order);
+        if (isAssignMode) {
+          // Wenn S gedrückt wird, Aufträge zuweisen
+          assignOrderToWorkerOrPlayer(order, key);
+        } else {
+          // Ansonsten Auftrag nur auswählen
+          handleJobClick(order);
+        }
       }
+    }
+
+    // Key "6" für Player-Zuweisung
+    if (key === "6" && isAssignMode && selectedOrder) {
+      player();
+    }
+  });
+
+  document.addEventListener("keyup", (event) => {
+    if (event.key.toLowerCase() === "s") {
+      isAssignMode = false; // S loslassen deaktiviert den Zuweisungsmodus
     }
   });
 }
+
 
 // Rufe diese Funktion am Ende des Skripts auf, um die Tastenevents zu initialisieren
 setupKeyListeners();
