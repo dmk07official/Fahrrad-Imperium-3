@@ -293,8 +293,6 @@ function setupKeyListeners() {
     // Überprüfen, ob das Werkstatt-Window aktiv ist
     const werkstattActive = document.getElementById("werkstatt").style.display === "block";
 
-    if (!werkstattActive) return; // Ignoriere Eingaben, wenn die Werkstatt nicht sichtbar ist
-
     if (key.toLowerCase() === "s") {
       isAssignMode = true; // S gedrückt halten aktiviert den Zuweisungsmodus
     }
