@@ -149,6 +149,7 @@ function spawnJob(order) {
 }
 
 function handleJobClick(order) {
+  if (selectedOrder === order) return; // Verhindert erneutes Öffnen für denselben Auftrag
   const selector = document.getElementById("selector");
   selector.style.display = "block";
   selectedOrder = order;
