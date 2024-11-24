@@ -327,6 +327,18 @@ function setupKeyListeners() {
   });
 }
 
+function assignOrderToWorkerOrPlayer(order, key) {
+  const workerId = `worker${key}`;
+  const workerDiv = workerDivs[workerId];
+
+  if (workerDiv) {
+    assignJob(workerDiv, workerId); // Auftrag an den entsprechenden Worker zuweisen
+  } else if (key === "6") {
+    player(); // Auftrag an den Spieler zuweisen
+  }
+}
+
+
 
 // Rufe diese Funktion am Ende des Skripts auf, um die Tastenevents zu initialisieren
 setupKeyListeners();
