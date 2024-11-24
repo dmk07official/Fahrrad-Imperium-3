@@ -283,6 +283,8 @@ function extractJobData(order) {
 
 // Tastatur Kürzel
 
+let isAssignMode = false;
+
 // Job Auswahl mit 1-5
 function setupKeyListeners() {
   document.addEventListener("keydown", (event) => {
