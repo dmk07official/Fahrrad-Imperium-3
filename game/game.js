@@ -280,3 +280,22 @@ function extractJobData(order) {
     payment: parseInt(order.dataset.payment),
   };
 }
+
+// Tastatur Kürzel
+
+// Job Auswahl mit 1-5
+function setupKeyListeners() {
+  document.addEventListener("keydown", (event) => {
+    const key = event.key;
+    if (!isNaN(key) && key >= 1 && key <= orders.length) {
+      const index = key - 1;
+      const order = orders[index];
+      if (order && order.classList.contains("job")) {
+        handleJobClick(order);
+      }
+    }
+  });
+}
+
+// Rufe diese Funktion am Ende des Skripts auf, um die Tastenevents zu initialisieren
+setupKeyListeners();
