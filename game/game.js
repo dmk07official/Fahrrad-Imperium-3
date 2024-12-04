@@ -69,7 +69,7 @@ let selectedOrder = null;
 
 // Individuelle Intervalle für Worker
 const workerIntervals = {
-  worker1: 100,
+  worker1: 1000,
   worker2: 1000,
   worker3: 1000,
   worker4: 1000,
@@ -149,10 +149,14 @@ function spawnJob(order) {
 }
 
 function handleJobClick(order) {
-  if (selectedOrder === order) return; // Verhindert erneutes Öffnen für denselben Auftrag
-  const selector = document.getElementById("selector");
-  selector.style.display = "block";
-  selectedOrder = order;
+  if (selectedOrder === order) return;
+  const selectorContainer = document.getElementById("selectorContainer");
+  selectorContainer.style.display = "flex";
+   const selector = document.getElementById("selector");
+   selector.style.display = "flex";
+   selectedOrder = order;
+   const blur = document.getElementById("blur");
+   blur.style.display = "block";
 }
 
 function player() {
@@ -165,7 +169,6 @@ function player() {
   playerDiv.dataset.job = JSON.stringify(job);
   playerDiv.innerHTML = `
     <strong>${job.name}</strong>
-    <p>Work: ${job.work}</p>
     <p>Progress: 0/${job.work}</p>
     <p>Payment: ${job.payment} Coins</p>
     <div class="progress-bar">
@@ -174,7 +177,9 @@ function player() {
   `;
   resetJob(selectedOrder);
   playerDiv.addEventListener("click", handlePlayerClick);
+  document.getElementById("selectorContainer").style.display = "none";
   document.getElementById("selector").style.display = "none";
+  document.getElementById("blur").style.display = "none";
 }
 
 function handlePlayerClick() {
@@ -185,7 +190,7 @@ function handlePlayerClick() {
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
   const progressPercentage = Math.min((progress / job.work) * 100, 100);
   progressBarFill.style.width = `${progressPercentage}%`;
-  playerDiv.querySelector("p:nth-of-type(2)").textContent = `Progress: ${progress}/${job.work}`;
+  playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
   if (progress >= job.work) {
     coins += job.payment;
@@ -234,7 +239,6 @@ function assignJob(workerDiv, workerId) {
   workerDiv.dataset.job = JSON.stringify(job);
   workerDiv.innerHTML = `
     <strong>${job.name}</strong>
-    <p>Work: ${job.work}</p>
     <p>Progress: 0/${job.work}</p>
     <p>Payment: ${job.payment} Coins</p>
     <div class="progress-bar">
@@ -242,7 +246,9 @@ function assignJob(workerDiv, workerId) {
     </div>
   `;
   resetJob(selectedOrder);
+  document.getElementById("selectorContainer").style.display = "none";
   document.getElementById("selector").style.display = "none";
+  document.getElementById("blur").style.display = "none";
 
   let progress = 0;
   const interval = setInterval(() => {
@@ -250,14 +256,14 @@ function assignJob(workerDiv, workerId) {
     const progressBarFill = workerDiv.querySelector(".progress-bar-fill");
     const progressPercentage = Math.min((progress / job.work) * 100, 100);
     progressBarFill.style.width = `${progressPercentage}%`;
-    workerDiv.querySelector("p:nth-of-type(2)").textContent = `Progress: ${progress}/${job.work}`;
+    workerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
     if (progress >= job.work) {
       clearInterval(interval);
       delete activeIntervals[workerId];
       coins += job.payment;
       workerDiv.dataset.job = "";
-      workerDiv.innerHTML = "Mitarbeiter: Kein Job";
+      workerDiv.innerHTML = "Kein Job";
       updateCoins();
       saveProgress();
     }
