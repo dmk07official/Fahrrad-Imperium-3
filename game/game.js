@@ -97,7 +97,7 @@ const workerDivs = {
 const jobs = [
   { name: "Job 1", work: 50, payment: 50 },
   { name: "Job 2", work: 75, payment: 75 },
-  { name: "Job 3", work: 100, payment: 100 },
+  { name: "Job 3", work: 10000000000000, payment: 100 },
 ];
 
 const activeIntervals = {};
