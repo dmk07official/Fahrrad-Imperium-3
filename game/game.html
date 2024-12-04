@@ -30,6 +30,7 @@
 </head>
 <body>
   <div class="container">
+    <div class="blur" id="blur"></div>
     <div class="window-choose">
       <button class="window-choose-button active" id="werkstatt" onclick="toggleActiveWindowChoose('werkstatt')">Werkstatt</button>
       <button class="window-choose-button" id="upgrades" onclick="toggleActiveWindowChoose('upgrades')">Upgrades</button>
@@ -57,14 +58,40 @@
 </div>
 
 <div id="orders">
-  <div id="worker1">Mitarbeiter: Kein Job</div>
-  <div id="worker2">Mitarbeiter: Kein Job</div>
-  <div id="worker3">Mitarbeiter: Kein Job</div>
-  <div id="worker4">Mitarbeiter: Kein Job</div>
-  <div id="worker5">Mitarbeiter: Kein Job</div>
+  
+  <div class="worker">
+    <h2>Mitarbeiter 1</h2>
+  <div class="worker-field" id="worker1"><p>Kein Job</p></div>
+  <button>Aufwerten</button>
+  </div>
+  
+  <div class="worker">
+    <h2>Mitarbeiter 2</h2>
+  <div class="worker-field" id="worker2"><p>Kein Job</p></div>
+  <button>Aufwerten</button>
+  </div>
+  
+  <div class="worker">
+    <h2>Mitarbeiter 3</h2>
+  <div class="worker-field" id="worker3"><p>Kein Job</p></div>
+  <button>Aufwerten</button>
+  </div>
+  
+  <div class="worker">
+    <h2>Mitarbeiter 4</h2>
+  <div class="worker-field" id="worker4"><p>Kein Job</p></div>
+  <button>Aufwerten</button>
+  </div>
+  
+  <div class="worker">
+    <h2>Mitarbeiter 5</h2>
+  <div class="worker-field" id="worker5"><p>Kein Job</p></div>
+  <button>Aufwerten</button>
+  </div>
 </div>
 
-<div id="selector">
+<div class="selector-container" id="selectorContainer">
+<div class="selector" id="selector">
   <button class="selectorButton" onclick="player()">Spieler</button>
   <button class="selectorButton" onclick="worker1()">Arbeiter 1</button>
   <button class="selectorButton" onclick="worker2()">Arbeiter 2</button>
@@ -72,6 +99,7 @@
   <button class="selectorButton" onclick="worker4()">Arbeiter 4</button>
   <button class="selectorButton" onclick="worker5()">Arbeiter 5</button>
 </div>      
+</div>
 
         <div class="ui">
       <p>Coins<span id="coins">0</span></p>
