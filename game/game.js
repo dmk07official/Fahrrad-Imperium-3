@@ -69,18 +69,40 @@ let selectedOrder = null;
 
 // Individuelle Intervalle für Worker
 const workerIntervals = {
-  worker1: 1000,
-  worker2: 1000,
-  worker3: 1000,
-  worker4: 1000,
-  worker5: 1000,
+  worker1: 800,
+  worker2: 800,
+  worker3: 800,
+  worker4: 800,
+  worker5: 800,
 };
 
-// Funktion zum Upgraden eines Workers
+// Upgrade-Kosten für Worker
+const workerUpgradeCost = {
+  worker1: 100,
+  worker2: 100,
+  worker3: 100,
+  worker4: 100,
+  worker5: 100,
+};
+
 function upgradeWorker(workerId) {
   if (workerIntervals[workerId] !== undefined) {
-    workerIntervals[workerId] *= 0.5;
-  }
+    
+    if (coins >= workerUpgradeCost[workerId]) {
+      coins -= workerUpgradeCost[workerId];
+      workerIntervals[workerId] *= 0.8;
+      workerUpgradeCost[workerId] *= 10;
+
+      const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
+      if (upgradeButton) {
+        upgradeButton.textContent = `Upgrade Cost: ${workerUpgradeCost[workerId]}`;
+      }
+      
+      updateCoins();
+    } else {
+      alert("Nicht genug Coins für das Upgrade!");
+    }
+  } 
 }
 
 
@@ -97,7 +119,7 @@ const workerDivs = {
 const jobs = [
   { name: "Job 1", work: 50, payment: 50 },
   { name: "Job 2", work: 75, payment: 75 },
-  { name: "Job 3", work: 10000000000000, payment: 100 },
+  { name: "Job 3", work: 100, payment: 100 },
 ];
 
 const activeIntervals = {};
