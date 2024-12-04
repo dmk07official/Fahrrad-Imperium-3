@@ -1,4 +1,4 @@
-//Speichern, Laden, Varianlen
+//Speichern, Laden, Variablen
 let coins = 0;
 
 function saveProgress() {
@@ -75,6 +75,14 @@ const workerIntervals = {
   worker4: 1000,
   worker5: 1000,
 };
+
+// Funktion zum Upgraden eines Workers
+function upgradeWorker(workerId) {
+  if (workerIntervals[workerId] !== undefined) {
+    workerIntervals[workerId] *= 0.9;
+  }
+}
+
 
 const orders = Array.from({ length: 5 }, (_, i) => document.getElementById(`order${i + 1}`));
 const playerDiv = document.getElementById("player");
