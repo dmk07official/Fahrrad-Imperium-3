@@ -79,7 +79,7 @@ const workerIntervals = {
 // Funktion zum Upgraden eines Workers
 function upgradeWorker(workerId) {
   if (workerIntervals[workerId] !== undefined) {
-    workerIntervals[workerId] *= 0.9;
+    workerIntervals[workerId] *= 0.5;
   }
 }
 
