@@ -40,7 +40,7 @@ function updateWorkerButtons() {
   for (const workerId in workerUpgradeCost) {
     const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
     if (upgradeButton) {
-      upgradeButton.textContent = `Upgrade Cost: ${workerUpgradeCost[workerId]}`;
+      upgradeButton.textContent = `Aufwerten: ${workerUpgradeCost[workerId]}€`;
     }
   }
 }
@@ -124,12 +124,12 @@ function upgradeWorker(workerId) {
 
       const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
       if (upgradeButton) {
-        upgradeButton.textContent = `Upgrade Cost: ${workerUpgradeCost[workerId]}`;
+        upgradeButton.textContent = `Aufwerten: ${workerUpgradeCost[workerId]}€`;
       }
       
       updateCoins();
     } else {
-      alert("Nicht genug Coins für das Upgrade!");
+      alert("Nicht genug € für die Ausblidung!");
     }
   } 
 }
