@@ -1,6 +1,24 @@
 //Speichern, Laden, Variablen
 let coins = 0;
 
+// Individuelle Intervalle für Worker
+const workerIntervals = {
+  worker1: 800,
+  worker2: 800,
+  worker3: 800,
+  worker4: 800,
+  worker5: 800,
+};
+
+// Upgrade-Kosten für Worker
+const workerUpgradeCost = {
+  worker1: 100,
+  worker2: 100,
+  worker3: 100,
+  worker4: 100,
+  worker5: 100,
+};
+
 function saveProgress() {
   const progress = {
     coins,
@@ -15,39 +33,25 @@ function loadProgress() {
   const progress = JSON.parse(localStorage.getItem('progress'));
   if (progress) {
     coins = progress.coins || 0;
-
-    // Lade Worker-Intervalle, falls vorhanden
-    if (progress.workerIntervals) {
-      for (const worker in workerIntervals) {
-        workerIntervals[worker] = progress.workerIntervals[worker] || workerIntervals[worker];
-      }
-    }
-
-    // Lade Upgrade-Kosten, falls vorhanden
-    if (progress.workerUpgradeCost) {
-      for (const worker in workerUpgradeCost) {
-        workerUpgradeCost[worker] = progress.workerUpgradeCost[worker] || workerUpgradeCost[worker];
-      }
-    }
+    Object.assign(workerIntervals, progress.workerIntervals || {});
+    Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
-
   updateCoins();
   updateWorkerButtons();
 }
 
-// Aktualisiert die Texte der Upgrade-Buttons
+// Funktion zur Aktualisierung der Upgrade-Buttons
 function updateWorkerButtons() {
   for (const workerId in workerUpgradeCost) {
     const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
     if (upgradeButton) {
-      upgradeButton.textContent = `Aufwerten: ${workerUpgradeCost[workerId]}€`;
+      upgradeButton.textContent = `Upgrade Cost: ${workerUpgradeCost[workerId]}`;
     }
   }
 }
 
-// Rufe beim Laden der Seite die gespeicherten Daten ab
+// Beim Laden der Seite Progress laden
 loadProgress();
-
         
 
 // Basic JS
@@ -95,24 +99,6 @@ document.getElementById('coins').textContent = formatNumber(coins);
 // Werkstatt
 
 let selectedOrder = null;
-
-// Individuelle Intervalle für Worker
-const workerIntervals = {
-  worker1: 800,
-  worker2: 800,
-  worker3: 800,
-  worker4: 800,
-  worker5: 800,
-};
-
-// Upgrade-Kosten für Worker
-const workerUpgradeCost = {
-  worker1: 100,
-  worker2: 100,
-  worker3: 100,
-  worker4: 100,
-  worker5: 100,
-};
 
 function upgradeWorker(workerId) {
   if (workerIntervals[workerId] !== undefined) {
