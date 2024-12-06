@@ -1,4 +1,4 @@
-//Speichern, Laden, Variablen
+// Speichern, Laden, Variablen
 let coins = 0;
 
 function saveProgress() {
@@ -7,7 +7,6 @@ function saveProgress() {
     workerIntervals,
     workerUpgradeCost,
   };
-
   localStorage.setItem('progress', JSON.stringify(progress));
 }
 
@@ -19,14 +18,18 @@ function loadProgress() {
     // Lade Worker-Intervalle, falls vorhanden
     if (progress.workerIntervals) {
       for (const worker in workerIntervals) {
-        workerIntervals[worker] = progress.workerIntervals[worker] || workerIntervals[worker];
+        if (progress.workerIntervals[worker] !== undefined) {
+          workerIntervals[worker] = progress.workerIntervals[worker];
+        }
       }
     }
 
     // Lade Upgrade-Kosten, falls vorhanden
     if (progress.workerUpgradeCost) {
       for (const worker in workerUpgradeCost) {
-        workerUpgradeCost[worker] = progress.workerUpgradeCost[worker] || workerUpgradeCost[worker];
+        if (progress.workerUpgradeCost[worker] !== undefined) {
+          workerUpgradeCost[worker] = progress.workerUpgradeCost[worker];
+        }
       }
     }
   }
@@ -46,51 +49,50 @@ function updateWorkerButtons() {
 }
 
 // Rufe beim Laden der Seite die gespeicherten Daten ab
-loadProgress();
+document.addEventListener("DOMContentLoaded", () => {
+  loadProgress();
 
-        
+  // Initialisiere das erste Laden erst nach dem DOM-Aufbau
+  if (orders.length > 0) {
+    startLoading(0);
+  }
+});
 
 // Basic JS
 function toggleActiveWindowChoose(buttonId) {
-    document.querySelectorAll('.window-choose-button').forEach(button => {
-        button.classList.remove('active');
-        button.classList.add('not-active');
-    });
+  const buttons = document.querySelectorAll('.window-choose-button');
+  const divs = document.querySelectorAll('.window');
 
-    const clickedButton = document.getElementById(buttonId);
-    if (clickedButton) {
-        clickedButton.classList.remove('not-active');
-        clickedButton.classList.add('active');
-    }
+  if (buttons.length === 0 || divs.length === 0) return;
 
-    document.querySelectorAll('.window').forEach(div => {
-        div.style.display = 'none';
-    });
+  buttons.forEach(button => {
+    button.classList.remove('active');
+    button.classList.add('not-active');
+  });
 
-    const correspondingDiv = document.getElementById('window' + buttonId.charAt(0).toUpperCase() + buttonId.slice(1));
-    if (correspondingDiv) {
-        correspondingDiv.style.display = 'block';
-    }
+  const clickedButton = document.getElementById(buttonId);
+  if (clickedButton) {
+    clickedButton.classList.remove('not-active');
+    clickedButton.classList.add('active');
+  }
+
+  divs.forEach(div => {
+    div.style.display = 'none';
+  });
+
+  const correspondingDiv = document.getElementById('window' + buttonId.charAt(0).toUpperCase() + buttonId.slice(1));
+  if (correspondingDiv) {
+    correspondingDiv.style.display = 'block';
+  }
 }
 
-function formatNumber(number) {
-    const suffixes = ['', 'K', 'M', 'B', 'T', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'];
-    
-    let i = 0;
-    while (number >= 1e3 && i < suffixes.length - 1) {
-        number /= 1e3;
-        i++;
-    }
-
-    return (number.toFixed(2) + suffixes[i]).replace('.00', '');
-}
-
-// Update
-
+// Update Coins
 function updateCoins() {
-        
-document.getElementById('coins').textContent = formatNumber(coins);
-        }
+  const coinsElement = document.getElementById('coins');
+  if (coinsElement) {
+    coinsElement.textContent = formatNumber(coins);
+  }
+}
 
 // Werkstatt
 
