@@ -86,13 +86,10 @@ function toggleActiveWindowChoose(buttonId) {
   }
 }
 
-// Update Coins
 function updateCoins() {
-  const coinsElement = document.getElementById('coins');
-  if (coinsElement) {
-    coinsElement.textContent = formatNumber(coins);
-  }
-}
+        
+document.getElementById('coins').textContent = formatNumber(coins);
+        }
 
 // Werkstatt
 
