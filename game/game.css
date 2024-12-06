@@ -47,9 +47,10 @@ p, h1, h2 {
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: calc(100vh - (var(--base-size) * 2.75));
+  height: calc(100vh - (var(--base-size) * 2.75 + env(safe-area-inset-top, 0))); /* Platz für die Leiste */
   background: linear-gradient(180deg, #1A1A1A, #2A2A2A, #3A3A3A);
   overflow-y: auto;
+  padding-top: calc(var(--base-size) * 2.75 + env(safe-area-inset-top, 0)); /* Verschiebt Inhalt nach unten */
 }
 
 #orders {
