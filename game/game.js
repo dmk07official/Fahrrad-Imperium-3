@@ -45,7 +45,7 @@ function updateWorkerButtons() {
   for (const workerId in workerUpgradeCost) {
     const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
     if (upgradeButton) {
-      upgradeButton.textContent = `Upgrade Cost: ${workerUpgradeCost[workerId]}`;
+      upgradeButton.textContent = `Ausbilden: ${workerUpgradeCost[workerId]}€`;
     }
   }
 }
