@@ -11,13 +11,15 @@ p, h1, h2 {
   justify-content: center;
   align-items: center;
   position: fixed;
-  top: 0;
+  top: env(safe-area-inset-top, 0); /* Sicherer Bereich für iOS */
   left: 0;
   width: 100%;
   height: calc(var(--base-size) * 2.75);
   background-color: #444;
   overflow-x: auto;
+  z-index: 1000; /* Stellt sicher, dass sie über anderen Elementen liegt */
 }
+
 
 .window-choose-button {
   width: calc(var(--base-size) * 7.8);
