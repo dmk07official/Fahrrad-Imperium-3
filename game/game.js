@@ -1,5 +1,6 @@
 //Speichern, Laden, Variablen
 let coins = 0;
+let upgrade = 1;
 
 // Individuelle Intervalle für Worker
 const workerIntervals = {
@@ -22,6 +23,7 @@ const workerUpgradeCost = {
 function saveProgress() {
   const progress = {
     coins,
+    upgrade,
     workerIntervals,
     workerUpgradeCost,
   };
@@ -33,6 +35,7 @@ function loadProgress() {
   const progress = JSON.parse(localStorage.getItem('progress'));
   if (progress) {
     coins = progress.coins || 0;
+    upgrade = progress.upgrade || 1;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
@@ -238,7 +241,7 @@ function handlePlayerClick() {
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
   if (progress >= job.work) {
-    coins += job.payment;
+    coins += job.payment * upgrade;
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
@@ -306,7 +309,7 @@ function assignJob(workerDiv, workerId) {
     if (progress >= job.work) {
       clearInterval(interval);
       delete activeIntervals[workerId];
-      coins += job.payment;
+      coins += job.payment * upgrade;
       workerDiv.dataset.job = "";
       workerDiv.innerHTML = "Kein Job";
       updateCoins();
@@ -330,6 +333,15 @@ function extractJobData(order) {
     progress: parseInt(order.dataset.progress),
     payment: parseInt(order.dataset.payment),
   };
+}
+
+//upgrade
+
+function upgradeCoins() {
+  if (coins >= 500) {
+  coins - 500;
+  upgrade * 1.1;
+  }
 }
 
 // Tastatur Kürzel
