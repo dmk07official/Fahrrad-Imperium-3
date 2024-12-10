@@ -340,7 +340,7 @@ function extractJobData(order) {
 function upgradeCoins() {
   if (coins >= 500) {
     coins -= 500; // Ziehe 500 von coins ab und speichere das Ergebnis
-    upgrade *= 1.1; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
+    upgrade += 0.1; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
   }
   updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
 }
