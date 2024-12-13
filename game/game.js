@@ -102,6 +102,8 @@ document.getElementById('coins').textContent = formatNumber(coins);
 // Werkstatt
 
 let selectedOrder = null;
+let currentPlayer = false;
+let currentWorker = false;
 
 function upgradeWorker(workerId) {
   if (workerIntervals[workerId] !== undefined) {
@@ -208,12 +210,14 @@ function handleJobClick(order) {
 
   
    const playerButton = document.getElementById("selectorPlayer");
-   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
-    playerButton.sytle.border = "2px solid red"
+   if (currentPlayer) {
+    playerButton.sytle.border = "solid red calc(var(--base-size) * 0.15)";
+    playerButton.style.color = "red";
    }
    const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
-   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
-    workerButton.sytle.border = "2px solid red"
+   if (currentWorker) {
+    workerButton.sytle.border = "solid red calc(var(--base-size) * 0.15)";
+    workerButton.style.color = "red";
   }
 }
 
@@ -238,6 +242,7 @@ function player() {
   document.getElementById("selectorContainer").style.display = "none";
   document.getElementById("selector").style.display = "none";
   document.getElementById("blur").style.display = "none";
+  currentPlayer = true;
 }
 
 function handlePlayerClick() {
@@ -255,6 +260,7 @@ function handlePlayerClick() {
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
+    currentPlayer = false;
     updateCoins();
     saveProgress();
   } else {
@@ -318,6 +324,7 @@ function assignJob(workerDiv, workerId) {
   document.getElementById("selectorContainer").style.display = "none";
   document.getElementById("selector").style.display = "none";
   document.getElementById("blur").style.display = "none";
+  currentWorker = true;
 
   let progress = 0;
   const interval = setInterval(() => {
@@ -337,6 +344,7 @@ function assignJob(workerDiv, workerId) {
   coins += job.payment * upgrade;
   workerDiv.dataset.job = "";
   workerDiv.innerHTML = "Kein Job";
+  currentWorker = false;
   updateCoins();
   saveProgress();
 }
