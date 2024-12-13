@@ -318,16 +318,21 @@ function assignJob(workerDiv, workerId) {
     workerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
     if (progress >= job.work) {
-      const statusFinished = document.getElementById(`workerStatus${workerId}`);
-      statusFinished.style.backgroundColor = "green";
-      clearInterval(interval);
-      delete activeIntervals[workerId];
-      coins += job.payment * upgrade;
-      workerDiv.dataset.job = "";
-      workerDiv.innerHTML = "Kein Job";
-      updateCoins();
-      saveProgress();
-    }
+  const statusFinished = document.getElementById(`workerStatus${workerId.slice(-1)}`);
+  if (statusFinished) {
+    statusFinished.style.backgroundColor = "green";
+  } else {
+    console.error(`Status element for ${workerId} not found`);
+  }
+  clearInterval(interval);
+  delete activeIntervals[workerId];
+  coins += job.payment * upgrade;
+  workerDiv.dataset.job = "";
+  workerDiv.innerHTML = "Kein Job";
+  updateCoins();
+  saveProgress();
+}
+
   }, workerIntervals[workerId]);
 
   activeIntervals[workerId] = interval;
