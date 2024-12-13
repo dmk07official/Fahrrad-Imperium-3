@@ -205,13 +205,15 @@ function handleJobClick(order) {
    selectedOrder = order;
    const blur = document.getElementById("blur");
    blur.style.display = "block";
+
+  
    const playerButton = document.getElementById("selectorPlayer");
    if (!selectedOrder || !selectedOrder.classList.contains("job")) {
-    playerButton.sytle.border = ""
+    playerButton.sytle.border = "2px solid red"
    }
    const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
    if (!selectedOrder || !selectedOrder.classList.contains("job")) {
-    workerButton.sytle.border = ""
+    workerButton.sytle.border = "2px solid red"
   }
 }
 
