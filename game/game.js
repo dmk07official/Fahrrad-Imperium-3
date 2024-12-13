@@ -259,11 +259,11 @@ function handlePlayerClick() {
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
   if (progress >= job.work) {
+    currentPlayer = false;
     coins += job.payment * upgrade;
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
-    currentPlayer = false;
     updateCoins();
     saveProgress();
   } else {
@@ -312,6 +312,7 @@ function assignJob(workerDiv, workerId) {
     alert("Dieser Mitarbeiter ist bereits beschäftigt.");
     return;
   }
+  currentWorker = true;
 
   const job = extractJobData(selectedOrder);
   workerDiv.dataset.job = JSON.stringify(job);
@@ -327,7 +328,6 @@ function assignJob(workerDiv, workerId) {
   document.getElementById("selectorContainer").style.display = "none";
   document.getElementById("selector").style.display = "none";
   document.getElementById("blur").style.display = "none";
-  currentWorker = true;
 
   let progress = 0;
   const interval = setInterval(() => {
