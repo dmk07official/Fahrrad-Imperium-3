@@ -318,8 +318,8 @@ function assignJob(workerDiv, workerId) {
     workerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
     if (progress >= job.work) {
-      const status = document.getElementById(`workerStatus${workerId}`);
-      status.style.backgroundColor = "green";
+      const statusFinished = document.getElementById(`workerStatus${workerId}`);
+      statusFinished.style.backgroundColor = "green";
       clearInterval(interval);
       delete activeIntervals[workerId];
       coins += job.payment * upgrade;
