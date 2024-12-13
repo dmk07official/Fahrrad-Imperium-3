@@ -102,7 +102,7 @@ document.getElementById('coins').textContent = formatNumber(coins);
 // Werkstatt
 
 let selectedOrder = null;
-let currentPlayer = false;
+let currentPlayer = true;
 let currentWorker = false;
 
 function upgradeWorker(workerId) {
@@ -210,15 +210,17 @@ function handleJobClick(order) {
 
   
    const playerButton = document.getElementById("selectorPlayer");
-   if (currentPlayer) {
-    playerButton.sytle.border = "solid red calc(var(--base-size) * 0.15)";
+if (currentPlayer) {
+    playerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
     playerButton.style.color = "red";
-   }
-   const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
-   if (currentWorker) {
-    workerButton.sytle.border = "solid red calc(var(--base-size) * 0.15)";
+}
+
+const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
+if (currentWorker) {
+    workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
     workerButton.style.color = "red";
-  }
+}
+
 }
 
 function player() {
