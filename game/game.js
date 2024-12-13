@@ -102,7 +102,7 @@ document.getElementById('coins').textContent = formatNumber(coins);
 // Werkstatt
 
 let selectedOrder = null;
-let currentPlayer = true;
+let currentPlayer = false;
 let currentWorker = false;
 
 function upgradeWorker(workerId) {
@@ -228,7 +228,9 @@ function player() {
     alert("Du bist schon beschäftigt.");
     return;
   }
-
+  
+  currentPlayer = true;
+  
   const job = extractJobData(selectedOrder);
   playerDiv.dataset.job = JSON.stringify(job);
   playerDiv.innerHTML = `
@@ -244,7 +246,6 @@ function player() {
   document.getElementById("selectorContainer").style.display = "none";
   document.getElementById("selector").style.display = "none";
   document.getElementById("blur").style.display = "none";
-  currentPlayer = true;
 }
 
 function handlePlayerClick() {
