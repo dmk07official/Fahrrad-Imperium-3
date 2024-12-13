@@ -205,6 +205,14 @@ function handleJobClick(order) {
    selectedOrder = order;
    const blur = document.getElementById("blur");
    blur.style.display = "block";
+   const playerButton = document.getElementById("selectorPlayer");
+   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
+    playerButton.sytle.border = ""
+   }
+   const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
+   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
+    workerButton.sytle.border = ""
+  }
 }
 
 function player() {
@@ -321,8 +329,6 @@ function assignJob(workerDiv, workerId) {
   const statusFinished = document.getElementById(`workerStatus${workerId.slice(-1)}`);
   if (statusFinished) {
     statusFinished.style.backgroundColor = "green";
-  } else {
-    console.error(`Status element for ${workerId} not found`);
   }
   clearInterval(interval);
   delete activeIntervals[workerId];
