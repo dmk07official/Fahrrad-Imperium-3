@@ -141,6 +141,16 @@ p, h1, h2 {
   background-color: #333;
   border: solid var(--color) calc(var(--base-size) * 0.1);
   border-radius: calc(var(--base-size) * 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.selector-button {
+  width: calc(var(--base-size) * 3.5);
+  height: calc(var(--base-size) * 10);
+  background-color: #333;
+  border: solid green calc(var(--base-size) * 0.1);
+  border-radius: calc(var(--base-size) * 1);
 }
 .worker-status {
   width: calc(var(--base-size) * 1.5);
