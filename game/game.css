@@ -132,10 +132,10 @@ p, h1, h2 {
   border-radius: calc(var(--base-size) * 2);
 }
 .worker-status {
-  width: calc(var(--base-size) * 2.5);
-  height: calc(var(--base-size) * 2.5);
+  width: calc(var(--base-size) * 1.5);
+  height: calc(var(--base-size) * 1.5);
   border-radius: 50%;
-  margin-top: 1 calc(var(--base-size) * 1);
+  margin-top: 1 calc(var(--base-size) * 0.75);
   background-color: green;
 }
     #player  {
