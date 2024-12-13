@@ -254,23 +254,34 @@ function handlePlayerClick() {
 
 function worker1() {
   assignJob(workerDivs.worker1, "worker1");
+  const status = document.getElementById("workerStatus1");
+  status.style.backgroundColor = "green";
 }
 
 function worker2() {
   assignJob(workerDivs.worker2, "worker2");
+  const status = document.getElementById("workerStatus2");
+  status.style.backgroundColor = "green";
 }
 
 function worker3() {
   assignJob(workerDivs.worker3, "worker3");
+  const status = document.getElementById("workerStatus3");
+  status.style.backgroundColor = "green";
 }
 
 function worker4() {
   assignJob(workerDivs.worker4, "worker4");
+  const status = document.getElementById("workerStatus4");
+  status.style.backgroundColor = "green";
 }
 
 function worker5() {
   assignJob(workerDivs.worker5, "worker5");
+  const status = document.getElementById("workerStatus5");
+  status.style.backgroundColor = "green";
 }
+
 
 function assignJob(workerDiv, workerId) {
   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
