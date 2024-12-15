@@ -219,10 +219,15 @@ if (currentPlayer) {
 }
 
 const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
-if (currentWorker) {
-    workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
-    workerButton.style.color = "red";
-}
+  if (workerButton) {
+    if (workerStatus[workerId]) {
+      workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
+      workerButton.style.color = "red";
+    } else {
+      workerButton.style.border = "solid green calc(var(--base-size) * 0.15)";
+      workerButton.style.color = "green";
+    }
+  }
 
 }
 
