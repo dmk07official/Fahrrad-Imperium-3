@@ -103,7 +103,13 @@ document.getElementById('coins').textContent = formatNumber(coins);
 
 let selectedOrder = null;
 let currentPlayer = false;
-let currentWorker = false;
+let currentWorker = {
+  worker1: false,
+  worker2: false,
+  worker3: false,
+  worker4: false,
+  worker5: false,
+};
 
 function upgradeWorker(workerId) {
   if (workerIntervals[workerId] !== undefined) {
