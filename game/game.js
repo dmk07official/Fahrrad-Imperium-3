@@ -220,7 +220,7 @@ if (currentPlayer) {
 
 const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
   if (workerButton) {
-    if (workerStatus[workerId]) {
+    if (currentWorker[workerId]) {
       workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
       workerButton.style.color = "red";
     } else {
@@ -320,7 +320,7 @@ function assignJob(workerDiv, workerId) {
     alert("Dieser Mitarbeiter ist bereits beschäftigt.");
     return;
   }
-  currentWorker = true;
+  currentWorker[workerId] = true;
 
   const job = extractJobData(selectedOrder);
   workerDiv.dataset.job = JSON.stringify(job);
@@ -350,12 +350,12 @@ function assignJob(workerDiv, workerId) {
   if (statusFinished) {
     statusFinished.style.backgroundColor = "green";
   }
+  currentWorker[workerId] = false;
   clearInterval(interval);
   delete activeIntervals[workerId];
   coins += job.payment * upgrade;
   workerDiv.dataset.job = "";
   workerDiv.innerHTML = "Kein Job";
-  currentWorker = false;
   updateCoins();
   saveProgress();
 }
