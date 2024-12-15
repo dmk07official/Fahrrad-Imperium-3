@@ -213,6 +213,9 @@ function handleJobClick(order) {
 if (currentPlayer) {
     playerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
     playerButton.style.color = "red";
+} else {
+    playerButton.style.border = "solid green calc(var(--base-size) * 0.15)";
+    playerButton.style.color = "green";
 }
 
 const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
