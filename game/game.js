@@ -224,14 +224,16 @@ if (currentPlayer) {
     playerButton.style.color = "green";
 }
 
-const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
-  if (workerButton) {
-    if (currentWorker[workerId]) {
-      workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
-      workerButton.style.color = "red";
-    } else {
-      workerButton.style.border = "solid green calc(var(--base-size) * 0.15)";
-      workerButton.style.color = "green";
+for (const workerId in currentWorker) {
+    const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
+    if (workerButton) {
+      if (currentWorker[workerId]) {
+        workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
+        workerButton.style.color = "red";
+      } else {
+        workerButton.style.border = "solid green calc(var(--base-size) * 0.15)";
+        workerButton.style.color = "green";
+      }
     }
   }
 
