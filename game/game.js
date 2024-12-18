@@ -281,7 +281,7 @@ function player() {
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseInt(job.progress) || 0;
-  progress += upgradeStrength;
+  
 
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
   const progressPercentage = Math.min((progress / job.work) * 100, 100);
