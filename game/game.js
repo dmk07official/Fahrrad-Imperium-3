@@ -406,21 +406,21 @@ function extractJobData(order) {
 
 function upgradeCoins() {
   if (coins >= upgradeCoinsCost) {
-    coins -= upgradeCoinsCost; // Ziehe 500 von coins ab und speichere das Ergebnis
-    upgradeCoins += 0.1; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
+    coins -= upgradeCoinsCost;
+    upgradeCoins += 0.1;
     upgradeCoinsCost *= 1.2;
   }
-  updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
+  updateCoins();
   updateUpgradeButtons();
 }
 
 function upgradeStrength() {
   if (coins >= upgradeStrengthCost) {
-    coins -= upgradeStrengthCost; // Ziehe 500 von coins ab und speichere das Ergebnis
-    upgradStrength += 0.25; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
+    coins -= upgradeStrengthCost;
+    upgradeStrength += 0.25;
     upgradeStrengthCost *= 1.2;
   }
-  updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
+  updateCoins();
   updateUpgradeButtons();
 }
 
