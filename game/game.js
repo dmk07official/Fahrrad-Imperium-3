@@ -43,8 +43,8 @@ function loadProgress() {
     coins = progress.coins || 0;
     upgradeCoins = progress.upgradeCoins || 1;
     upgradeCoinsCost = progress.upgradeCoinsCost || 10;
-    upgradStrength = progress.upgradeStrength || 1;
-    upgradeCoinsStrength = progress.upgradeStrengthCost || 10;
+    upgradeStrength = progress.upgradeStrength || 1;
+    upgradeStrengthCost = progress.upgradeStrengthCost || 10;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
@@ -63,7 +63,7 @@ function updateWorkerButtons() {
   }
 }
 
-function updateUpgradeButtons {
+function updateUpgradeButtons() {
   document.getElementById('upgradeCoinsCost').textContent = formatNumber(upgradeCoinsCost);
   document.getElementById('upgradeStrengthCost').textContent = formatNumber(upgradeStrengthCost);
 }
@@ -408,7 +408,7 @@ function upgradeCoins() {
   if (coins >= upgradeCoinsCost) {
     coins -= upgradeCoinsCost; // Ziehe 500 von coins ab und speichere das Ergebnis
     upgradeCoins += 0.1; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
-    upgradeCoinsCost *= 0.2;
+    upgradeCoinsCost *= 1.2;
   }
   updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
   updateUpgradeButtons();
@@ -418,7 +418,7 @@ function upgradeStrength() {
   if (coins >= upgradeStrengthCost) {
     coins -= upgradeStrengthCost; // Ziehe 500 von coins ab und speichere das Ergebnis
     upgradStrength += 0.25; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
-    upgradeStrengthCost *= 0.2;
+    upgradeStrengthCost *= 1.2;
   }
   updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
   updateUpgradeButtons();
