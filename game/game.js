@@ -1,6 +1,9 @@
 //Speichern, Laden, Variablen
 let coins = 0;
-let upgrade = 1;
+let upgradeCoins = 1;
+let upgradeCoinsCost = 10;
+let upgradeStrength = 1;
+let upgradeStrengthCost = 10;
 
 // Individuelle Intervalle für Worker
 const workerIntervals = {
@@ -23,7 +26,10 @@ const workerUpgradeCost = {
 function saveProgress() {
   const progress = {
     coins,
-    upgrade,
+    upgradeCoins,
+    upgradeCoinsCost,
+    upgradeStrength,
+    upgradeStrengthCost,
     workerIntervals,
     workerUpgradeCost,
   };
@@ -35,12 +41,16 @@ function loadProgress() {
   const progress = JSON.parse(localStorage.getItem('progress'));
   if (progress) {
     coins = progress.coins || 0;
-    upgrade = progress.upgrade || 1;
+    upgradeCoins = progress.upgradeCoins || 1;
+    upgradeCoinsCost = progress.upgradeCoinsCost || 10;
+    upgradStrength = progress.upgradeStrength || 1;
+    upgradeCoinsStrength = progress.upgradeStrengthCost || 10;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
   updateCoins();
   updateWorkerButtons();
+  updateUpgradeButton();
 }
 
 // Funktion zur Aktualisierung der Upgrade-Buttons
@@ -51,6 +61,11 @@ function updateWorkerButtons() {
       upgradeButton.textContent = `Ausbilden: ${workerUpgradeCost[workerId]}€`;
     }
   }
+}
+
+function updateUpgradeButtons {
+  document.getElementById('upgradeCoinsCost').textContent = formatNumber(upgradeCoinsCost);
+  document.getElementById('upgradeStrengthCost').textContent = formatNumber(upgradeStrengthCost);
 }
 
 // Beim Laden der Seite Progress laden
@@ -95,7 +110,6 @@ function formatNumber(number) {
 // Update
 
 function updateCoins() {
-        
 document.getElementById('coins').textContent = formatNumber(coins);
         }
 
@@ -267,7 +281,7 @@ function player() {
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseInt(job.progress) || 0;
-  progress++;
+  progress += upgradeStrength;
 
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
   const progressPercentage = Math.min((progress / job.work) * 100, 100);
@@ -276,7 +290,7 @@ function handlePlayerClick() {
 
   if (progress >= job.work) {
     currentPlayer = false;
-    coins += job.payment * upgrade;
+    coins += job.payment * upgradeCoins;
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
@@ -361,7 +375,7 @@ function assignJob(workerDiv, workerId) {
   currentWorker[workerId] = false;
   clearInterval(interval);
   delete activeIntervals[workerId];
-  coins += job.payment * upgrade;
+  coins += job.payment * upgradeCoins;
   workerDiv.dataset.job = "";
   workerDiv.innerHTML = "Kein Job";
   updateCoins();
