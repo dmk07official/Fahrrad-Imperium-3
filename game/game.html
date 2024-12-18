@@ -114,7 +114,10 @@
       
       <div class="window" id="windowUpgrades" style="display: none">
         <h2 class="window-header">Upgrades</h2>
-        <button class="upgrade-button" id="upgradeButton" onclick="upgradeCoins()">Aufwerten</button>
+        <p>Bezahlung verbessern um Faktor 0.1</p>
+        <button class="upgrade-button" id="upgradeCoins" onclick="upgradeCoins()"><span id="upgradeCoinsCost">10</span></button>
+        <p>Tippstärke verbessern um Faktor 0.25</p>
+        <button class="upgrade-button" id="upgradeStrength" onclick="upgradeStrength()"><span id="upgradeStrengthCost">10</span></button>
       </div>
       
       <div class="window" id="windowTeileLieferant" style="display: none">        
