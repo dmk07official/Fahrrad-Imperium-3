@@ -50,7 +50,7 @@ function loadProgress() {
   }
   updateCoins();
   updateWorkerButtons();
-  updateUpgradeButton();
+  updateUpgradeButtons();
 }
 
 // Funktion zur Aktualisierung der Upgrade-Buttons
@@ -405,11 +405,23 @@ function extractJobData(order) {
 //upgrade
 
 function upgradeCoins() {
-  if (coins >= 500) {
-    coins -= 500; // Ziehe 500 von coins ab und speichere das Ergebnis
-    upgrade += 0.1; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
+  if (coins >= upgradeCoinsCost) {
+    coins -= upgradeCoinsCost; // Ziehe 500 von coins ab und speichere das Ergebnis
+    upgradeCoins += 0.1; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
+    upgradeCoinsCost *= 0.2;
   }
   updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
+  updateUpgradeButtons();
+}
+
+function upgradeStrength() {
+  if (coins >= upgradeStrengthCost) {
+    coins -= upgradeStrengthCost; // Ziehe 500 von coins ab und speichere das Ergebnis
+    upgradStrength += 0.25; // Multipliziere upgrade mit 1.1 und speichere das Ergebnis
+    upgradeStrengthCost *= 0.2;
+  }
+  updateCoins(); // Aktualisiere die Anzeige oder Verarbeitung
+  updateUpgradeButtons();
 }
 
 
