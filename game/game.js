@@ -281,7 +281,7 @@ function player() {
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseInt(job.progress) || 0;
-  
+  progress += upgradeStrength;
 
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
   const progressPercentage = Math.min((progress / job.work) * 100, 100);
@@ -290,7 +290,7 @@ function handlePlayerClick() {
 
   if (progress >= job.work) {
     currentPlayer = false;
-    coins += job.payment * upgradeCoins;
+    coins += job.payment *= upgradeCoins;
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
@@ -375,7 +375,7 @@ function assignJob(workerDiv, workerId) {
   currentWorker[workerId] = false;
   clearInterval(interval);
   delete activeIntervals[workerId];
-  coins += job.payment * upgradeCoins;
+  coins += job.payment *= upgradeCoins;
   workerDiv.dataset.job = "";
   workerDiv.innerHTML = "Kein Job";
   updateCoins();
