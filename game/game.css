@@ -11,13 +11,14 @@ p, h1, h2 {
   justify-content: center;
   align-items: center;
   position: fixed;
-  top: env(safe-area-inset-top, 0); /* Sicherer Bereich für iOS */
+  top: env(safe-area-inset-top, 0);
   left: 0;
   width: 100%;
-  height: calc(var(--base-size) * 2.75);
-  background-color: #444;
+  height: calc(var(--base-size) * 2.5);
+  border-bottom: solid var(--color) calc(var(--base-size) * 0.1);
+  background-color: rgba(20,20,20,0.5);
   overflow-x: auto;
-  z-index: 1000; /* Stellt sicher, dass sie über anderen Elementen liegt */
+  z-index: 998;
 }
 
 .blur {
@@ -29,6 +30,21 @@ p, h1, h2 {
   z-index: 999;
   backdrop-filter: blur(3.5px);
   display: none;
+}
+
+.ui {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(var(--base-size) * 2.5);
+  background-color: rgba(20,20,20,0.5);
+  border-top: solid var(--color) calc(var(--base-size) * 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 998;
+  
 }
 
 
@@ -55,12 +71,14 @@ p, h1, h2 {
 
 .window {
   position: absolute;
-  top: calc(var(--base-size) * 2.75 + env(safe-area-inset-top, 0));
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #1A1A1A, #2A2A2A, #3A3A3A);
+  background: linear-gradient(180deg, #1A1A1A, #3A3A3A);
   overflow-y: auto;
+  padding-top: calc(var(--base-size) * 2.5);
+  padding-bottom: calc(var(--base-size) * 2.5);
 }
 
 #orders {
@@ -81,7 +99,6 @@ p, h1, h2 {
   border-radius: calc(var(--base-size) * 0.5);
   margin: calc(var(--base-size) * 0.25);
   font-size: calc(var(--base-size) * 0.8);
-  position: relative;
 }
 .passive {
   border: calc(var(--base-size) * 0.15) solid #555;
@@ -96,32 +113,55 @@ p, h1, h2 {
   background-color: #333;
 }
 .worker {
-  width: calc(var(--base-size) * 10);
+  position: relative;
+  width: calc(var(--base-size) * 10.5);
   height: calc(var(--base-size) * 15);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   border: calc(var(--base-size) * 0.1) solid var(--color);
   background-color: #222;
   border-radius: calc(var(--base-size) * 0.5);
   margin: calc(var(--base-size) * 0.25);
   font-size: calc(var(--base-size) * 0.8);
-  position: relative;
+  overflow: hidden;
+}
+.worker-status {
+  width: calc(var(--base-size) * 10.5);
+  height: calc(var(--base-size) * 0.4);
+  margin-top: 0;
+  margin-bottom: calc(var(--base-size) * 0.5);
+  border-bottom: solid var(--color) calc(var(--base-size) * 0.075);
+  background-color: #2E7D32;
+}
+.worker-header {
+  font-size: calc(var(--base-size) * 1.2);
+  margin: 0;
+  margin: bottom: calc(var(--base-size) * 0.5)
 }
 .worker-field {
-  width: calc(var(--base-size) * 8);
-  height: calc(var(--base-size) * 6);
+  position: relative;
+  width: calc(var(--base-size) * 8.5);
+  height: calc(var(--base-size) * 5.5);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: calc(var(--base-size) * 0.15) solid #555;
   background-color: #444;
-  border-radius: calc(var(--base-size) * 0.5);
-  margin: calc(var(--base-size) * 0.25);
+  border-radius: calc(var(--base-size) * 0.6);
+  margin: calc(var(--base-size) * 0.4);
   font-size: calc(var(--base-size) * 0.8);
-  position: relative;
+  overflow: hidden;
+}
+.improve-worker {
+  width: calc(var(--base-size) * 8);
+  height: calc(var(--base-size) * 2.5);
+  background-color: #444;
+  color: var(--color);
+  font-weight: bold;
+  border: none;
+  border-radius: calc(var(--base-size) * 0.5);
+  margin-top: calc(var(--base-size) * 0.5);
 }
 .selector-container {
   position: absolute;
@@ -155,14 +195,6 @@ p, h1, h2 {
   border: solid green calc(var(--base-size) * 0.15);
   border-radius: calc(var(--base-size) * 1);
 }
-.worker-status {
-  width: calc(var(--base-size) * 1.5);
-  height: calc(var(--base-size) * 1.5);
-  border-radius: 50%;
-  margin-top: calc(var(--base-size) * 0.2);
-  margin-bottom: calc(var(--base-size) * 0.4);
-  background-color: green;
-}
     #player  {
       width: 150px;
       height: 150px;
@@ -177,14 +209,16 @@ p, h1, h2 {
     }
     .progress-bar {
       width: 100%;
-      height: 10px;
-      background-color: red;
+      height: calc(var(--base-size) * 0.5);
+      border-top: solid var(--color) calc(var(--base-size) * 0.05);
+      background-color: rgba(80,80,80,50);
       position: absolute;
       bottom: 0;
       left: 0;
     }
     .progress-bar-fill {
       height: 100%;
-      background-color: green;
+      background-color: var(--color);
       width: 0;
     }
+    
