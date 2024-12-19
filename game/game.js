@@ -265,15 +265,10 @@ function handleJobClick(order) {
    blur.style.display = "block";
 
    selectorContainer.addEventListener("click", (event) => {
-  // Überprüfen, ob der Klick nicht auf den selector war
   if (!selector.contains(event.target)) {
-    // Auf display: none setzen
-    selectorContainer.style.display = "none";
-    selector.style.display = "none";
-    blur.style.display = "none";
+    fadeOutSelector();
   }
 });
-
   
    const playerButton = document.getElementById("selectorPlayer");
 if (currentPlayer) {
@@ -297,6 +292,22 @@ for (const workerId in currentWorker) {
     }
   }
 
+}
+
+function fadeOutSelector() {
+  selectorContainer.classList.add("fade-out-selector");
+  selector.classList.add("fade-out-selector");
+  blur.classList.add("fade-out-selector");
+
+  setTimeout(() => {
+    selectorContainer.style.display = "none";
+    selector.style.display = "none";
+    blur.style.display = "none";
+
+    selectorContainer.classList.remove("fade-out-selector");
+    selector.classList.remove("fade-out-selector");
+    blur.classList.remove("fade-out-selector");
+  }, 200);
 }
 
 function player() {
