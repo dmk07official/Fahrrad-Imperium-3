@@ -308,7 +308,7 @@ function fadeOutSelector() {
     selector.classList.remove("fade-out-selector");
     blur.classList.remove("fade-out-selector");
 
-    selectorContainer.style.opacity = 1";
+    selectorContainer.style.opacity = "1";
     selector.style.opacity = "1";
     blur.style.opacity = "1";
   }, 200);
