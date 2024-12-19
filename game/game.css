@@ -196,6 +196,18 @@ p, h1, h2 {
   border: solid green calc(var(--base-size) * 0.15);
   border-radius: calc(var(--base-size) * 1);
 }
+.fade-out-selector {
+    animation: fadeOutSelector 0.2s forwards;
+  }
+
+  @keyframes fadeOutSelector {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
     #player  {
       width: 150px;
       height: 150px;
