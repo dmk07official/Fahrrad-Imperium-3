@@ -264,6 +264,16 @@ function handleJobClick(order) {
    const blur = document.getElementById("blur");
    blur.style.display = "block";
 
+   selectorContainer.addEventListener("click", (event) => {
+  // Überprüfen, ob der Klick nicht auf den selector war
+  if (!selector.contains(event.target)) {
+    // Auf display: none setzen
+    selectorContainer.style.display = "none";
+    selector.style.display = "none";
+    blur.style.display = "none";
+  }
+});
+
   
    const playerButton = document.getElementById("selectorPlayer");
 if (currentPlayer) {
