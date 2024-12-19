@@ -1,11 +1,14 @@
 //Speichern, Laden, Variablen
 let coins = 0;
+let upgrade = 1;
 let upgradeCoins = 1;
 let upgradeCoinsCost = 10;
 let upgradeStrength = 1;
-let upgradeStrengthCost = 10;
+let upgradeStrengthCost = 50;
+let day = 1;
+let month = 1;
+let year = 2050;
 
-// Individuelle Intervalle für Worker
 const workerIntervals = {
   worker1: 800,
   worker2: 800,
@@ -14,7 +17,6 @@ const workerIntervals = {
   worker5: 800,
 };
 
-// Upgrade-Kosten für Worker
 const workerUpgradeCost = {
   worker1: 100,
   worker2: 100,
@@ -32,6 +34,9 @@ function saveProgress() {
     upgradeStrengthCost,
     workerIntervals,
     workerUpgradeCost,
+    day,
+    month,
+    year,
   };
 
   localStorage.setItem('progress', JSON.stringify(progress));
@@ -45,15 +50,24 @@ function loadProgress() {
     upgradeCoinsCost = progress.upgradeCoinsCost || 10;
     upgradeStrength = progress.upgradeStrength || 1;
     upgradeStrengthCost = progress.upgradeStrengthCost || 10;
+    day = progress.day || 1;
+    month = progress.month || 1;
+    year = progress.year || 2050;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
   updateCoins();
+  updateDate();
   updateWorkerButtons();
   updateUpgradeButtons();
+  startSaveInterval();
 }
 
-// Funktion zur Aktualisierung der Upgrade-Buttons
+function updateCoins() {
+        
+document.getElementById('coins').textContent = formatNumber(coins);
+        }
+
 function updateWorkerButtons() {
   for (const workerId in workerUpgradeCost) {
     const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
@@ -68,11 +82,38 @@ function updateUpgradeButtons() {
   document.getElementById('upgradeStrengthCost').textContent = formatNumber(upgradeStrengthCost);
 }
 
-// Beim Laden der Seite Progress laden
+function startSaveInterval() {
+  setInterval(() => {
+    saveProgress();
+  }, 1000);
+}
+
 loadProgress();
-        
 
 // Basic JS
+
+function updateDate() {
+    const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+    
+    const currentDateElement = document.getElementById('currentDate');
+    const formattedDate = `${day}.${month + 1}.${year}`; 
+    currentDateElement.textContent = formattedDate;
+
+    day++;
+
+    if (day > daysInMonth) {
+        day = 1;
+        month++;
+
+        if (month > 11) {
+            month = 0;
+            year++;
+        }
+    }
+}
+
+setInterval(updateDate, 5000);
+
 function toggleActiveWindowChoose(buttonId) {
     document.querySelectorAll('.window-choose-button').forEach(button => {
         button.classList.remove('active');
@@ -106,12 +147,6 @@ function formatNumber(number) {
 
     return (number.toFixed(2) + suffixes[i]).replace('.00', '');
 }
-
-// Update
-
-function updateCoins() {
-document.getElementById('coins').textContent = formatNumber(coins);
-        }
 
 // Werkstatt
 
@@ -231,22 +266,22 @@ function handleJobClick(order) {
   
    const playerButton = document.getElementById("selectorPlayer");
 if (currentPlayer) {
-    playerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
-    playerButton.style.color = "red";
+    playerButton.style.border = "solid #C62828 calc(var(--base-size) * 0.15)";
+    playerButton.style.color = "#C62828";
 } else {
-    playerButton.style.border = "solid green calc(var(--base-size) * 0.15)";
-    playerButton.style.color = "green";
+    playerButton.style.border = "solid #2E7D32 calc(var(--base-size) * 0.15)";
+    playerButton.style.color = "#2E7D32";
 }
 
 for (const workerId in currentWorker) {
     const workerButton = document.getElementById(`selectorWorker${workerId.slice(-1)}`);
     if (workerButton) {
       if (currentWorker[workerId]) {
-        workerButton.style.border = "solid red calc(var(--base-size) * 0.15)";
-        workerButton.style.color = "red";
+        workerButton.style.border = "solid #C62828 calc(var(--base-size) * 0.15)";
+        workerButton.style.color = "#C62828";
       } else {
-        workerButton.style.border = "solid green calc(var(--base-size) * 0.15)";
-        workerButton.style.color = "green";
+        workerButton.style.border = "solid #2E7D32 calc(var(--base-size) * 0.15)";
+        workerButton.style.color = "#2E7D32";
       }
     }
   }
@@ -290,12 +325,11 @@ function handlePlayerClick() {
 
   if (progress >= job.work) {
     currentPlayer = false;
-    coins += job.payment *= upgradeCoins;
+    coins += job.payment * upgradeCoins;
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
     updateCoins();
-    saveProgress();
   } else {
     playerDiv.dataset.job = JSON.stringify({ ...job, progress });
   }
@@ -304,31 +338,31 @@ function handlePlayerClick() {
 function worker1() {
   assignJob(workerDivs.worker1, "worker1");
   const status = document.getElementById("workerStatus1");
-  status.style.backgroundColor = "red";
+  status.style.backgroundColor = "#C62828";
 }
 
 function worker2() {
   assignJob(workerDivs.worker2, "worker2");
   const status = document.getElementById("workerStatus2");
-  status.style.backgroundColor = "red";
+  status.style.backgroundColor = "#C62828";
 }
 
 function worker3() {
   assignJob(workerDivs.worker3, "worker3");
   const status = document.getElementById("workerStatus3");
-  status.style.backgroundColor = "red";
+  status.style.backgroundColor = "#C62828";
 }
 
 function worker4() {
   assignJob(workerDivs.worker4, "worker4");
   const status = document.getElementById("workerStatus4");
-  status.style.backgroundColor = "red";
+  status.style.backgroundColor = "#C62828";
 }
 
 function worker5() {
   assignJob(workerDivs.worker5, "worker5");
   const status = document.getElementById("workerStatus5");
-  status.style.backgroundColor = "red";
+  status.style.backgroundColor = "#C62828";
 }
 
 
@@ -370,16 +404,15 @@ function assignJob(workerDiv, workerId) {
     if (progress >= job.work) {
   const statusFinished = document.getElementById(`workerStatus${workerId.slice(-1)}`);
   if (statusFinished) {
-    statusFinished.style.backgroundColor = "green";
+    statusFinished.style.backgroundColor = "#2E7D32";
   }
   currentWorker[workerId] = false;
   clearInterval(interval);
   delete activeIntervals[workerId];
-  coins += job.payment *= upgradeCoins;
+  coins += job.payment * upgradeCoins;
   workerDiv.dataset.job = "";
   workerDiv.innerHTML = "Kein Job";
   updateCoins();
-  saveProgress();
 }
 
   }, workerIntervals[workerId]);
@@ -404,83 +437,40 @@ function extractJobData(order) {
 
 //upgrade
 
-function upgradeCoins() {
+function buyUpgradeCoins() {
   if (coins >= upgradeCoinsCost) {
     coins -= upgradeCoinsCost;
     upgradeCoins += 0.1;
-    upgradeCoinsCost *= 1.2;
+    upgradeCoinsCost *= 1.1;
   }
   updateCoins();
   updateUpgradeButtons();
 }
 
-function upgradeStrength() {
+function buyUpgradeStrength() {
   if (coins >= upgradeStrengthCost) {
     coins -= upgradeStrengthCost;
     upgradeStrength += 0.25;
-    upgradeStrengthCost *= 1.2;
+    upgradeStrengthCost *= 1.1;
   }
   updateCoins();
   updateUpgradeButtons();
 }
 
-
 // Tastatur Kürzel
 
-let isAssignMode = false;
-
-// Job Auswahl mit 1-5
 function setupKeyListeners() {
   document.addEventListener("keydown", (event) => {
     const key = event.key;
-
-    // Überprüfen, ob das Werkstatt-Window aktiv ist
-    const werkstattActive = document.getElementById("werkstatt").style.display === "block";
-
-    if (key.toLowerCase() === "s") {
-      isAssignMode = true; // S gedrückt halten aktiviert den Zuweisungsmodus
-    }
-
     if (!isNaN(key) && key >= 1 && key <= orders.length) {
       const index = key - 1;
       const order = orders[index];
-
       if (order && order.classList.contains("job")) {
-        if (isAssignMode) {
-          // Wenn S gedrückt wird, Aufträge zuweisen
-          assignOrderToWorkerOrPlayer(order, key);
-        } else {
-          // Ansonsten Auftrag nur auswählen
-          handleJobClick(order);
-        }
+        handleJobClick(order);
       }
     }
-
-    // Key "6" für Player-Zuweisung
-    if (key === "6" && isAssignMode && selectedOrder) {
-      player();
-    }
-  });
-
-  document.addEventListener("keyup", (event) => {
-    if (event.key.toLowerCase() === "s") {
-      isAssignMode = false; // S loslassen deaktiviert den Zuweisungsmodus
-    }
   });
 }
 
-function assignOrderToWorkerOrPlayer(order, key) {
-  const workerId = `worker${key}`;
-  const workerDiv = workerDivs[workerId];
-
-  if (workerDiv) {
-    assignJob(workerDiv, workerId); // Auftrag an den entsprechenden Worker zuweisen
-  } else if (key === "6") {
-    player(); // Auftrag an den Spieler zuweisen
-  }
-}
-
-
-
-// Rufe diese Funktion am Ende des Skripts auf, um die Tastenevents zu initialisieren
 setupKeyListeners();
+
