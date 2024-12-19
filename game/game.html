@@ -41,6 +41,11 @@
       <button class="window-choose-button" id="einstellungen" onclick="toggleActiveWindowChoose('einstellungen')">Einstellungen</button>
       <button class="window-choose-button" onclick="openMenu">Hauptmenü</button>
     </div>
+    
+    <div class="ui">
+      <p>Coins<span id="coins">0</span></p>
+      <p><span id="currentDate"></span></p>
+    </div>
       
       <div class="window" id="windowWerkstatt" style="display: block">
         <h2 class="window-header">Werkstatt</h2>
@@ -61,37 +66,37 @@
   
   <div class="worker">
     <div id="workerStatus1" class="worker-status"></div>
-    <h2>Mitarbeiter 1</h2>
+    <h2 class="worker-header">Mitarbeiter 1</h2>
   <div class="worker-field" id="worker1"><p>Kein Job</p></div>
-  <button id="workerUpgrade_worker1" onclick="upgradeWorker('worker1')">Ausbilden:100€</button>
+  <button class="improve-worker" id="workerUpgrade_worker1" onclick="upgradeWorker('worker1')">Ausbilden: 100€</button>
   </div>
   
   <div class="worker">
     <div id="workerStatus2" class="worker-status"></div>
-    <h2>Mitarbeiter 2</h2>
+    <h2 class="worker-header">Mitarbeiter 2</h2>
   <div class="worker-field" id="worker2"><p>Kein Job</p></div>
-  <button id="workerUpgrade_worker2" onclick="upgradeWorker('worker2')">Ausbilden: 100€</button>
+  <button class="improve-worker" id="workerUpgrade_worker2" onclick="upgradeWorker('worker2')">Ausbilden: 100€</button>
   </div>
   
   <div class="worker">
     <div id="workerStatus3" class="worker-status"></div>
-    <h2>Mitarbeiter 3</h2>
+    <h2 class="worker-header">Mitarbeiter 3</h2>
   <div class="worker-field" id="worker3"><p>Kein Job</p></div>
-  <button id="workerUpgrade_worker3" onclick="upgradeWorker('worker3')">Ausbilden: 100€</button>
+  <button class="improve-worker" id="workerUpgrade_worker3" onclick="upgradeWorker('worker3')">Ausbilden: 100€</button>
   </div>
   
   <div class="worker">
     <div id="workerStatus4" class="worker-status"></div>
-    <h2>Mitarbeiter 4</h2>
+    <h2 class="worker-header">Mitarbeiter 4</h2>
   <div class="worker-field" id="worker4"><p>Kein Job</p></div>
-  <button id="workerUpgrade_worker4" onclick="upgradeWorker('worker4')">Ausbilden: 100€</button>
+  <button class="improve-worker" id="workerUpgrade_worker4" onclick="upgradeWorker('worker4')">Ausbilden: 100€</button>
   </div>
   
   <div class="worker">
     <div id="workerStatus5" class="worker-status"></div>
-    <h2>Mitarbeiter 5</h2>
+    <h2 class="worker-header">Mitarbeiter 5</h2>
   <div class="worker-field" id="worker5"><p>Kein Job</p></div>
- <button id="workerUpgrade_worker5" onclick="upgradeWorker('worker5')">Ausbilden: 100€</button>
+ <button class="improve-worker" id="workerUpgrade_worker5" onclick="upgradeWorker('worker5')">Ausbilden: 100€</button>
   </div>
 </div>
 
@@ -106,22 +111,14 @@
 </div>      
 </div>
 
-        <div class="ui">
-      <p>Coins<span id="coins">0</span></p>
-    </div>
-
 </div>
       
       <div class="window" id="windowUpgrades" style="display: none">
         <h2 class="window-header">Upgrades</h2>
         <p>Bezahlung verbessern um Faktor 0.1</p>
-        <button class="upgrade-button" id="upgradeCoins" onclick="upgradeCoins()"><span id="upgradeCoinsCost">10</span></button>
+        <button class="upgrade-button" id="upgradeCoins" onclick="buyUpgradeCoins()"><span id="upgradeCoinsCost">10</span></button>
         <p>Tippstärke verbessern um Faktor 0.25</p>
-        <button class="upgrade-button" id="upgradeStrength" onclick="upgradeStrength()"><span id="upgradeStrengthCost">10</span></button>
-
-        <div class="ui">
-      <p>Coins<span id="coins">0</span></p>
-    </div>
+        <button class="upgrade-button" id="upgradeStrength" onclick="buyUpgradeStrength()"><span id="upgradeStrengthCost">50</span></button>
       </div>
       
       <div class="window" id="windowTeileLieferant" style="display: none">        
