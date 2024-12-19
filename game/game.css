@@ -1,5 +1,6 @@
 body {
-  text-align: center
+  text-align: center;
+  background-color: #222;
 }
 
 p, h1, h2 {
