@@ -219,7 +219,7 @@ function startLoading(index) {
       spawnJob(order);
       findNextPassiveJob();
     }
-  }, 1000);
+  }, 500);
 }
 
 function findNextPassiveJob() {
