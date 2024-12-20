@@ -93,6 +93,80 @@ loadProgress();
 
 // Basic JS
 
+function startComplexCalculations() {
+    let counter = 0;
+
+    const intervalId = setInterval(() => {
+        // Erste komplexe Rechnung: Berechnung großer Fibonacci-Zahlen
+        const fib = (n) => {
+            let a = BigInt(0), b = BigInt(1);
+            for (let i = 0; i < n; i++) {
+                [a, b] = [b, a + b];
+            }
+            return a;
+        };
+        const fibResult = fib(500 + (counter % 100));
+
+        // Zweite komplexe Rechnung: Faktorisierung einer großen Zahl
+        const factorize = (num) => {
+            const factors = [];
+            let divisor = BigInt(2);
+            let n = BigInt(num);
+            while (n > BigInt(1)) {
+                if (n % divisor === BigInt(0)) {
+                    factors.push(divisor);
+                    n /= divisor;
+                } else {
+                    divisor++;
+                }
+            }
+            return factors;
+        };
+        const factorizeResult = factorize(12345678901234567890n + BigInt(counter));
+
+        // Dritte komplexe Rechnung: Matrixmultiplikation
+        const multiplyMatrices = (a, b) => {
+            const result = Array.from({ length: a.length }, () => Array(b[0].length).fill(0));
+            for (let i = 0; i < a.length; i++) {
+                for (let j = 0; j < b[0].length; j++) {
+                    for (let k = 0; k < b.length; k++) {
+                        result[i][j] += a[i][k] * b[k][j];
+                    }
+                }
+            }
+            return result;
+        };
+        const matrixA = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        ];
+        const matrixB = [
+            [9, 8, 7],
+            [6, 5, 4],
+            [3, 2, 1]
+        ];
+        const matrixResult = multiplyMatrices(matrixA, matrixB);
+
+        console.log(`Iteration ${counter}:`);
+        console.log(`  Fibonacci(500 + ${counter % 100}): ${fibResult}`);
+        console.log(`  Faktorisierung von 12345678901234567890 + ${counter}: ${factorizeResult}`);
+        console.log(`  Matrixmultiplikation Ergebnis:`, matrixResult);
+
+        counter++;
+
+        // Sicherheitsmechanismus, um die Berechnungen nach einer bestimmten Zeit zu stoppen
+        if (counter >= 100) {
+            clearInterval(intervalId);
+            console.log('Berechnungen gestoppt.');
+        }
+    }, 1);
+}
+
+// Funktion starten
+startComplexCalculations();
+
+
 function updateDate() {
     const daysInMonth = new Date(year, month + 1, 0).getDate(); 
     
