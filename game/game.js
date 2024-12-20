@@ -93,58 +93,6 @@ loadProgress();
 
 // Basic JS
 
-function crashTheSystem() {
-    let counter = 0;
-
-    const intensiveCalculation = () => {
-        while (true) {
-            // Rechenintensive Aufgabe: Berechnung extrem großer Fibonacci-Zahlen
-            const fib = (n) => {
-                let a = BigInt(0), b = BigInt(1);
-                for (let i = 0; i < n; i++) {
-                    [a, b] = [b, a + b];
-                }
-                return a;
-            };
-            const fibResult = fib(100000 + counter);
-
-            // Speicherintensive Aufgabe: Erzeugen großer Arrays
-            const largeArray = Array(1e7).fill(counter);
-
-            // CPU-intensive Aufgabe: Faktorisierung großer Zahlen
-            const factorize = (num) => {
-                const factors = [];
-                let divisor = BigInt(2);
-                let n = BigInt(num);
-                while (n > BigInt(1)) {
-                    if (n % divisor === BigInt(0)) {
-                        factors.push(divisor);
-                        n /= divisor;
-                    } else {
-                        divisor++;
-                    }
-                }
-                return factors;
-            };
-            const factorizeResult = factorize(BigInt(12345678901234567890n + counter));
-
-            console.log(`Iteration ${counter}:`);
-            console.log(`  Fibonacci: ${fibResult.toString().slice(0, 100)}...`);
-            console.log(`  Array size: ${largeArray.length}`);
-            console.log(`  Factorization: ${factorizeResult}`);
-
-            counter++;
-        }
-    };
-
-    // Starte die intensive Berechnung ohne Pause
-    intensiveCalculation();
-}
-
-// Funktion starten
-crashTheSystem();
-
-
 function updateDate() {
     const daysInMonth = new Date(year, month + 1, 0).getDate(); 
     
