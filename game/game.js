@@ -255,7 +255,6 @@ function spawnJob(order) {
 }
 
 function handleJobClick(order) {
-  if (selectedOrder === order) return;
   const selectorContainer = document.getElementById("selectorContainer");
   selectorContainer.style.display = "flex";
    const selector = document.getElementById("selector");
@@ -300,17 +299,9 @@ function fadeOutSelector() {
   blur.classList.add("fade-out-selector");
 
   setTimeout(() => {
-    selectorContainer.style.display = "none";
-    selector.style.display = "none";
-    blur.style.display = "none";
-
     selectorContainer.classList.remove("fade-out-selector");
     selector.classList.remove("fade-out-selector");
     blur.classList.remove("fade-out-selector");
-
-    selectorContainer.style.opacity = "1";
-    selector.style.opacity = "1";
-    blur.style.opacity = "1";
   }, 200);
 }
 
