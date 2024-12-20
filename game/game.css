@@ -201,13 +201,18 @@ p, h1, h2 {
   }
 
   @keyframes fadeOutSelector {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
+  0% {
+    opacity: 1;
   }
+  99% {
+    opacity: 0;
+  }
+  100% {
+    display: none;
+    opacity: 1;
+  }
+}
+
     #player  {
       width: 150px;
       height: 150px;
