@@ -1,120 +1,44 @@
-//Speichern, Laden, Variablen
-let coins = 0;
-let upgrade = 1;
-let upgradeCoins = 1;
-let upgradeCoinsCost = 10;
-let upgradeStrength = 1;
-let upgradeStrengthCost = 50;
-let day = 1;
-let month = 1;
-let year = 2050;
-
-const workerIntervals = {
-  worker1: 800,
-  worker2: 800,
-  worker3: 800,
-  worker4: 800,
-  worker5: 800,
+let state = {
+  coins: 0,
+  upgradeCoins: 1, upgradeCoinsCost: 10, upgradeStrength: 1, upgradeStrengthCost: 50,
+  day: 1, month: 1, year: 2050,
+  workerIntervals: { worker1: 800, worker2: 800, worker3: 800, worker4: 800, worker5: 800 },
+  workerUpgradeCost: { worker1: 100, worker2: 100, worker3: 100, worker4: 100, worker5: 100 }
 };
 
-const workerUpgradeCost = {
-  worker1: 100,
-  worker2: 100,
-  worker3: 100,
-  worker4: 100,
-  worker5: 100,
-};
-
-function saveProgress() {
-  const progress = {
-    coins,
-    upgradeCoins,
-    upgradeCoinsCost,
-    upgradeStrength,
-    upgradeStrengthCost,
-    workerIntervals,
-    workerUpgradeCost,
-    day,
-    month,
-    year,
-  };
-
-  localStorage.setItem('progress', JSON.stringify(progress));
-}
+// Speichern und Laden
+function saveProgress() { localStorage.setItem('progress', JSON.stringify(state)); }
 
 function loadProgress() {
-  const progress = JSON.parse(localStorage.getItem('progress'));
-  if (progress) {
-    coins = progress.coins || 0;
-    upgradeCoins = progress.upgradeCoins || 1;
-    upgradeCoinsCost = progress.upgradeCoinsCost || 10;
-    upgradeStrength = progress.upgradeStrength || 1;
-    upgradeStrengthCost = progress.upgradeStrengthCost || 10;
-    day = progress.day || 1;
-    month = progress.month || 1;
-    year = progress.year || 2050;
-    Object.assign(workerIntervals, progress.workerIntervals || {});
-    Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
-  }
-  updateCoins();
-  updateDate();
-  updateWorkerButtons();
-  updateUpgradeButtons();
-  startSaveInterval();
+  const savedState = JSON.parse(localStorage.getItem('progress'));
+  if (savedState) state = { ...state, ...savedState };
+  updateUI();
+  setInterval(saveProgress, 1000);
 }
 
-function updateCoins() {
-        
-document.getElementById('coins').textContent = formatNumber(coins);
-        }
-
-function updateWorkerButtons() {
-  for (const workerId in workerUpgradeCost) {
-    const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
-    if (upgradeButton) {
-      const formattedCost = formatNumber(workerUpgradeCost[workerId]);
-      upgradeButton.innerHTML = `Ausbilden:<br>${formattedCost}€`;
-    }
+// UI-Aktualisierungen
+function updateUI() {
+  document.getElementById('coins').textContent = formatNumber(state.coins);
+  document.getElementById('upgradeCoinsCost').textContent = formatNumber(state.upgradeCoinsCost);
+  document.getElementById('upgradeStrengthCost').textContent = formatNumber(state.upgradeStrengthCost);
+  document.getElementById('currentDate').textContent = `${state.day}.${state.month + 1}.${state.year}`;
+  for (const workerId in state.workerUpgradeCost) {
+    const button = document.getElementById(`workerUpgrade_${workerId}`);
+    if (button) button.innerHTML = `Ausbilden:<br>${formatNumber(state.workerUpgradeCost[workerId])}€`;
   }
 }
 
-function updateUpgradeButtons() {
-  document.getElementById('upgradeCoinsCost').textContent = formatNumber(upgradeCoinsCost);
-  document.getElementById('upgradeStrengthCost').textContent = formatNumber(upgradeStrengthCost);
-}
-
-function startSaveInterval() {
-  setInterval(() => {
-    saveProgress();
-  }, 1000);
+// Datum
+function updateDate() {
+  const daysInMonth = new Date(state.year, state.month + 1, 0).getDate();
+  if (++state.day > daysInMonth) { state.day = 1; if (++state.month > 11) { state.month = 0; state.year++; } }
+  document.getElementById('currentDate').textContent = `${state.day}.${state.month + 1}.${state.year}`;
 }
 
 loadProgress();
-
-// Basic JS
-
-function updateDate() {
-    const daysInMonth = new Date(year, month + 1, 0).getDate(); 
-    
-    const currentDateElement = document.getElementById('currentDate');
-    const formattedDate = `${day}.${month + 1}.${year}`; 
-    currentDateElement.textContent = formattedDate;
-
-    day++;
-
-    if (day > daysInMonth) {
-        day = 1;
-        month++;
-
-        if (month > 11) {
-            month = 0;
-            year++;
-        }
-    }
-}
-
 setInterval(updateDate, 5000);
 
+// Basic JS
 function toggleActiveWindowChoose(buttonId) {
     document.querySelectorAll('.window-choose-button').forEach(button => {
         button.classList.remove('active');
