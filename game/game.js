@@ -261,7 +261,7 @@ function handleJobClick(order) {
    selector.style.display = "flex";
    selectedOrder = order;
    const blur = document.getElementById("blur");
-   blur.style.display = "block";
+   //blur.style.display = "block";
 
    selectorContainer.addEventListener("click", (event) => {
   if (!selector.contains(event.target)) {
