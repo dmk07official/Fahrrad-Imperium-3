@@ -1,44 +1,117 @@
-let state = {
-  coins: 0,
-  upgradeCoins: 1, upgradeCoinsCost: 10, upgradeStrength: 1, upgradeStrengthCost: 50,
-  day: 1, month: 1, year: 2050,
-  workerIntervals: { worker1: 800, worker2: 800, worker3: 800, worker4: 800, worker5: 800 },
-  workerUpgradeCost: { worker1: 100, worker2: 100, worker3: 100, worker4: 100, worker5: 100 }
+//Speichern, Laden, Variablen
+let coins = 0;
+let upgrade = 1;
+let upgradeCoins = 1, upgradeCoinsCost = 10;
+let upgradeStrength = 1, upgradeStrengthCost = 50;
+let day = 1, month = 1, year = 2050;
+
+const workerIntervals = {
+  worker1: 800, worker2: 800, worker3: 800, worker4: 800, worker5: 800,
 };
 
-// Speichern und Laden
-function saveProgress() { localStorage.setItem('progress', JSON.stringify(state)); }
+const workerUpgradeCost = {
+  worker1: 100, worker2: 100, worker3: 100, worker4: 100, worker5: 100,
+};
 
-function loadProgress() {
-  const savedState = JSON.parse(localStorage.getItem('progress'));
-  if (savedState) state = { ...state, ...savedState };
-  updateUI();
-  setInterval(saveProgress, 1000);
+function saveProgress() {
+  const progress = {
+    coins,
+    upgradeCoins, upgradeCoinsCost,
+    upgradeStrength, upgradeStrengthCost,
+    workerIntervals,
+    workerUpgradeCost,
+    day, month, year,
+  };
+
+  localStorage.setItem('progress', JSON.stringify(progress));
 }
 
-// UI-Aktualisierungen
-function updateUI() {
-  document.getElementById('coins').textContent = formatNumber(state.coins);
-  document.getElementById('upgradeCoinsCost').textContent = formatNumber(state.upgradeCoinsCost);
-  document.getElementById('upgradeStrengthCost').textContent = formatNumber(state.upgradeStrengthCost);
-  document.getElementById('currentDate').textContent = `${state.day}.${state.month + 1}.${state.year}`;
-  for (const workerId in state.workerUpgradeCost) {
-    const button = document.getElementById(`workerUpgrade_${workerId}`);
-    if (button) button.innerHTML = `Ausbilden:<br>${formatNumber(state.workerUpgradeCost[workerId])}€`;
+function loadProgress() {
+  const progress = JSON.parse(localStorage.getItem('progress'));
+  if (progress) {
+    coins = progress.coins || 0;
+    upgradeCoins = progress.upgradeCoins || 1;
+    upgradeCoinsCost = progress.upgradeCoinsCost || 10;
+    upgradeStrength = progress.upgradeStrength || 1;
+    upgradeStrengthCost = progress.upgradeStrengthCost || 10;
+    day = progress.day || 1;
+    month = progress.month || 1;
+    year = progress.year || 2050;
+    Object.assign(workerIntervals, progress.workerIntervals || {});
+    Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
+  }
+  updateCoins();
+  updateDate();
+  updateWorkerButtons();
+  updateUpgradeButtons();
+  startSaveInterval();
+}
+
+function updateCoins() {
+        
+document.getElementById('coins').textContent = formatNumber(coins);
+        }
+
+function formatNumber(number) {
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'];
+    
+    let i = 0;
+    while (number >= 1e3 && i < suffixes.length - 1) {
+        number /= 1e3;
+        i++;
+    }
+
+    return (number.toFixed(2) + suffixes[i]).replace('.00', '');
+}
+
+function updateWorkerButtons() {
+  for (const workerId in workerUpgradeCost) {
+    const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
+    if (upgradeButton) {
+      const formattedCost = formatNumber(workerUpgradeCost[workerId]);
+      upgradeButton.innerHTML = `Ausbilden:<br>${formattedCost}€`;
+    }
   }
 }
 
-// Datum
-function updateDate() {
-  const daysInMonth = new Date(state.year, state.month + 1, 0).getDate();
-  if (++state.day > daysInMonth) { state.day = 1; if (++state.month > 11) { state.month = 0; state.year++; } }
-  document.getElementById('currentDate').textContent = `${state.day}.${state.month + 1}.${state.year}`;
+function updateUpgradeButtons() {
+  document.getElementById('upgradeCoinsCost').textContent = formatNumber(upgradeCoinsCost);
+  document.getElementById('upgradeStrengthCost').textContent = formatNumber(upgradeStrengthCost);
 }
 
+function startSaveInterval() {
+  setInterval(() => {
+    saveProgress();
+  }, 1000);
+}
+
+//startSaveInterval();
 loadProgress();
+
+function updateDate() {
+    const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+    
+    const currentDateElement = document.getElementById('currentDate');
+    const formattedDate = `${day}.${month + 1}.${year}`; 
+    currentDateElement.textContent = formattedDate;
+
+    day++;
+
+    if (day > daysInMonth) {
+        day = 1;
+        month++;
+
+        if (month > 11) {
+            month = 0;
+            year++;
+        }
+    }
+}
+
 setInterval(updateDate, 5000);
 
 // Basic JS
+
 function toggleActiveWindowChoose(buttonId) {
     document.querySelectorAll('.window-choose-button').forEach(button => {
         button.classList.remove('active');
@@ -61,28 +134,12 @@ function toggleActiveWindowChoose(buttonId) {
     }
 }
 
-function formatNumber(number) {
-    const suffixes = ['', 'K', 'M', 'B', 'T', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'];
-    
-    let i = 0;
-    while (number >= 1e3 && i < suffixes.length - 1) {
-        number /= 1e3;
-        i++;
-    }
-
-    return (number.toFixed(2) + suffixes[i]).replace('.00', '');
-}
-
 // Werkstatt
 
 let selectedOrder = null;
 let currentPlayer = false;
 let currentWorker = {
-  worker1: false,
-  worker2: false,
-  worker3: false,
-  worker4: false,
-  worker5: false,
+  worker1: false, worker2: false, worker3: false, worker4: false, worker5: false,
 };
 
 function upgradeWorker(workerId) {
@@ -91,16 +148,11 @@ function upgradeWorker(workerId) {
     if (coins >= workerUpgradeCost[workerId]) {
       coins -= workerUpgradeCost[workerId];
       workerIntervals[workerId] *= 0.8;
-      workerUpgradeCost[workerId] *= 10;
-
-      const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
-      if (upgradeButton) {
-        upgradeButton.textContent = `Aufwerten: ${workerUpgradeCost[workerId]}€`;
-      }
-      
+      workerUpgradeCost[workerId] *= 10;      
       updateCoins();
+      updateWorkerButtons();
     } else {
-      alert("Nicht genug € für die Ausblidung!");
+      alert("Nicht genug € für eine Ausblidung!");
     }
   } 
 }
@@ -143,7 +195,7 @@ function startLoading(index) {
       spawnJob(order);
       findNextPassiveJob();
     }
-  }, 500);
+  }, 1000);
 }
 
 function findNextPassiveJob() {
@@ -179,27 +231,25 @@ function spawnJob(order) {
 }
 
 function handleJobClick(order) {
+  if (selectedOrder === order) return;
   const selectorContainer = document.getElementById("selectorContainer");
   selectorContainer.style.display = "flex";
    const selector = document.getElementById("selector");
    selector.style.display = "flex";
    selectedOrder = order;
    const blur = document.getElementById("blur");
-   //blur.style.display = "block";
+   blur.style.display = "block";
 
-   selectorContainer.addEventListener("click", (event) => {
-  if (!selector.contains(event.target)) {
-    fadeOutSelector();
-  }
-});
   
    const playerButton = document.getElementById("selectorPlayer");
 if (currentPlayer) {
     playerButton.style.border = "solid #C62828 calc(var(--base-size) * 0.15)";
     playerButton.style.color = "#C62828";
+    playerButton.disabled = true;
 } else {
     playerButton.style.border = "solid #2E7D32 calc(var(--base-size) * 0.15)";
     playerButton.style.color = "#2E7D32";
+    playerButton.disabled = false; 
 }
 
 for (const workerId in currentWorker) {
@@ -208,25 +258,15 @@ for (const workerId in currentWorker) {
       if (currentWorker[workerId]) {
         workerButton.style.border = "solid #C62828 calc(var(--base-size) * 0.15)";
         workerButton.style.color = "#C62828";
+        workerButton.disabled = true; 
       } else {
         workerButton.style.border = "solid #2E7D32 calc(var(--base-size) * 0.15)";
         workerButton.style.color = "#2E7D32";
+        workerButton.disabled = false; 
       }
     }
   }
 
-}
-
-function fadeOutSelector() {
-  selectorContainer.classList.add("fade-out-selector");
-  selector.classList.add("fade-out-selector");
-  blur.classList.add("fade-out-selector");
-
-  setTimeout(() => {
-    selectorContainer.classList.remove("fade-out-selector");
-    selector.classList.remove("fade-out-selector");
-    blur.classList.remove("fade-out-selector");
-  }, 200);
 }
 
 function player() {
@@ -376,7 +416,7 @@ function extractJobData(order) {
   };
 }
 
-//upgrade
+// Upgrade
 
 function buyUpgradeCoins() {
   if (coins >= upgradeCoinsCost) {
@@ -414,3 +454,4 @@ function setupKeyListeners() {
 }
 
 setupKeyListeners();
+
