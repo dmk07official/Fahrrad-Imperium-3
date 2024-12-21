@@ -1,6 +1,19 @@
+  html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   text-align: center;
-  background-color: #222;
+  background-color: #333;
 }
 
 p, h1, h2 {
@@ -71,15 +84,13 @@ p, h1, h2 {
 }
 
 .window {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   background: linear-gradient(180deg, #1A1A1A, #3A3A3A);
   overflow-y: auto;
   padding-top: calc(var(--base-size) * 2.5);
   padding-bottom: calc(var(--base-size) * 2.5);
+  box-sizing: border-box;
 }
 
 #orders {
@@ -186,33 +197,30 @@ p, h1, h2 {
   align-items: center;
   justify-content: center;
 }
+.worker-selector {
+  width: 77%;
+  margin: 1%;
+  margin-left: 2%;
+  background-color: #444;
+  border-radius: calc(var(--base-size) * 1);
+}
+.player-selector {
+  width: 17%;
+  margin: 1%;
+  margin-right: 2%;
+  background-color: #444;
+  border-radius: calc(var(--base-size) * 1);
+}
 .selector-button {
-  width: calc(var(--base-size) * 6.5);
+  width: calc(var(--base-size) * 5);
   height: calc(var(--base-size) * 10);
   background-color: #333;
   font-weight: bold;
-  margin: calc(var(--base-size) * 0.5);
+  margin: calc(var(--base-size) * 0.25);
   color: green;
   border: solid green calc(var(--base-size) * 0.15);
   border-radius: calc(var(--base-size) * 1);
 }
-.fade-out-selector {
-    animation: fadeOutSelector 0.2s forwards;
-  }
-
-  @keyframes fadeOutSelector {
-  0% {
-    opacity: 1;
-  }
-  99% {
-    opacity: 0;
-  }
-  100% {
-    display: none;
-    opacity: 1;
-  }
-}
-
     #player  {
       width: 150px;
       height: 150px;
