@@ -3,9 +3,7 @@
 const CACHE_NAME = 'site-assets-v1';
 const REQUIRED_FILES = [
     'green-arrow.png',
-    '/images/image2.jpg',
     'background-game.mp3',
-    '/audio/audio2.mp3',
 ];
 
 async function checkAndInstallFiles() {
