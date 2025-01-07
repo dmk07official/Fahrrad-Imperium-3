@@ -18,11 +18,11 @@
       <button class="window-choose-button active" id="werkstatt" onclick="toggleActiveWindowChoose('werkstatt')">Werkstatt</button>
       <button class="window-choose-button" id="upgrades" onclick="toggleActiveWindowChoose('upgrades')">Upgrades</button>
       <button class="window-choose-button" id="teileLieferant" onclick="toggleActiveWindowChoose('teileLieferant')">Teile Lieferant</button>
-      <button class="window-choose-button" id="faehigkeitenbaum" onclick="toggleActiveWindowChoose('faehigkeitenbaum')">Fähigkeitenbaum</button>
+      <button class="window-choose-button" id="prestige" onclick="toggleActiveWindowChoose('prestige')">Prestige</button>
       <button class="window-choose-button" id="clans" onclick="toggleActiveWindowChoose('clans')">Clans</button>
       <button class="window-choose-button" id="quests" onclick="toggleActiveWindowChoose('quests')">Quests</button>
       <button class="window-choose-button" id="einstellungen" onclick="toggleActiveWindowChoose('einstellungen')">Einstellungen</button>
-      <button class="window-choose-button" onclick="openMenu">Hauptmenü</button>
+      <button class="window-choose-button" onclick="openMenu()">Hauptmenü</button>
     </div>
     
     <div class="ui">
@@ -32,25 +32,41 @@
       
       <div class="window" id="windowWerkstatt" style="display: block">
         <h2 class="window-header">Werkstatt</h2>
+ 
+<div class="top-line">
        
-<div id="orders">
+<div class="orders-half">
+<div class="order-container">
+  <div class="orders-row">
   <div id="order1" class="order passive">Passiv</div>
   <div id="order2" class="order passive">Passiv</div>
   <div id="order3" class="order passive">Passiv</div>
+  </div>
+  <div class="orders-row">
   <div id="order4" class="order passive">Passiv</div>
   <div id="order5" class="order passive">Passiv</div>
+  <div id="order6" class="order passive">Passiv</div>
+  </div>
+</div>
 </div>
 
-<div id="orders">
-  <div id="player">Spieler: Kein Job</div>
+<div class="players-half">
+  <div class="player">
+    <div id="playerStatus" class="player-status"></div>
+    <h2 class="player-header">Spieler</h2>
+  <div class="player-field" id="player">Kein Job</div>
+  </div>
 </div>
 
-<div id="orders">
+</div>
+
+<div id="workers">
   
   <div class="worker">
     <div id="workerStatus1" class="worker-status"></div>
     <h2 class="worker-header">Mitarbeiter 1</h2>
   <div class="worker-field" id="worker1"><p>Kein Job</p></div>
+  <p>Klicks pro Sekunde <span id="workerTimeDisplay1"></span></p>
   <button class="improve-worker" id="workerUpgrade_worker1" onclick="upgradeWorker('worker1')">Ausbilden: 100€</button>
   </div>
   
@@ -58,6 +74,7 @@
     <div id="workerStatus2" class="worker-status"></div>
     <h2 class="worker-header">Mitarbeiter 2</h2>
   <div class="worker-field" id="worker2"><p>Kein Job</p></div>
+  <p>Klicks pro Sekunde <span id="workerTimeDisplay2"></span></p>
   <button class="improve-worker" id="workerUpgrade_worker2" onclick="upgradeWorker('worker2')">Ausbilden: 100€</button>
   </div>
   
@@ -65,6 +82,7 @@
     <div id="workerStatus3" class="worker-status"></div>
     <h2 class="worker-header">Mitarbeiter 3</h2>
   <div class="worker-field" id="worker3"><p>Kein Job</p></div>
+  <p>Klicks pro Sekunde <span id="workerTimeDisplay3"></span></p>
   <button class="improve-worker" id="workerUpgrade_worker3" onclick="upgradeWorker('worker3')">Ausbilden: 100€</button>
   </div>
   
@@ -72,6 +90,7 @@
     <div id="workerStatus4" class="worker-status"></div>
     <h2 class="worker-header">Mitarbeiter 4</h2>
   <div class="worker-field" id="worker4"><p>Kein Job</p></div>
+  <p>Klicks pro Sekunde <span id="workerTimeDisplay4"></span></p>
   <button class="improve-worker" id="workerUpgrade_worker4" onclick="upgradeWorker('worker4')">Ausbilden: 100€</button>
   </div>
   
@@ -79,6 +98,7 @@
     <div id="workerStatus5" class="worker-status"></div>
     <h2 class="worker-header">Mitarbeiter 5</h2>
   <div class="worker-field" id="worker5"><p>Kein Job</p></div>
+  <p>Klicks pro Sekunde <span id="workerTimeDisplay5"></span></p>
  <button class="improve-worker" id="workerUpgrade_worker5" onclick="upgradeWorker('worker5')">Ausbilden: 100€</button>
   </div>
 </div>
@@ -101,21 +121,82 @@
 </div>
       
       <div class="window" id="windowUpgrades" style="display: none">
+        
         <h2 class="window-header">Upgrades</h2>
-        <p>Bezahlung verbessern um Faktor 0.1</p>
-        <button class="upgrade-button" id="upgradeCoins" onclick="buyUpgradeCoins()"><span id="upgradeCoinsCost">10</span></button>
-        <p>Tippstärke verbessern um Faktor 0.25</p>
-        <button class="upgrade-button" id="upgradeStrength" onclick="buyUpgradeStrength()"><span id="upgradeStrengthCost">50</span></button>
+        <p>Bezahlung von Spieler verbessern um 5%</p>
+        <button class="upgrade-button" id="upgradeCoinsPlayer" onclick="buyUpgradeCoinsPlayer()"><span id="upgradeCoinsPlayerCost">10</span></button>
+        
+        <p>Bezahlung von Mitarbeitern verbessern um 5%</p>
+        <button class="upgrade-button" id="upgradeCoinsWorker" onclick="buyUpgradeCoinsWorker()"><span id="upgradeCoinsWorkerCost">10</span></button>
+        
+        <p>Bezahlung verbessern um 10%</p>
+        <button class="upgrade-button" id="upgradeCoins" onclick="buyUpgradeCoins()"><span id="upgradeCoinsCost">50</span></button>
+        
+        <p>Tippstärke verbessern um 0.5</p>
+        <button class="upgrade-button" id="upgradeStrength" onclick="buyUpgradeStrength()"><span id="upgradeStrengthCost">100</span></button>
+        
+        <p>Jobsuche Stufe I&II verkürzen um 1 Sekunde</p>
+        <button class="upgrade-button" id="upgradeJob" onclick="buyUpgradeJob()"><span id="upgradeJobCost">250</span></button>
       </div>
       
       <div class="window" id="windowTeileLieferant" style="display: none">        
         <h2 class="window-header">Teile Lieferant</h2>
+              
+        <h2 id="deliveryName">BikeParts GmbH</h2>
+             
+        <div class="loyal-container">
+        <p id="localCustomerStatus">365 Tage bis loyaler Kunde</p>
+        </div>
+             
+        <p>Qualität</p>
+        <div class="custom-progress-bar-quality">
+        <div class="custom-progress-fill-quality" id="progressFillQuality"></div>
+        <div class="percent-container"><p class="custom-percent-quality"><span id="qualityLevelPercent">50</span></p></div>
+        </div>
+
+        <p>Kosten</p>
+        <div class="custom-progress-bar-cost">
+        <div class="custom-progress-fill-cost" id="progressFillCost"></div>
+        <div class="percent-container"><p class="custom-percent-cost"><span id="costLevelPercent">50</span></p></div>
+        </div>
+             
+        <button id="changeCustomFill"><span>Neuen Lieferanten suchen</span> <br> <span>25K</span>
+        </button>
         
+    
+    
       </div>
       
-      <div class="window" id="windowFaehigkeitenbaum" style="display: none">
-        <h2 class="window-header">Fähigkeitenbaum</h2>
+      <div class="window" id="windowPrestige" style="display: none">
+        <h2 class="window-header">Prestige</h2>
         
+        <div class="prestige-container">
+          <div class="prestige-half">
+          
+          <p>Anzahl Prestige <br>
+          <span id="prestigeCount"></span>
+          <img class="prestige-green-arrow" src="green-arrow.png">
+          <span id="newPrestigeCount"></span>
+          </p>
+          
+          <p>Multiplikator <br>
+          <span id="prestigeMultiplier"></span>
+          <span><img class="prestige-green-arrow" src="green-arrow.png"></span>
+          <span id="newPrestigeMultiplier"></span>
+          </p>
+          
+          <p>Kosten <br>
+          <span id="prestigeCost"></span>
+          </p>
+          
+          <button onclick="buyPrestige()">Nächsten Schritt</button>
+          </div>
+          <div class="prestige-line"></div>
+          <div class="prestige-half">
+            
+          </div>
+          
+        </div>        
       </div>
       
       <div class="window" id="windowClans" style="display: none">
