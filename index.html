@@ -1,13 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="de">
+  <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spiel-Launcher</title>
-</head>
-<body>
-    <h1>Willkommen zu Fahrrad Imperium!</h1>
-    <p>Klicke unten, um das Spiel zu starten:</p>
-    <a href="game/game.html">Spiel starten</a>
-</body>
+    <meta name="viewport" content="width=1000, user-scalable=no">
+    <meta name="description" content="Fahrrad Imperium: Eine neue Welt, ist ein Web basiertes Klicker/Story Spiel mit Multiplayer Elementen.">
+    <meta name="keywords" content="Fahrrad Imperium, Fahrrad Imperium 2, Fahrrad Imperium: Eine neue Welt, Fahrrad Spiel Online,">
+    <meta name="author" content="Dein Fahrrad Imperium Team">    
+    <title>Fahrrad Imperium / Menü</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../global-css-variables.css">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>  
+  </head>
+  <body>
+    
+    <div id="loadingScreen"></div>
+    
+    <div id="blur" class="blur"></div>
+    
+    <div class="fade-in" id="fadeIn"></div>  
+    
+    <div class="duo-container">
+      
+      <img src="index/tiktok-logo.png" class="tiktok-button" onclick="openTiktok()"> 
+      <img src="index/discord-logo.png" class="discord-button" onclick="openDiscord()">
+
+      <div id="particles-js"></div>
+  
+      <div class="logo-container">
+        <h2 class="header">Fahrrad Imperium World</h2>    
+        <h2 class="sub-header">Tipp dich reich</h2>
+        <img src="index/logo.png" class="logo">
+      </div>
+      
+      <div class="parent-container">
+        <div class="button-container">
+          <button class="menu-button" onclick="startGame()">Spielen</button>
+          
+          <button class="menu-button" onclick="openPopup('popupNews')">Neues</button>
+          
+         
+        </div>
+      </div>
+    </div>
+  
+    <div id="popupNews" class="popup-news">
+      <div class="popup-content-news">
+        <h2 class="news-header">Neues</h2>
+          <div class="news-container">
+            <p class="version-info">12.08.2024</p>
+            <p class="news">- Es werden noch Sprecher für Radio Voicelines im Hauptspiel gesucht. Bei Interesse via Discord melden.</p>
+            <p class="version-info">12.08.2024</p>
+            <p class="news">- Fahrrad Imperium World ist nun verfügbar. Zeit diesen Weg erneut zu gehen und zur größten Fahrradwerkstatt der Welt zu werden.</p>  
+      </div>
+    </div>
+    <p class="close-tab-info">Tippe außerhalb zum schließen</p>
+  </div>
+  
+  
+    </div>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="index.js"></script>
+  </body>
 </html>
