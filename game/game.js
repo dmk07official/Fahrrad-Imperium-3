@@ -356,6 +356,16 @@ function handleJobClick(order) {
 
     document.body.style.overflow = 'hidden';
 
+    selectorContainer.addEventListener("click", (event) => {
+      if (!selector.contains(event.target)) {
+    selectorContainer.style.display = "none";
+    selector.style.display = "none";
+    blur.style.display = "none";
+    document.body.style.overflow = "";
+    selectedOrder = null;
+      }
+    });
+
     const playerButton = document.getElementById("selectorPlayer");
     if (currentPlayer) {
       playerButton.style.border = "solid #C62828 calc(var(--base-size) * 0.15)";
