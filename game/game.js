@@ -43,7 +43,6 @@ let upgradeStrength = 1, upgradeStrengthCost = 100;
 let upgradeJob = 10, upgradeJobCost = 250;
 let day = 1, month = 1, year = 2050;
 let qualityValue = 1, costValue = 1;
-let maxQuality = 1.5, maxCost = 1.5;     
 let loyalCustomerActivated = false;
 let loyalCustomerCounter = 0;       
 let buttonCooldown = false;
@@ -72,7 +71,6 @@ function saveProgress() {
     qualityValue, costValue,        
     loyalCustomerCounter,
     loyalCustomerActivated,      
-    maxQuality, maxCost, 
     supplierName,
   };
 
@@ -103,8 +101,6 @@ function loadProgress() {
     costValue = progress.costValue || 1;
     loyalCustomerCounter = progress.loyalCustomerCounter || 0;
     loyalCustomerActivated = progress.loyalCustomerActivated;
-    maxQuality = progress.maxQuality || 1.5;
-    maxCost = progress.maxCost || 1.5;
     supplierName = progress.supplierName;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
@@ -714,7 +710,7 @@ function changeCustomFill() {
             updateCoins();
 
             buttonCooldown = true;
-            let countdown = 30;
+            let countdown = 10;
             let buttonElement = document.getElementById("changeCustomFill");
 
             let countdownInterval = setInterval(function() {
@@ -726,7 +722,7 @@ function changeCustomFill() {
                     buttonElement.innerHTML = '<span>Neuen Lieferanten suchen</span> <br> <span>25K</span>';
                     clearInterval(countdownInterval);
                 }
-            }, 1000);
+            }, 5000);
 
             const supplierNames = ["BikeCare GmbH", "CyclingTech", "WheelWorks AG", "GearUp GmbH", "BikePro KG", "Barans Fahrradteile", "RideSmart GmbH", "PedalPower GmbH", "Die Bike-Profis", "CycleSolutions Logistik", "RideEasy GmbH", "PedalPusher AG", "RideMate OHG", "BikeGenius GmbH", "DLH Group", "Lieferino", "Gubi Fortnite"];
             const randomIndex = Math.floor(Math.random() * supplierNames.length);
@@ -750,8 +746,8 @@ function checkLoyalCustomerStatus() {
     const localCustomerStatusElement = document.getElementById('localCustomerStatus');
 
     if (!loyalCustomerActivated && loyalCustomerCounter >= 365) {
-        qualityValue = Math.min(1.5, qualityValue + 0.1);
-        costValue = Math.min(1.5, costValue + 0.1);
+        qualityValu += 0.1;
+        costValue += 0.1;
 
         updateBarWithAnimation('progressFillQuality', qualityValue);
         updateBarWithAnimation('progressFillCost', costValue);
@@ -773,7 +769,7 @@ function checkLoyalCustomerStatus() {
 setInterval(() => {
     loyalCustomerCounter += 1;
     checkLoyalCustomerStatus();
-}, 1000);
+}, 5000);
 
 // Prestige 
 
