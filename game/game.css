@@ -281,6 +281,16 @@ p, h1, h2 {
   border: solid green calc(var(--base-size) * 0.15);
   border-radius: calc(var(--base-size) * 1);
 }
+.delivery-button {
+  width: calc(var(--base-size) * 8);
+  height: calc(var(--base-size) * 2.5);
+  background-color: #444;
+  color: var(--color);
+  font-weight: bold;
+  border: none;
+  border-radius: calc(var(--base-size) * 0.5);
+  margin-top: calc(var(--base-size) * 0.5);
+}
 .progress-bar {
   width: 100%;
   height: calc(var(--base-size) * 0.5);
