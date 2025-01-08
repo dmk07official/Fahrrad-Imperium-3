@@ -711,6 +711,7 @@ function changeCustomFill() {
             hidePercentages();
             updateUpgradeButtons();
             updatePrestige();
+            updateCoins();
 
             buttonCooldown = true;
             let countdown = 30;
