@@ -47,8 +47,8 @@ let loyalCustomerActivated = false;
 let loyalCustomerCounter = 0;       
 let buttonCooldown = false;
 let supplierName = "BikeParts GmbH";
-let probabilitySuccess = 80;
-const minimumProbability = 70;
+let probabilitySuccess = 70;
+const minimumProbability = 30;
 
 const workerIntervals = {
   worker1: 665, worker2: 665, worker3: 665, worker4: 665, worker5: 665,
@@ -710,13 +710,14 @@ function changeCustomFill() {
             loyalCustomerActivated = false;
             localCustomerStatusElement.textContent = `${365 - loyalCustomerCounter} Tage bis loyaler Kunde`;
 
-            probabilitySuccess = 80;
+            probabilitySuccess = 70;
 
             checkLoyalCustomerStatus();
             updateBarWithAnimation('progressFillQuality', qualityValue);
             updateBarWithAnimation('progressFillCost', costValue);
             hidePercentages();
             updateUpgradeButtons();
+            updateGamble();
             updatePrestige();
             updateCoins();
 
@@ -785,11 +786,11 @@ setInterval(() => {
 function gambleDelivery() {
   const gamble = Math.random() * 100 < probabilitySuccess;
             if (gamble) {
-                qualityValue += 0.1;
-                costValue += 0.1;
+                qualityValue += 0.05;
+                costValue += 0.05;
             } else {
-                qualityValue -= 0.2;
-                costValue -= 0.2;
+                qualityValue -= 0.1;
+                costValue -= 0.1;
                 if (qualityValue < 0.5) {
                 qualityValue = 0.5;
                 }
@@ -799,7 +800,7 @@ function gambleDelivery() {
             }
 
             if (probabilitySuccess > minimumProbability) {
-                probabilitySuccess -= 10;
+                probabilitySuccess -= 5;
             }
             updateBarWithAnimation('progressFillQuality', qualityValue);
             updateBarWithAnimation('progressFillCost', costValue);
