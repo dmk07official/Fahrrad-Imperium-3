@@ -790,11 +790,11 @@ function gambleDelivery() {
             } else {
                 qualityValue -= 0.2;
                 costValue -= 0.2;
-                if (qualityValue < 0) {
-                qualityValue = 0;
+                if (qualityValue < 0.5) {
+                qualityValue = 0.5;
                 }
-                if (costValue < 0) {
-                costValue = 0;
+                if (costValue < 0.5) {
+                costValue = 0.5;
                 }
             }
 
