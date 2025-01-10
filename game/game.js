@@ -111,6 +111,7 @@ function loadProgress() {
   }
   updateCoins();
   updatePrestige();
+  updateGamble();
   updateDate();
   updateWorkerDisplay();
   updateWorkerButtons();
@@ -140,7 +141,7 @@ document.getElementById('prestigeMultiplier').textContent = formatNumber(prestig
 document.getElementById('newPrestigeMultiplier').textContent = formatNumber(prestigeMultiplier * 2);
 document.getElementById('prestigeCost').textContent = formatNumber(prestigeCost / costValue);
         }
-function updatePrestige() {
+function updateGamble() {
 document.getElementById('gambleWin').textContent = formatNumber(probabilitySucces);
 document.getElementById('gambleLose').textContent = formatNumber(100 - probabilitySucces);
         }
