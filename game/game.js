@@ -140,6 +140,10 @@ document.getElementById('prestigeMultiplier').textContent = formatNumber(prestig
 document.getElementById('newPrestigeMultiplier').textContent = formatNumber(prestigeMultiplier * 2);
 document.getElementById('prestigeCost').textContent = formatNumber(prestigeCost / costValue);
         }
+function updatePrestige() {
+document.getElementById('gambleWin').textContent = formatNumber(probabilitySucces);
+document.getElementById('gambleLose').textContent = formatNumber(100 - probabilitySucces);
+        }
 
 function formatNumber(number) {
     const suffixes = ['', 'K', 'M', 'B', 'T', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'];
@@ -752,7 +756,7 @@ function checkLoyalCustomerStatus() {
     const localCustomerStatusElement = document.getElementById('localCustomerStatus');
 
     if (!loyalCustomerActivated && loyalCustomerCounter >= 365) {
-        qualityValu += 0.1;
+        qualityValue += 0.1;
         costValue += 0.1;
 
         updateBarWithAnimation('progressFillQuality', qualityValue);
@@ -790,6 +794,13 @@ function gambleDelivery() {
             if (probabilitySuccess > minimumProbability) {
                 probabilitySuccess -= 10;
             }
+            updateBarWithAnimation('progressFillQuality', qualityValue);
+            updateBarWithAnimation('progressFillCost', costValue);
+            hidePercentages();
+            updateUpgradeButtons();
+            updateGamble();
+            updatePrestige();
+            updateCoins();
         }
 
 // Prestige 
