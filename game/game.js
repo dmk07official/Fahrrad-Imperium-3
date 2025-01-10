@@ -47,6 +47,8 @@ let loyalCustomerActivated = false;
 let loyalCustomerCounter = 0;       
 let buttonCooldown = false;
 let supplierName = "BikeParts GmbH";
+let probabilitySuccess = 80;
+const minimumProbability = 20;
 
 const workerIntervals = {
   worker1: 665, worker2: 665, worker3: 665, worker4: 665, worker5: 665,
@@ -72,6 +74,7 @@ function saveProgress() {
     loyalCustomerCounter,
     loyalCustomerActivated,      
     supplierName,
+    probabilitySuccess,
   };
 
   localStorage.setItem('FI3test5', JSON.stringify(progress));
@@ -102,6 +105,7 @@ function loadProgress() {
     loyalCustomerCounter = progress.loyalCustomerCounter || 0;
     loyalCustomerActivated = progress.loyalCustomerActivated;
     supplierName = progress.supplierName;
+    probabilitySuccess = progress.probabilitySuccess || 80;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
@@ -701,6 +705,8 @@ function changeCustomFill() {
             loyalCustomerActivated = false;
             localCustomerStatusElement.textContent = `${365 - loyalCustomerCounter} Tage bis loyaler Kunde`;
 
+            probabilitySuccess = 80;
+
             checkLoyalCustomerStatus();
             updateBarWithAnimation('progressFillQuality', qualityValue);
             updateBarWithAnimation('progressFillCost', costValue);
@@ -770,6 +776,21 @@ setInterval(() => {
     loyalCustomerCounter += 1;
     checkLoyalCustomerStatus();
 }, 5000);
+
+function gambleDelivery() {
+  const gamble = Math.random() * 100 < probabilitySuccess;
+            if (gamble) {
+                qualityValue += 0.1;
+                costValue += 0.1;
+            } else {
+                qualityValue -= 0.2;
+                costValue -= 0.2;
+            }
+
+            if (probabilitySuccess > minimumProbability) {
+                probabilitySuccess -= 10;
+            }
+        }
 
 // Prestige 
 
