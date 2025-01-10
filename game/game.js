@@ -790,6 +790,12 @@ function gambleDelivery() {
             } else {
                 qualityValue -= 0.2;
                 costValue -= 0.2;
+                if (qualityValue < 0) {
+                qualityValue = 0;
+                }
+                if (costValue < 0) {
+                costValue = 0;
+                }
             }
 
             if (probabilitySuccess > minimumProbability) {
