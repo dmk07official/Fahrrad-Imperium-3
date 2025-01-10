@@ -48,7 +48,7 @@ let loyalCustomerCounter = 0;
 let buttonCooldown = false;
 let supplierName = "BikeParts GmbH";
 let probabilitySuccess = 80;
-const minimumProbability = 20;
+const minimumProbability = 80;
 
 const workerIntervals = {
   worker1: 665, worker2: 665, worker3: 665, worker4: 665, worker5: 665,
