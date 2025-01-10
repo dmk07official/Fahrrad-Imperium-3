@@ -143,7 +143,7 @@ document.getElementById('prestigeCost').textContent = formatNumber(prestigeCost 
         }
 function updateGamble() {
 document.getElementById('gambleWin').textContent = formatNumber(probabilitySucces);
-document.getElementById('gambleLose').textContent = formatNumber(100 - probabilitySucces);
+document.getElementById('gambleLose').textContent = formatNumber(100 -= probabilitySucces);
         }
 
 function formatNumber(number) {
