@@ -142,9 +142,9 @@ document.getElementById('newPrestigeMultiplier').textContent = formatNumber(pres
 document.getElementById('prestigeCost').textContent = formatNumber(prestigeCost / costValue);
         }
 function updateGamble() {
-document.getElementById('gambleWin').textContent = formatNumber(probabilitySucces);
-document.getElementById('gambleLose').textContent = formatNumber(100 -= probabilitySucces);
-        }
+  document.getElementById('gambleWin').textContent = formatNumber(probabilitySuccess);
+  document.getElementById('gambleLose').textContent = formatNumber(100 - probabilitySuccess);
+}
 
 function formatNumber(number) {
     const suffixes = ['', 'K', 'M', 'B', 'T', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'];
