@@ -123,6 +123,9 @@ function loadProgress() {
   updatePercentageElements();
   checkLoyalCustomerStatus();
   updateDeliveryName();
+
+  startLoading(0);
+
   startSaveInterval();
   
   const backgroundMusic = new Howl({
@@ -285,8 +288,6 @@ const jobs = [
 ];
 
 const activeIntervals = {};
-
-startLoading(0);
 
 function startLoading(index) {
   const order = orders[index];
@@ -725,6 +726,7 @@ function changeCustomFill() {
             buttonCooldown = true;
             let countdown = 10;
             let buttonElement = document.getElementById("changeCustomFill");
+            buttonElement.innerText = `Warte noch ${countdown} Tage`;
 
             let countdownInterval = setInterval(function() {
                 buttonElement.innerText = `Warte noch ${countdown} Tage`;
@@ -802,10 +804,11 @@ function gambleDelivery() {
                 costValue = 0.5;
                 }
             }
-  }
             updateBarWithAnimation('progressFillQuality', qualityValue);
             updateBarWithAnimation('progressFillCost', costValue);
             hidePercentages();
+  }
+            
             updateUpgradeButtons();
             updateGamble();
             updatePrestige();
