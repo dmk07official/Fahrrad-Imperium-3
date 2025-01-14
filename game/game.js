@@ -47,8 +47,8 @@ let loyalCustomerActivated = false;
 let loyalCustomerCounter = 0;       
 let buttonCooldown = false;
 let supplierName = "BikeParts GmbH";
-let probabilitySuccess = 70;
-const minimumProbability = 30;
+let probabilitySuccess = 50;
+let gambleCost = 10000;
 
 const workerIntervals = {
   worker1: 665, worker2: 665, worker3: 665, worker4: 665, worker5: 665,
@@ -75,6 +75,7 @@ function saveProgress() {
     loyalCustomerActivated,      
     supplierName,
     probabilitySuccess,
+    gambleCost,
   };
 
   localStorage.setItem('FI3test5', JSON.stringify(progress));
@@ -105,7 +106,8 @@ function loadProgress() {
     loyalCustomerCounter = progress.loyalCustomerCounter || 0;
     loyalCustomerActivated = progress.loyalCustomerActivated;
     supplierName = progress.supplierName;
-    probabilitySuccess = progress.probabilitySuccess || 80;
+    probabilitySuccess = progress.probabilitySuccess || 50;
+    gambleCost = progress.gambleCost || 10000;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
@@ -142,8 +144,7 @@ document.getElementById('newPrestigeMultiplier').textContent = formatNumber(pres
 document.getElementById('prestigeCost').textContent = formatNumber(prestigeCost / costValue);
         }
 function updateGamble() {
-  document.getElementById('gambleWin').textContent = formatNumber(probabilitySuccess);
-  document.getElementById('gambleLose').textContent = formatNumber(100 - probabilitySuccess);
+  document.getElementById('gambleCost').textContent = formatNumber(gambleCost);
 }
 
 function formatNumber(number) {
@@ -710,7 +711,7 @@ function changeCustomFill() {
             loyalCustomerActivated = false;
             localCustomerStatusElement.textContent = `${365 - loyalCustomerCounter} Tage bis loyaler Kunde`;
 
-            probabilitySuccess = 70;
+            gambleCost = 10000;
 
             checkLoyalCustomerStatus();
             updateBarWithAnimation('progressFillQuality', qualityValue);
@@ -784,10 +785,13 @@ setInterval(() => {
 }, 5000);
 
 function gambleDelivery() {
+  if (coins >= gambleCost)
+      coins -= gambleCost;
+      gambleCost *= 10;
   const gamble = Math.random() * 100 < probabilitySuccess;
             if (gamble) {
-                qualityValue += 0.05;
-                costValue += 0.05;
+                qualityValue += 0.1;
+                costValue += 0.1;
             } else {
                 qualityValue -= 0.1;
                 costValue -= 0.1;
@@ -797,10 +801,6 @@ function gambleDelivery() {
                 if (costValue < 0.5) {
                 costValue = 0.5;
                 }
-            }
-
-            if (probabilitySuccess > minimumProbability) {
-                probabilitySuccess -= 5;
             }
             updateBarWithAnimation('progressFillQuality', qualityValue);
             updateBarWithAnimation('progressFillCost', costValue);
