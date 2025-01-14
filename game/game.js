@@ -51,11 +51,11 @@ let probabilitySuccess = 50;
 let gambleCost = 10000;
 
 const workerIntervals = {
-  worker1: 665, worker2: 665, worker3: 665, worker4: 665, worker5: 665,
+  worker1: 665, worker2: 665, worker3: 665, worker4: 665,
 };
 
 const workerUpgradeCost = {
-  worker1: 100, worker2: 100, worker3: 100, worker4: 100, worker5: 100,
+  worker1: 100, worker2: 100, worker3: 100, worker4: 100,
 };
 
 function saveProgress() {
@@ -251,7 +251,7 @@ function toggleActiveWindowChoose(buttonId) {
 let selectedOrder = null;
 let currentPlayer = false;
 let currentWorker = {
-  worker1: false, worker2: false, worker3: false, worker4: false, worker5: false,
+  worker1: false, worker2: false, worker3: false, worker4: false,
 };
 
 function upgradeWorker(workerId) {
@@ -278,7 +278,6 @@ const workerDivs = {
   worker2: document.getElementById("worker2"),
   worker3: document.getElementById("worker3"),
   worker4: document.getElementById("worker4"),
-  worker5: document.getElementById("worker5"),
 };
 
 const jobs = [
@@ -475,12 +474,6 @@ function worker3() {
 function worker4() {
   assignJob(workerDivs.worker4, "worker4");
   const status = document.getElementById("workerStatus4");
-  status.style.backgroundColor = "#C62828";
-}
-
-function worker5() {
-  assignJob(workerDivs.worker5, "worker5");
-  const status = document.getElementById("workerStatus5");
   status.style.backgroundColor = "#C62828";
 }
 
