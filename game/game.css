@@ -281,7 +281,7 @@ p, h1, h2 {
   border: solid green calc(var(--base-size) * 0.15);
   border-radius: calc(var(--base-size) * 1);
 }
-#changeCustomFill {
+.delivery-button {
   width: calc(var(--base-size) * 20);
   height: calc(var(--base-size) * 2.5);
   background-color: #444;
