@@ -785,7 +785,7 @@ setInterval(() => {
 }, 5000);
 
 function gambleDelivery() {
-  if (coins >= gambleCost)
+  if (coins >= gambleCost) {
       coins -= gambleCost;
       gambleCost *= 10;
   const gamble = Math.random() * 100 < probabilitySuccess;
@@ -802,6 +802,7 @@ function gambleDelivery() {
                 costValue = 0.5;
                 }
             }
+  }
             updateBarWithAnimation('progressFillQuality', qualityValue);
             updateBarWithAnimation('progressFillCost', costValue);
             hidePercentages();
