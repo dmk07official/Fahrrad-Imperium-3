@@ -444,7 +444,7 @@ function player() {
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseFloat(job.progress) || 0;
-  progress += upgradeStrengthI;
+  progress += upgradeStrengthPlayerI;
   progress = Math.round(progress * 10) / 10;
 
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
