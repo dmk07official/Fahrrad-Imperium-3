@@ -281,7 +281,7 @@ const workerDivs = {
 };
 
 const jobs = [
-  { name: "Job 1", work: 100000000, payment: 10 },
+  { name: "Job 1", work: 10, payment: 1000000000000000000000000000000000000000000000 },
   { name: "Job 2", work: 25, payment: (25 * 1.2) },
   { name: "Job 3", work: 50, payment: (50 * 1.4) },
   { name: "Job 4", work: 100, payment: (100 * 1.6) },
