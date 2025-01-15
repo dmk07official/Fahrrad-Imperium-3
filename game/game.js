@@ -72,7 +72,7 @@ function saveProgress() {
     upgradeJobI, upgradeJobCostI,
     upgradeCoinsII, upgradeCoinsCostII,
     upgradeCoinsPlayerII, upgradeCoinsPlayerCostII,
-    upgradeStrengthWorkerII, upgradeStrengthWorkerCostII
+    upgradeStrengthWorkerII, upgradeStrengthWorkerCostII,
     workerIntervals,
     workerUpgradeCost,
     day, month, year,
@@ -883,6 +883,8 @@ function buyPrestige() {
     upgradeCoinsCostII = 500;
     upgradeCoinsPlayerII = 1;
     upgradeCoinsPlayerCostII = 750;
+    upgradeStrengthWorkerII = 1;
+    upgradeStrengthWorkerCostII = 1000;
     saveProgress();
     location.reload();
   } else {
