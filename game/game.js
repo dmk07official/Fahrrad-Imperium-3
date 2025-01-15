@@ -560,7 +560,7 @@ function extractJobData(order) {
 
 //Anzeigen vom jetzigem Stand zu Neuem Stand mit Pfeil emoticon, größere Sprünge für infinite Upgrades bei besondern Zahlen, wie 10 25 50 100 250 500 1000
 
-function buyUpgradeCoinsPlayer() {
+function buyUpgradeCoinsPlayerI() {
   if (coins >= (upgradeCoinsPlayerCostI / costValue)) {
     coins -= (upgradeCoinsPlayerCostI / costValue);
     upgradeCoinsPlayerI += 0.05;
@@ -570,7 +570,7 @@ function buyUpgradeCoinsPlayer() {
   updateUpgradeButtons();
 }
 
-function buyUpgradeCoinsWorker() {
+function buyUpgradeCoinsWorkerI() {
   if (coins >= (upgradeCoinsWorkerCostI / costValue)) {
     coins -= (upgradeCoinsWorkerCostI / costValue);
     upgradeCoinsWorkerI += 0.05;
@@ -580,7 +580,7 @@ function buyUpgradeCoinsWorker() {
   updateUpgradeButtons();
 }
 
-function buyUpgradeCoins() {
+function buyUpgradeCoinsI() {
   if (coins >= (upgradeCoinsCostI / costValue)) {
     coins -= (upgradeCoinsCostI / costValue);
     upgradeCoinsI += 0.1;
@@ -590,7 +590,7 @@ function buyUpgradeCoins() {
   updateUpgradeButtons();
 }
 
-function buyUpgradeStrength() {
+function buyUpgradeStrengthPlayerI() {
   if (coins >= (upgradeStrengthCostI / costValue)) {
     coins -= (upgradeStrengthCostI / costValue);
     upgradeStrengthPlayerI += 0.5;
@@ -600,13 +600,13 @@ function buyUpgradeStrength() {
   updateUpgradeButtons();
 }
 
-function buyUpgradeJob() {
+function buyUpgradeJobI() {
   if (upgradeJobI == 1) {
       return;
   }
   if (coins >= (upgradeJobCostI / costValue)) {
     coins -= (upgradeJobCostI / costValue);
-    upgradeJob--;
+    upgradeJobI--;
     if (upgradeJobI <= 4) {
       upgradeJobCostI *= 30;
     } else if (upgradeJobI <= 7) {
