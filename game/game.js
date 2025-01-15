@@ -43,6 +43,7 @@ let upgradeStrengthPlayerI = 1, upgradeStrengthPlayerCostI = 100;
 let upgradeJobI = 10, upgradeJobCostI = 250;
 let upgradeCoinsII = 1, upgradeCoinsCostII = 500;
 let upgradeCoinsPlayerII = 1, upgradeCoinsPlayerCostII = 750;
+let upgradeStrengthWorkerII = 1, upgradeStrengthWorkerCostII = 1000;
 let day = 1, month = 1, year = 2050;
 let qualityValue = 1, costValue = 1;
 let loyalCustomerActivated = false;
@@ -71,6 +72,7 @@ function saveProgress() {
     upgradeJobI, upgradeJobCostI,
     upgradeCoinsII, upgradeCoinsCostII,
     upgradeCoinsPlayerII, upgradeCoinsPlayerCostII,
+    upgradeStrengthWorkerII, upgradeStrengthWorkerCostII
     workerIntervals,
     workerUpgradeCost,
     day, month, year,
@@ -106,6 +108,8 @@ function loadProgress() {
     upgradeCoinsCostII = progress.upgradeCoinsCostII || 500;
     upgradeCoinsPlayerII = progress.upgradeCoinsPlayerII || 1;
     upgradeCoinsPlayerCostII = progress.upgradeCoinsPlayerCostII || 750;
+    upgradeStrenthWorkerII = progress.upgradeStrengthWorkerII || 1;
+    upgradeStrengthWorkerCostII = progress.upgradeStrengthWorkerCostII || 1000;
     day = progress.day || 1;
     month = progress.month || 1;
     year = progress.year || 2050;
@@ -202,6 +206,7 @@ function updateUpgradeButtons() {
   document.getElementById('upgradeJobCostI').textContent = formatNumber(upgradeJobCostI / costValue);
   document.getElementById('upgradeCoinsCostII').textContent = formatNumber(upgradeCoinsCostII / costValue);
   document.getElementById('upgradeCoinsPlayerCostII').textContent = formatNumber(upgradeCoinsPlayerCostII / costValue); 
+  document.getElementById('upgradeStrengthWorkerCostII').textContent = formatNumber(upgradeStrengthWorkerCostII / costValue);
 }
 
 function startSaveInterval() {
@@ -521,7 +526,8 @@ function assignJob(workerDiv, workerId) {
 
   let progress = 0;
   const interval = setInterval(() => {
-    progress++;
+    progress += upgradeStrengthWorkerII;
+    progress = Math.round(progress * 10) / 10;
     const progressBarFill = workerDiv.querySelector(".progress-bar-fill");
     const progressPercentage = Math.min((progress / job.work) * 100, 100);
     progressBarFill.style.width = `${progressPercentage}%`;
@@ -644,6 +650,16 @@ function buyUpgradeCoinsPlayerII() {
     coins -= (upgradeCoinsPlayerCostII / costValue);
     upgradeCoinsPlayerII += 0.1;
     upgradeCoinsPlayerCostII *= 1.15;
+  }
+  updateCoins();
+  updateUpgradeButtons();
+}
+
+function buyUpgradeStrengthWorkerII() {
+  if (coins >= (upgradeStrengthWorkerCostII / costValue)) {
+    coins -= (upgradeStrengthWorkerCostII / costValue);
+    upgradeStrengthWorkerII += 0.1;
+    upgradeStrengthWorkerCostII *= 4;
   }
   updateCoins();
   updateUpgradeButtons();
