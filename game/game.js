@@ -309,7 +309,7 @@ function startLoading(index) {
   order.classList.add("loading");
   order.textContent = `Auftrag wird gesucht... ${upgradeJob}`;
 
-  let timer = upgradeJob;
+  let timer = upgradeJobI;
   const interval = setInterval(() => {
     timer--;
     order.textContent = `Auftrag wird gesucht... ${timer}`;
