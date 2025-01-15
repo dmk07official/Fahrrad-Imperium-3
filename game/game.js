@@ -444,7 +444,7 @@ function player() {
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseFloat(job.progress) || 0;
-  progress += upgradeStrength;
+  progress += upgradeStrengthI;
   progress = Math.round(progress * 10) / 10;
 
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
@@ -642,7 +642,7 @@ function buyUpgradeCoinsII() {
 function buyUpgradeCoinsPlayerII() {
   if (coins >= (upgradeCoinsPlayerCostII / costValue)) {
     coins -= (upgradeCoinsPlayerCostII / costValue);
-    upgradeCoinsPlayerII += 0.05;
+    upgradeCoinsPlayerII += 0.1;
     upgradeCoinsPlayerCostII *= 1.15;
   }
   updateCoins();
