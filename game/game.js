@@ -41,6 +41,8 @@ let upgradeCoinsWorkerI = 1, upgradeCoinsWorkerCostI = 10;
 let upgradeCoinsI = 1, upgradeCoinsCostI = 50;
 let upgradeStrengthPlayerI = 1, upgradeStrengthPlayerCostI = 100;
 let upgradeJobI = 10, upgradeJobCostI = 250;
+let upgradeCoinsII = 1, upgradeCoinsCostII = 500;
+let upgradeCoinsPlayerII = 1, upgradeCoinsPlayerCostII = 750;
 let day = 1, month = 1, year = 2050;
 let qualityValue = 1, costValue = 1;
 let loyalCustomerActivated = false;
@@ -62,11 +64,13 @@ function saveProgress() {
   const progress = {
     coins,
     prestigeCount, prestigeMultiplier, prestigeCost,
-    upgradeCoinsPlayer, upgradeCoinsPlayerCost,
-    upgradeCoinsWorker, upgradeCoinsWorkerCost,
-    upgradeCoins, upgradeCoinsCost,
-    upgradeStrength, upgradeStrengthCost,
-    upgradeJob, upgradeJobCost,
+    upgradeCoinsPlayerI, upgradeCoinsPlayerCostI,
+    upgradeCoinsWorkerI, upgradeCoinsWorkerCostI,
+    upgradeCoinsI, upgradeCoinsCostI,
+    upgradeStrengthPlayerI, upgradeStrengthPlayerCostI,
+    upgradeJobI, upgradeJobCostI,
+    upgradeCoinsII, upgradeCoinsCostII,
+    upgradeCoinsPlayerII, upgradeCoinsPlayerCostII,
     workerIntervals,
     workerUpgradeCost,
     day, month, year,
@@ -88,16 +92,20 @@ function loadProgress() {
     prestigeCount = progress.prestigeCount || 0;
     prestigeMultiplier = progress.prestigeMultiplier || 1;
     prestigeCost = progress.prestigeCost || 1000;
-    upgradeCoinsPlayer = progress.upgradeCoinsPlayer || 1;
-    upgradeCoinsPlayerCost = progress.upgradeCoinsPlayerCost || 10;
-    upgradeCoinsWorker = progress.upgradeCoinsWorker || 1;
-    upgradeCoinsWorkerCost = progress.upgradeCoinsWorkerCost || 10;
-    upgradeCoins = progress.upgradeCoins || 1;
-    upgradeCoinsCost = progress.upgradeCoinsCost || 50;
-    upgradeStrength = progress.upgradeStrength || 1;
-    upgradeStrengthCost = progress.upgradeStrengthCost || 100;
-    upgradeJob = progress.upgradeJob || 10;
-    upgradeJobCost = progress.upgradeJobCost || 250;
+    upgradeCoinsPlayerI = progress.upgradeCoinsPlayerI || 1;
+    upgradeCoinsPlayerCostI = progress.upgradeCoinsPlayerCostI || 10;
+    upgradeCoinsWorkerI = progress.upgradeCoinsWorkerI || 1;
+    upgradeCoinsWorkerCostI = progress.upgradeCoinsWorkerCostI || 10;
+    upgradeCoinsI = progress.upgradeCoinsI || 1;
+    upgradeCoinsCostI = progress.upgradeCoinsCostI || 50;
+    upgradeStrengthPlayerI = progress.upgradeStrengthPlayerI || 1;
+    upgradeStrengthPlayerCostI = progress.upgradeStrengthPlayerCostI || 100;
+    upgradeJobI = progress.upgradeJobI || 10;
+    upgradeJobCostI = progress.upgradeJobCostI || 250;
+    upgradeCoinsII = progress.upgradeCoinsII || 1;
+    upgradeCoinsCostII = progress.upgradeCoinsCostII || 500;
+    upgradeCoinsPlayerII = progress.upgradeCoinsPlayerII || 1;
+    upgradeCoinsPlayerCostII = progress.upgradeCoinsPlayerCostII || 750;
     day = progress.day || 1;
     month = progress.month || 1;
     year = progress.year || 2050;
@@ -187,11 +195,13 @@ function updateWorkerButtons() {
 }
 
 function updateUpgradeButtons() {
-   document.getElementById('upgradeCoinsPlayerCostI').textContent = formatNumber(upgradeCoinsPlayerCostI / costValue); 
-    document.getElementById('upgradeCoinsWorkerCostI').textContent = formatNumber(upgradeCoinsWorkerCostI / costValue);
+  document.getElementById('upgradeCoinsPlayerCostI').textContent = formatNumber(upgradeCoinsPlayerCostI / costValue); 
+  document.getElementById('upgradeCoinsWorkerCostI').textContent = formatNumber(upgradeCoinsWorkerCostI / costValue);
   document.getElementById('upgradeCoinsCostI').textContent = formatNumber(upgradeCoinsCostI / costValue);
   document.getElementById('upgradeStrengthPlayerCostI').textContent = formatNumber(upgradeStrengthPlayerCostI / costValue);
   document.getElementById('upgradeJobCostI').textContent = formatNumber(upgradeJobCostI / costValue);
+  document.getElementById('upgradeCoinsCostII').textContent = formatNumber(upgradeCoinsCostII / costValue);
+  document.getElementById('upgradeCoinsPlayerCostII').textContent = formatNumber(upgradeCoinsPlayerCostII / costValue); 
 }
 
 function startSaveInterval() {
@@ -446,7 +456,7 @@ function handlePlayerClick() {
     currentPlayer = false;
     const statusFinished = document.getElementById("playerStatus");
     statusFinished.style.backgroundColor = "#2E7D32";
-    coins += (job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * prestigeMultiplier) * qualityValue);
+    coins += (job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * (upgradeCoinsPlayerII * upgradeCoinsII) * prestigeMultiplier) * qualityValue);
     playerDiv.dataset.job = "";
     playerDiv.innerHTML = "Spieler: Kein Job";
     playerDiv.removeEventListener("click", handlePlayerClick);
@@ -525,7 +535,7 @@ function assignJob(workerDiv, workerId) {
   currentWorker[workerId] = false;
   clearInterval(interval);
   delete activeIntervals[workerId];
-  coins += (job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI) * prestigeMultiplier) * qualityValue);
+  coins += (job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI) * upgradeCoinsII * prestigeMultiplier) * qualityValue);
   workerDiv.dataset.job = "";
   workerDiv.innerHTML = "Kein Job";
   updateCoins();
@@ -591,8 +601,8 @@ function buyUpgradeCoinsI() {
 }
 
 function buyUpgradeStrengthPlayerI() {
-  if (coins >= (upgradeStrengthCostI / costValue)) {
-    coins -= (upgradeStrengthCostI / costValue);
+  if (coins >= (upgradeStrengthPlayerCostI / costValue)) {
+    coins -= (upgradeStrengthPlayerCostI / costValue);
     upgradeStrengthPlayerI += 0.5;
     upgradeStrengthPlayerCostI *= 4;
   }
@@ -614,6 +624,26 @@ function buyUpgradeJobI() {
     } else {
       upgradeJobCostI *= 10;
     }
+  }
+  updateCoins();
+  updateUpgradeButtons();
+}
+
+function buyUpgradeCoinsII() {
+  if (coins >= (upgradeCoinsCostII / costValue)) {
+    coins -= (upgradeCoinsCostII / costValue);
+    upgradeCoinsII += 0.1;
+    upgradeCoinsCostII *= 1.2;
+  }
+  updateCoins();
+  updateUpgradeButtons();
+}
+
+function buyUpgradeCoinsPlayerII() {
+  if (coins >= (upgradeCoinsPlayerCostII / costValue)) {
+    coins -= (upgradeCoinsPlayerCostII / costValue);
+    upgradeCoinsPlayerII += 0.05;
+    upgradeCoinsPlayerCostII *= 1.15;
   }
   updateCoins();
   updateUpgradeButtons();
@@ -833,6 +863,10 @@ function buyPrestige() {
     upgradeStrengthPlayerCostI = 100;
     upgradeJobI = 10;
     upgradeJobCostI = 250;
+    upgradeCoinsII = 1;
+    upgradeCoinsCostII = 500;
+    upgradeCoinsPlayerII = 1;
+    upgradeCoinsPlayerCostII = 750;
     saveProgress();
     location.reload();
   } else {
