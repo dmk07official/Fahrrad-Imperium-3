@@ -307,7 +307,7 @@ function startLoading(index) {
 
   order.classList.remove("passive");
   order.classList.add("loading");
-  order.textContent = `Auftrag wird gesucht... ${upgradeJob}`;
+  order.textContent = `Auftrag wird gesucht... ${upgradeJobI}`;
 
   let timer = upgradeJobI;
   const interval = setInterval(() => {
