@@ -891,10 +891,9 @@ if (prestigeFade) {
   prestigeFade.style.display = "block";
   prestigeFade.classList.add('fadeout');
   prestigeFade.addEventListener("animationend", function() {
-    prestigeFade.style.display = "none";
     setTimeout(() => {
       location.reload();
-    }, 250); // Optional: Warte nach der Animation.
+    }, 500); // Optional: Warte nach der Animation.
   });
 }
 
