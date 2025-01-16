@@ -886,7 +886,18 @@ function buyPrestige() {
     upgradeStrengthWorkerII = 1;
     upgradeStrengthWorkerCostII = 1000;
     saveProgress();
-    location.reload();
+    const prestigeFade = document.querySelector(".prestige-fade");
+if (prestigeFade) {
+  prestigeFade.style.display = "block";
+  prestigeFade.classList.add('fadeout');
+  prestigeFade.addEventListener("animationend", function() {
+    prestigeFade.style.display = "none";
+    setTimeout(() => {
+      location.reload();
+    }, 250); // Optional: Warte nach der Animation.
+  });
+}
+
   } else {
   alert("Du hast nicht genug geld für die Erweiterung");
   }
