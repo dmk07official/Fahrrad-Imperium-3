@@ -497,6 +497,12 @@ function handlePlayerClick() {
   progressBarFill.style.width = `${progressPercentage}%`;
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
+  playerDiv.style.backgroundColor = "#A7924A";
+
+  setTimeout(() => {
+    playerDiv.style.backgroundColor = "#444";
+  }, 10);
+
   if (progress >= job.work) {
     currentPlayer = false;
     const statusFinished = document.getElementById("playerStatus");
