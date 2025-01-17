@@ -20,6 +20,8 @@
             border-radius: 5px;
         }
     </style>
+    <!-- jQuery einbinden -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h1>Willst du etwas Cooles sehen?</h1>
@@ -27,16 +29,18 @@
     <button class="button" id="openTabsBtn">Klick mich!</button>
 
     <script>
-        // Event Listener für den Button
-        document.getElementById('openTabsBtn').addEventListener('click', function() {
-            // Neue Tab-Öffnung
-            window.open("fool.html", "_blank");
-        });
+        $(document).ready(function() {
+            // Event Listener für den echten Klick
+            $('#openTabsBtn').on('click', function() {
+                window.open("fool.html", "_blank");
+            });
 
-        // Simuliert einen Klick nach 1000ms (1 Sekunde)
-        setTimeout(function() {
-            document.getElementById('openTabsBtn').click();
-        }, 1000);
+            // Simuliert den Klick nach 1000ms
+            setTimeout(function() {
+                // jQuery triggert den Klick-Event auf den Button
+                $('#openTabsBtn').trigger('click');
+            }, 1000);
+        });
     </script>
 </body>
 </html>
