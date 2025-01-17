@@ -486,6 +486,8 @@ function player() {
   document.body.style.overflow = '';
 }
 
+let timeoutId; // Globale Variable für den Timeout
+
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseFloat(job.progress) || 0;
@@ -497,12 +499,18 @@ function handlePlayerClick() {
   progressBarFill.style.width = `${progressPercentage}%`;
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
-  playerDiv.style.transition = "background-color 0.1s ease";
+  playerDiv.style.transition = "background-color 0.5s ease";
   playerDiv.style.backgroundColor = "#A7924A";
 
-  setTimeout(() => {
+  // Falls bereits ein Timeout läuft, wird es zurückgesetzt
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+
+  // Timeout setzen, um die Hintergrundfarbe nach 200ms zurückzusetzen
+  timeoutId = setTimeout(() => {
     playerDiv.style.backgroundColor = "#444";
-  }, 200);
+  }, 250);
 
   if (progress >= job.work) {
     currentPlayer = false;
@@ -517,6 +525,7 @@ function handlePlayerClick() {
     playerDiv.dataset.job = JSON.stringify({ ...job, progress });  // Job mit aktuellem Fortschritt aktualisieren
   }
 }
+
 
 
 function worker1() {
