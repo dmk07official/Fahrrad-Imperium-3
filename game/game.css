@@ -216,7 +216,7 @@ p, h1, h2 {
   justify-content: center;
   align-items: center;
   background-image: radial-gradient(circle, #222 0%, #222 100%);
-  border: calc(var(--base-size) * 0.1) solid var(--color);
+  border: calc(var(--base-size) * 0.05) solid var(--color);
   border-radius: calc(var(--base-size) * 0.6);
   margin: calc(var(--base-size) * 0.4);
   font-size: calc(var(--base-size) * 0.8);
