@@ -500,7 +500,7 @@ function handlePlayerClick() {
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
   playerDiv.style.transition = "background-image 0.5s ease";
-  playerDiv.style.backgroundImage = "radial-gradient(circle, #222 0%, #343024 25%, #9f8531 100%)";
+  playerDiv.style.backgroundImage = "radial-gradient(circle, #222 0%, #343024 50%, #9f8531 100%)";
 
 
 if (timeoutId) {
