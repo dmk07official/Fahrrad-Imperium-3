@@ -508,14 +508,24 @@ function handlePlayerClick() {
   progressBarFill.style.width = `${progressPercentage}%`;
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
-  playerDiv.style.transition = "background-color 0.0010s ease";
+  function handlePlayerClick() {
+  const job = JSON.parse(playerDiv.dataset.job);
+  let progress = parseFloat(job.progress) || 0;
+  progress += upgradeStrengthPlayerI;
+  progress = Math.round(progress * 10) / 10;
 
-  // Farbwechsel
+  const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
+  const progressPercentage = Math.min((progress / job.work) * 100, 100);
+  progressBarFill.style.width = `${progressPercentage}%`;
+  playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
+
+  playerDiv.style.transition = "background-color 0.1s ease";
+  
   playerDiv.style.backgroundColor = "#A7924A";
 
   setTimeout(() => {
     playerDiv.style.backgroundColor = "#444";
-  }, 40);
+  }, 200);
 }
 
 
