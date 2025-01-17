@@ -217,6 +217,8 @@ function updateUpgradeButtons() {
   document.getElementById('upgradeCoinsCostII').textContent = formatNumber(upgradeCoinsCostII / costValue);
   document.getElementById('upgradeCoinsPlayerCostII').textContent = formatNumber(upgradeCoinsPlayerCostII / costValue); 
   document.getElementById('upgradeStrengthWorkerCostII').textContent = formatNumber(upgradeStrengthWorkerCostII / costValue);
+    
+  document.getElementById('upgradeJobCostII').textContent = formatNumber(upgradeJobCostII / costValue);
 }
 
 function startSaveInterval() {
