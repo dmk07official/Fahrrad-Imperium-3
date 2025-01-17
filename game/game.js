@@ -84,11 +84,11 @@ function saveProgress() {
     gambleCost,
   };
 
-  localStorage.setItem('FI3test5', JSON.stringify(progress));
+  localStorage.setItem('FI3test6', JSON.stringify(progress));
 }
 
 function loadProgress() {
-  const progress = JSON.parse(localStorage.getItem('FI3test5'));
+  const progress = JSON.parse(localStorage.getItem('FI3test6'));
   if (progress) {
     coins = progress.coins || 0;
     prestigeCount = progress.prestigeCount || 0;
