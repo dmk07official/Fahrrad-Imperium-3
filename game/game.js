@@ -499,19 +499,17 @@ function handlePlayerClick() {
   progressBarFill.style.width = `${progressPercentage}%`;
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
-  playerDiv.style.transition = "background-color 0.5s ease";
-  playerDiv.style.backgroundColor = "radial-gradient(circle, #444 0%, #524f43 25%, #85743e 100%)";
-    
+  playerDiv.style.transition = "background-image 0.5s ease";
+  playerDiv.style.backgroundImage = "radial-gradient(circle, #444 0%, #524f43 25%, #85743e 100%)";
 
-  // Falls bereits ein Timeout läuft, wird es zurückgesetzt
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-  }
 
-  // Timeout setzen, um die Hintergrundfarbe nach 200ms zurückzusetzen
-  timeoutId = setTimeout(() => {
-    playerDiv.style.backgroundColor = "#444";
-  }, 250);
+if (timeoutId) {
+  clearTimeout(timeoutId);
+}
+
+timeoutId = setTimeout(() => {
+  playerDiv.style.backgroundImage = "radial-gradient(circle, #444 0%, #444 100%)";
+}, 250);
 
   if (progress >= job.work) {
     currentPlayer = false;
