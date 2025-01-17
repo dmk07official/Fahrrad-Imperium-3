@@ -215,7 +215,7 @@ p, h1, h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #444;
+  radial-gradient(circle, #444 0%, #444 100%);
   border-radius: calc(var(--base-size) * 0.6);
   margin: calc(var(--base-size) * 0.4);
   font-size: calc(var(--base-size) * 0.8);
