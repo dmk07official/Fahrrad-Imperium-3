@@ -500,7 +500,7 @@ function handlePlayerClick() {
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
   playerDiv.style.transition = "background-color 0.5s ease";
-  playerDiv.style.backgroundColor = "#E6E673";
+  playerDiv.style.backgroundColor = "#333";
 
   // Falls bereits ein Timeout läuft, wird es zurückgesetzt
   if (timeoutId) {
