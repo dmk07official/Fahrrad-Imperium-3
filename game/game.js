@@ -36,6 +36,7 @@ window.addEventListener('load', () => {
 //Speichern, Laden, Variablen
 let coins = 0;
 let prestigeCount = 0, prestigeMultiplier = 1, prestigeCost = 1000;
+let currentJobStage = 1;
 let upgradeCoinsPlayerI = 1, upgradeCoinsPlayerCostI = 10;
 let upgradeCoinsWorkerI = 1, upgradeCoinsWorkerCostI = 10;
 let upgradeCoinsI = 1, upgradeCoinsCostI = 50;
@@ -44,6 +45,8 @@ let upgradeJobI = 10, upgradeJobCostI = 250;
 let upgradeCoinsII = 1, upgradeCoinsCostII = 500;
 let upgradeCoinsPlayerII = 1, upgradeCoinsPlayerCostII = 750;
 let upgradeStrengthWorkerII = 1, upgradeStrengthWorkerCostII = 1000;
+
+let upgradeJobII = 10, upgradeJobCostII = 2500;
 let day = 1, month = 1, year = 2050;
 let qualityValue = 1, costValue = 1;
 let loyalCustomerActivated = false;
@@ -65,6 +68,7 @@ function saveProgress() {
   const progress = {
     coins,
     prestigeCount, prestigeMultiplier, prestigeCost,
+    currentJobStage,
     upgradeCoinsPlayerI, upgradeCoinsPlayerCostI,
     upgradeCoinsWorkerI, upgradeCoinsWorkerCostI,
     upgradeCoinsI, upgradeCoinsCostI,
@@ -73,6 +77,8 @@ function saveProgress() {
     upgradeCoinsII, upgradeCoinsCostII,
     upgradeCoinsPlayerII, upgradeCoinsPlayerCostII,
     upgradeStrengthWorkerII, upgradeStrengthWorkerCostII,
+
+    upgradeJobII, upgradeJobCostII,
     workerIntervals,
     workerUpgradeCost,
     day, month, year,
@@ -94,6 +100,7 @@ function loadProgress() {
     prestigeCount = progress.prestigeCount || 0;
     prestigeMultiplier = progress.prestigeMultiplier || 1;
     prestigeCost = progress.prestigeCost || 1000;
+    currentJobStage = progress.currentJobStage || 1;
     upgradeCoinsPlayerI = progress.upgradeCoinsPlayerI || 1;
     upgradeCoinsPlayerCostI = progress.upgradeCoinsPlayerCostI || 10;
     upgradeCoinsWorkerI = progress.upgradeCoinsWorkerI || 1;
@@ -110,6 +117,9 @@ function loadProgress() {
     upgradeCoinsPlayerCostII = progress.upgradeCoinsPlayerCostII || 750;
     upgradeStrenthWorkerII = progress.upgradeStrengthWorkerII || 1;
     upgradeStrengthWorkerCostII = progress.upgradeStrengthWorkerCostII || 1000;
+
+    upgradeJobII = progress.upgradeJobII || 10;
+    upgradeJobCostII = progress.upgradeJobCostII || 2500;
     day = progress.day || 1;
     month = progress.month || 1;
     year = progress.year || 2050;
@@ -304,6 +314,19 @@ const jobs = [
   { name: "Job 6", work: 500, payment: (500 * 2) },
 ];
 
+const jobStages = {
+  1: [jobs[0], jobs[1], jobs[2]],
+  2: [jobs[1], jobs[2], jobs[3]],
+  3: [jobs[2], jobs[3], jobs[4]],
+  4: [jobs[3], jobs[4], jobs[5]],
+};
+
+function getJobUpgradeTime(stage) {
+  if (stage <= 2) return jobUpgradeI;
+  if (stage <= 4) return jobUpgradeII;
+  return jobUpgradeI;
+}
+
 const activeIntervals = {};
 
 function startLoading(index) {
@@ -312,9 +335,11 @@ function startLoading(index) {
 
   order.classList.remove("passive");
   order.classList.add("loading");
-  order.textContent = `Auftrag wird gesucht... ${upgradeJobI}`;
 
-  let timer = upgradeJobI;
+  const timerDuration = getJobUpgradeTime(currentJobStage);
+  order.textContent = `Auftrag wird gesucht... ${timerDuration}`;
+
+  let timer = timerDuration;
   const interval = setInterval(() => {
     timer--;
     order.textContent = `Auftrag wird gesucht... ${timer}`;
@@ -343,13 +368,15 @@ function findNextPassiveJob() {
 }
 
 function spawnJob(order) {
-  const job = jobs[Math.floor(Math.random() * jobs.length)];
+  const availableJobs = jobStages[currentJobStage];
+  const job = availableJobs[Math.floor(Math.random() * availableJobs.length)];
+
   order.classList.remove("loading");
   order.classList.add("job");
   order.innerHTML = `
     <strong>${job.name}</strong>
     <p>Work: ${job.work}</p>
-    <p>Payment: ${job.payment} Coins</p>
+    <p>Payment: ${job.payment.toFixed(2)} Coins</p>
   `;
   order.dataset.work = job.work;
   order.dataset.progress = 0;
@@ -665,6 +692,25 @@ function buyUpgradeStrengthWorkerII() {
   updateUpgradeButtons();
 }
 
+function buyUpgradeJobII() {
+  if (upgradeJobII == 1) {
+      return;
+  }
+  if (coins >= (upgradeJobCostII / costValue)) {
+    coins -= (upgradeJobCostII / costValue);
+    upgradeJobII--;
+    if (upgradeJobII <= 4) {
+      upgradeJobCostII *= 30;
+    } else if (upgradeJobII <= 7) {
+      upgradeJobCostII *= 20;
+    } else {
+      upgradeJobCostII *= 10;
+    }
+  }
+  updateCoins();
+  updateUpgradeButtons();
+}
+
 //Teile Lieferant 
 
 function updateBar(elementId, value) {
@@ -885,6 +931,9 @@ function buyPrestige() {
     upgradeCoinsPlayerCostII = 750;
     upgradeStrengthWorkerII = 1;
     upgradeStrengthWorkerCostII = 1000;
+
+    upgradeJobII = 10;
+    upgradeJobCostII = 2500;
     saveProgress();
     const prestigeFade = document.querySelector(".prestige-fade");
 if (prestigeFade) {
