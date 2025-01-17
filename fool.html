@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>April Streich</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Willst du etwas Cooles sehen?</h1>
+    <p>Klicke auf den Button, aber sei vorsichtig! 👀</p>
+    <button class="button" id="openTabsBtn">Klick mich!</button>
+
+    <script>
+        document.getElementById('openTabsBtn').addEventListener('click', function() {
+            alert("April Streich! Du hast den Button gedrückt!");
+            setTimeout(function() {
+                window.open("https://www.youtube.com", "_blank"); // Zum Beispiel ein witziges Video
+                window.open("https://www.example.com", "_blank"); // Oder eine andere lustige Seite
+            }, 500); // Verzögerung von 500ms nach dem Klick
+        });
+    </script>
+</body>
+</html>
