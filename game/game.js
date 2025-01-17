@@ -526,8 +526,6 @@ function handlePlayerClick() {
   setTimeout(() => {
     playerDiv.style.backgroundColor = "#444";
   }, 200);
-}
-
 
   if (progress >= job.work) {
     currentPlayer = false;
