@@ -891,6 +891,7 @@ if (prestigeFade) {
   prestigeFade.style.display = "block";
   prestigeFade.classList.add('fadeout');
   prestigeFade.addEventListener("animationend", function() {
+  prestigeFade.style.display = "block";
     setTimeout(() => {
       location.reload();
     }, 500); // Optional: Warte nach der Animation.
