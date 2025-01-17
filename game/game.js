@@ -500,7 +500,7 @@ function handlePlayerClick() {
   playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
   playerDiv.style.transition = "background-image 0.5s ease";
-  playerDiv.style.backgroundImage = "radial-gradient(circle, #444 0%, #524f43 25%, #85743e 100%)";
+  playerDiv.style.backgroundImage = "radial-gradient(circle, #222 0%, #343024 25%, #9f8531 100%)";
 
 
 if (timeoutId) {
@@ -508,7 +508,7 @@ if (timeoutId) {
 }
 
 timeoutId = setTimeout(() => {
-  playerDiv.style.backgroundImage = "radial-gradient(circle, #444 0%, #444 100%)";
+  playerDiv.style.backgroundImage = "radial-gradient(circle, #222 0%, #222 100%)";
 }, 250);
 
   if (progress >= job.work) {
