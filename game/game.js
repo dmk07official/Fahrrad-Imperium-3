@@ -335,9 +335,9 @@ function changeJobStage(newStage) {
 
 
 function getJobUpgradeTime(stage) {
-  if (stage <= 2) return jobUpgradeI;
-  if (stage <= 4) return jobUpgradeII;
-  return jobUpgradeI;
+  if (stage <= 2) return upgradeJobI;
+  if (stage <= 4) return upgradeJobII;
+  return upgradeJobI;
 }
 
 const activeIntervals = {};
