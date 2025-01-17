@@ -321,6 +321,19 @@ const jobStages = {
   4: [jobs[3], jobs[4], jobs[5]],
 };
 
+function changeJobStage(newStage) {
+  if (newStage < 1 || newStage > 4) {
+    console.error("Ungültige Jobstufe:", newStage);
+    return;
+  }
+
+  currentJobStage = newStage;
+  
+  const displayElement = document.getElementById("current-stage-display");
+  displayElement.textContent = `Aktuelle Jobstufe: ${currentJobStage}`;
+}
+
+
 function getJobUpgradeTime(stage) {
   if (stage <= 2) return jobUpgradeI;
   if (stage <= 4) return jobUpgradeII;
