@@ -296,7 +296,7 @@ p, h1, h2 {
   width: 100%;
   height: calc(var(--base-size) * 0.5);
   border-top: solid var(--color) calc(var(--base-size) * 0.05);
-  background-color: rgba(80,80,80,50);
+  background-color: #222;
   position: absolute;
   bottom: 0;
   left: 0;
