@@ -325,7 +325,6 @@ const jobStages = {
 
 function changeJobStage(newStage) {
   if (newStage < 1 || newStage > 4) {
-    console.error("Ungültige Jobstufe:", newStage);
     return;
   }
 
@@ -333,6 +332,28 @@ function changeJobStage(newStage) {
   
   const displayElement = document.getElementById("current-stage-display");
   displayElement.textContent = `Aktuelle Jobstufe: ${currentJobStage}`;
+}
+
+function openJobStage() {
+  const jobStageContainer = document.getElementById("jobStageContainer");
+    jobStageContainer.style.display = "flex";
+
+    const jobStage = document.getElementById("jobStage");
+    jobStage.style.display = "flex";
+
+    const blur = document.getElementById("blur");
+    blur.style.display = "block";
+
+    document.body.style.overflow = 'hidden';
+
+    jobStageContainer.addEventListener("click", (event) => {
+      if (!selector.contains(event.target)) {
+    jobStageContainer.style.display = "none";
+    jobStage.style.display = "none";
+    blur.style.display = "none";
+    document.body.style.overflow = "";
+      }
+    });
 }
 
 
@@ -352,12 +373,12 @@ function startLoading(index) {
   order.classList.add("loading");
 
   const timerDuration = getJobUpgradeTime(currentJobStage);
-  order.textContent = `Auftrag wird gesucht... ${timerDuration}`;
+  order.textContent = `Auftrag suchen... ${timerDuration}`;
 
   let timer = timerDuration;
   const interval = setInterval(() => {
     timer--;
-    order.textContent = `Auftrag wird gesucht... ${timer}`;
+    order.textContent = `Auftrag suchen... ${timer}`;
     if (timer <= 0) {
       clearInterval(interval);
       spawnJob(order);
@@ -389,9 +410,9 @@ function spawnJob(order) {
   order.classList.remove("loading");
   order.classList.add("job");
   order.innerHTML = `
-    <strong>${job.name}</strong>
-    <p>Work: ${job.work}</p>
-    <p>Payment: ${job.payment.toFixed(2)} Coins</p>
+    <strong style="margin-top: -0.25em; font-size: 1.25em;">${job.name}</strong>
+    <div style="background-color: gold; height: 0.15em; width: 80%; border-radius: 0.5em; margin: 0.4em; margin-top: 0.4em;"></div>
+    <p>Arbeit: <br> ${job.work}</p>
   `;
   order.dataset.work = job.work;
   order.dataset.progress = 0;
@@ -473,9 +494,9 @@ function player() {
   const job = extractJobData(selectedOrder);
   playerDiv.dataset.job = JSON.stringify(job);
   playerDiv.innerHTML = `
-    <strong>${job.name}</strong>
-    <p>Progress: 0/${job.work}</p>
-    <p>Payment: ${job.payment} Coins</p>
+    <strong style="margin-top: -0.5em; font-size: 1.25em;">${job.name}</strong>
+    <div style="background-color: gold; height: 0.15em; width: 80%; border-radius: 0.5em; margin: 0.8em;"></div>
+    <p>Bezahlung: ${formatNumber(job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * (upgradeCoinsPlayerII * upgradeCoinsII) * prestigeMultiplier) * qualityValue)} Coins</p>
     <div class="progress-bar">
       <div class="progress-bar-fill" style="width: 0%;"></div>
     </div>
@@ -488,8 +509,6 @@ function player() {
   document.body.style.overflow = '';
 }
 
-let timeoutId; // Globale Variable für den Timeout
-
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseFloat(job.progress) || 0;
@@ -499,19 +518,6 @@ function handlePlayerClick() {
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
   const progressPercentage = Math.min((progress / job.work) * 100, 100);
   progressBarFill.style.width = `${progressPercentage}%`;
-  playerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
-
-  playerDiv.style.transition = "background-image 0.5s ease";
-  playerDiv.style.backgroundImage = "radial-gradient(circle, #222 0%, #343024 50%, #9f8531 100%)";
-
-
-if (timeoutId) {
-  clearTimeout(timeoutId);
-}
-
-timeoutId = setTimeout(() => {
-  playerDiv.style.backgroundImage = "radial-gradient(circle, #222 0%, #222 100%)";
-}, 250);
 
   if (progress >= job.work) {
     currentPlayer = false;
@@ -553,7 +559,6 @@ function worker4() {
   status.style.backgroundColor = "#C62828";
 }
 
-
 function assignJob(workerDiv, workerId) {
   if (!selectedOrder || !selectedOrder.classList.contains("job")) {
     alert("Es gibt keinen ausgewählten Auftrag.");
@@ -569,9 +574,9 @@ function assignJob(workerDiv, workerId) {
   const job = extractJobData(selectedOrder);
   workerDiv.dataset.job = JSON.stringify(job);
   workerDiv.innerHTML = `
-    <strong>${job.name}</strong>
-    <p>Progress: 0/${job.work}</p>
-    <p>Payment: ${job.payment} Coins</p>
+    <strong style="margin-top: -0.25em; font-size: 1.25em;">${job.name}</strong>
+    <div style="background-color: gold; height: 0.15em; width: 80%; border-radius: 0.5em; margin: 0.4em; margin-top: 0.4em;"></div>
+    <p>Bezahlung: <br> ${formatNumber(job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI)  * upgradeCoinsII * prestigeMultiplier) * qualityValue)} Coins</p>
     <div class="progress-bar">
       <div class="progress-bar-fill" style="width: 0%;"></div>
     </div>
@@ -589,7 +594,6 @@ function assignJob(workerDiv, workerId) {
     const progressBarFill = workerDiv.querySelector(".progress-bar-fill");
     const progressPercentage = Math.min((progress / job.work) * 100, 100);
     progressBarFill.style.width = `${progressPercentage}%`;
-    workerDiv.querySelector("p:nth-of-type(1)").textContent = `Progress: ${progress}/${job.work}`;
 
     if (progress >= job.work) {
   const statusFinished = document.getElementById(`workerStatus${workerId.slice(-1)}`);
