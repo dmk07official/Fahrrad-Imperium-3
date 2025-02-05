@@ -112,7 +112,7 @@ p, h1, h2 {
   border: calc(var(--base-size) * 0.1) solid var(--color);
   background-color: #222;
   border-radius: calc(var(--base-size) * 0.5);
-  margin: calc(var(--base-size) * 0.25);
+  margin: calc(var(--base-size) * 0.2);
   font-size: calc(var(--base-size) * 0.8);
   display: flex;
   flex-direction: column;  
@@ -140,7 +140,7 @@ p, h1, h2 {
   border: calc(var(--base-size) * 0.1) solid var(--color);
   background-color: #222;
   border-radius: calc(var(--base-size) * 0.5);
-  margin: calc(var(--base-size) * 0.25);
+  margin: calc(var(--base-size) * 0.2);
   overflow: hidden;
 }
 #workers {
@@ -176,7 +176,7 @@ p, h1, h2 {
 .worker {
   position: relative;
   width: calc(var(--base-size) * 12.5);
-  height: calc(var(--base-size) * 15);
+  height: calc(var(--base-size) * 16);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -210,24 +210,33 @@ p, h1, h2 {
 .worker-field {
   position: relative;
   width: calc(var(--base-size) * 10);
-  height: calc(var(--base-size) * 5.5);
+  height: calc(var(--base-size) * 6.5);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-image: radial-gradient(circle, #222 0%, #222 100%);
-  border: calc(var(--base-size) * 0.05) solid var(--color);
+  background-color: #444;
   border-radius: calc(var(--base-size) * 0.6);
   margin: calc(var(--base-size) * 0.4);
   font-size: calc(var(--base-size) * 0.8);
   overflow: hidden;
 }
 .player-field {
-  width: calc(var(--base-size) * 22.5);
-  height: calc(var(--base-size) * 9.5);
+  width: calc(var(--base-size) * 20);
+  height: calc(var(--base-size) * 6);
+}
+.change-job-level {
+  width: calc(var(--base-size) * 20);
+  height: calc(var(--base-size) * 3);
+  background-color: #444;
+  color: var(--color);
+  font-weight: bold;
+  border: none;
+  border-radius: calc(var(--base-size) * 0.5);
+  margin-top: calc(var(--base-size) * 0.5);
 }
 .improve-worker {
-  width: calc(var(--base-size) * 8);
+  width: calc(var(--base-size) * 10);
   height: calc(var(--base-size) * 2.5);
   background-color: #444;
   color: var(--color);
@@ -236,6 +245,7 @@ p, h1, h2 {
   border-radius: calc(var(--base-size) * 0.5);
   margin-top: calc(var(--base-size) * 0.5);
 }
+.job-stage-container,
 .selector-container {
   position: fixed;
   top: 0;
@@ -248,6 +258,7 @@ p, h1, h2 {
   justify-content: center;
   z-index: 9999;
 }
+.job-stage,
 .selector {
   width: calc(var(--base-size) * 40);
   height: calc(var(--base-size) * 20);
@@ -296,7 +307,7 @@ p, h1, h2 {
   width: 100%;
   height: calc(var(--base-size) * 0.5);
   border-top: solid var(--color) calc(var(--base-size) * 0.05);
-  background-color: #222;
+  background-color: #444;
   position: absolute;
   bottom: 0;
   left: 0;
