@@ -56,9 +56,22 @@
     <div id="playerStatus" class="player-status"></div>
     <h2 class="player-header">Spieler</h2>
   <div class="player-field" id="player">Kein Job</div>
+  <button class="change-job-level" onclick="openJobStage()">Jobstufe ändern</button>
   </div>
 </div>
 
+</div>
+
+<div class="job-stage-container" id="jobStageContainer">
+<div class="job-stage" id="jobStage">
+  <div id="job-stage-buttons">
+  <button onclick="changeJobStage(1)">Jobstufe 1</button>
+  <button onclick="changeJobStage(2)">Jobstufe 2</button>
+  <button onclick="changeJobStage(3)">Jobstufe 3</button>
+  <button onclick="changeJobStage(4)">Jobstufe 4</button>
+</div>
+<p id="current-stage-display">Aktuelle Jobstufe: 1</p>
+</div>
 </div>
 
 <div id="workers">
@@ -144,16 +157,6 @@
 
         <p>Jobsuche Stufe III&IV verkürzen um 1 Sekunde</p>
         <button class="upgrade-button" id="upgradeJobII" onclick="buyUpgradeJobII()"><span id="upgradeJobCostII">2500</span></button>
-
-
-        <div id="job-stage-buttons">
-  <button onclick="changeJobStage(1)">Jobstufe 1</button>
-  <button onclick="changeJobStage(2)">Jobstufe 2</button>
-  <button onclick="changeJobStage(3)">Jobstufe 3</button>
-  <button onclick="changeJobStage(4)">Jobstufe 4</button>
-</div>
-<p id="current-stage-display">Aktuelle Jobstufe: 1</p>
-
       </div>
       
       <div class="window" id="windowTeileLieferant" style="display: none">        
