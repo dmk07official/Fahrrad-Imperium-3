@@ -45,7 +45,6 @@ let upgradeJobI = 10, upgradeJobCostI = 250;
 let upgradeCoinsII = 1, upgradeCoinsCostII = 500;
 let upgradeCoinsPlayerII = 1, upgradeCoinsPlayerCostII = 750;
 let upgradeStrengthWorkerII = 1, upgradeStrengthWorkerCostII = 1000;
-
 let upgradeJobII = 10, upgradeJobCostII = 2500;
 let day = 1, month = 1, year = 2050;
 let qualityValue = 1, costValue = 1;
@@ -55,6 +54,7 @@ let buttonCooldown = false;
 let supplierName = "BikeParts GmbH";
 let probabilitySuccess = 50;
 let gambleCost = 10000;
+let vibrate = true;
 
 const workerIntervals = {
   worker1: 665, worker2: 665, worker3: 665, worker4: 665,
@@ -514,6 +514,9 @@ function handlePlayerClick() {
   let progress = parseFloat(job.progress) || 0;
   progress += upgradeStrengthPlayerI;
   progress = Math.round(progress * 10) / 10;
+  if (navigator.vibrate && vibrate) {   
+          navigator.vibrate(100);
+        } 
 
   const progressBarFill = playerDiv.querySelector(".progress-bar-fill");
   const progressPercentage = Math.min((progress / job.work) * 100, 100);
