@@ -5,6 +5,7 @@
 
 p {
   font-size: calc(var(--base-size) * 0.9);
+  color: #7A7A7A;
 }
 
 h1 {
