@@ -87,7 +87,6 @@ function saveProgress() {
     loyalCustomerCounter,
     loyalCustomerActivated,      
     supplierName,
-    probabilitySuccess,
     gambleCost,
   };
 
@@ -140,7 +139,6 @@ function loadProgress() {
     loyalCustomerCounter = progress.loyalCustomerCounter || 0;
     loyalCustomerActivated = progress.loyalCustomerActivated;
     supplierName = progress.supplierName;
-    probabilitySuccess = progress.probabilitySuccess || 50;
     gambleCost = progress.gambleCost || 10000;
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
