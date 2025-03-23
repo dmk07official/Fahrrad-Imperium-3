@@ -186,7 +186,7 @@ function openDiscord() {
     src: "index/tap.mp3",
     autoplay: true,
   });
-  window.open('https://discord.com/invite/rE2UMBH7xV', '_blank');
+  window.open('https://discord.gg/RSVE3fyQ5Y', '_blank');
 }
 
 function openTiktok() {
