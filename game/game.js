@@ -110,7 +110,7 @@ function saveProgress() {
     gambleCost,
   };
 
-  localStorage.setItem('FI3test6', JSON.stringify(progress));
+  localStorage.setItem('FI3test7', JSON.stringify(progress));
 }
 
 function loadProgress() {
