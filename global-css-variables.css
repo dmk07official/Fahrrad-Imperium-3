@@ -5,21 +5,32 @@
 
 p {
   font-size: calc(var(--base-size) * 0.9);
+  font-family: 'Baloo 2', sans-serif;
+  margin: 0;
   color: #7A7A7A;
+}
+
+button {
+  font-size: calc(var(--base-size) * 0.8);
+  font-family: 'Baloo 2', sans-serif;
 }
 
 h1 {
   font-size: calc(var(--base-size) * 2);
+  font-family: 'Baloo 2', sans-serif;
+  margin: 0;
 }
 
 h2 {
   font-size: calc(var(--base-size) * 1.5);
+  font-family: 'Baloo 2', sans-serif;
+  margin: 0;
 }
 
 body {
   color: var(--color);
   text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   touch-action: manipulation;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -33,7 +44,7 @@ body {
   display: none;
 }
 
-p, h1, h2, div {
+body, p, h1, h2, strong, div, button {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
