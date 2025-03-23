@@ -109,7 +109,7 @@ function loadUserDataFromFirebase(userId) {
 
 function updateCoinsInDatabase() {
     if (auth.currentUser) { 
-        const progressData = JSON.parse(localStorage.getItem('FI3test6'));
+        const progressData = JSON.parse(localStorage.getItem('FI3test7'));
         if (progressData && 'coins' in progressData) {
             const coins = progressData.coins;
             const userId = auth.currentUser.uid;
@@ -121,7 +121,7 @@ function updateCoinsInDatabase() {
 
 function updatePrestigeCountInDatabase() {
     if (auth.currentUser) {
-        const progressData = JSON.parse(localStorage.getItem('FI3test6'));
+        const progressData = JSON.parse(localStorage.getItem('FI3test7'));
         if (progressData && 'prestigeCount' in progressData) {
             const prestigeCount = progressData.prestigeCount;
             const userId = auth.currentUser.uid;

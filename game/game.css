@@ -767,12 +767,13 @@ p, h1, h2 {
     align-items: center;
     background-color: #222;
     width: calc(var(--base-size) * 27.5);
-    height: calc(var(--base-size) * 16.5);
+    height: calc(var(--base-size) * 17.5);
     border-radius: calc(var(--base-size) * 1);
     padding-top: calc(var(--base-size) * 0.5);
     padding-bottom: calc(var(--base-size) * 0.5);
     margin-left: calc(var(--base-size) * 0.5);
     margin-right: calc(var(--base-size) * 0.5);
+    margin-bottom: calc(var(--base-size) * 5);
     position: relative; 
     border: calc(var(--base-size) * 0.1) solid var(--color);
   }

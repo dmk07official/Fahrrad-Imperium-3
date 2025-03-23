@@ -114,7 +114,7 @@ function saveProgress() {
 }
 
 function loadProgress() {
-  const progress = JSON.parse(localStorage.getItem('FI3test6'));
+  const progress = JSON.parse(localStorage.getItem('FI3test7'));
   if (progress) {
     coins = progress.coins || 0;
     prestigeCount = progress.prestigeCount || 0;
