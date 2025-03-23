@@ -3,6 +3,12 @@
 const CACHE_NAME = 'site-assets-v1';
 const REQUIRED_FILES = [
     'green-arrow.png',
+    'gold-arrow.png',
+    'coin.png',
+    'coin_disabled.png',
+    'prestige.png',
+    'tap.png',
+    'work.png',
     'background-game.mp3',
 ];
 
@@ -41,13 +47,18 @@ let currentUpgradeMultiplier = 1;
 let upgradeCoinsPlayerI = 1, upgradeCoinsPlayerCostI = 10, upgradeCoinsPlayerLevelI = 0;
 let upgradeCoinsWorkerI = 1, upgradeCoinsWorkerCostI = 10, upgradeCoinsWorkerLevelI = 0;
 let upgradeCoinsI = 1, upgradeCoinsCostI = 50, upgradeCoinsLevelI = 0;
-let upgradeStrengthPlayerI = 1, upgradeStrengthPlayerCostI = 100, upgradeStrengthPlayerLevelI = 0;
+let upgradeStrengthPlayerI = 0, upgradeStrengthPlayerCostI = 100, upgradeStrengthPlayerLevelI = 0;
 let upgradeJobI = 10, upgradeJobCostI = 250, upgradeJobLevelI = 0;
-let upgradeCoinsII = 1, upgradeCoinsCostII = 500, upgradeCoinsLevelII = 0;
-let upgradeCoinsPlayerII = 1, upgradeCoinsPlayerCostII = 750, upgradeCoinsPlayerLevelII = 0;
+let upgradeCoinsPlayerII = 1, upgradeCoinsPlayerCostII = 500, upgradeCoinsPlayerLevelII = 0;
+let upgradeCoinsII = 1, upgradeCoinsCostII = 750, upgradeCoinsLevelII = 0;
 let upgradeStrengthWorkerII = 1, upgradeStrengthWorkerCostII = 1000, upgradeStrengthWorkerLevelII = 0;
 let upgradeDeliveryChanceII = 50, upgradeDeliveryChanceCostII = 2000, upgradeDeliveryChanceLevelII = 0;
 let upgradeJobII = 10, upgradeJobCostII = 2500, upgradeJobLevelII = 0;
+let upgradeCoinsIII = 1, upgradeCoinsCostIII = 5000, upgradeCoinsLevelIII = 0;
+let upgradeStrengthPlayerIII = 0, upgradeStrengthPlayerCostIII = 7500, upgradeStrengthPlayerLevelIII = 0;
+let upgradeDeliveryIII = 1, upgradeDeliveryCostIII = 10000, upgradeDeliveryLevelIII = 0;
+let upgradeCoinsWorkerIII = 1, upgradeCoinsWorkerCostIII = 15000, upgradeCoinsWorkerLevelIII = 0;
+let upgradeJobIII = 10, upgradeJobCostIII = 25000, upgradeJobLevelIII = 0;
 let day = 1, month = 1, year = 2050;
 let qualityValue = 1, costValue = 1;
 let loyalCustomerActivated = false;
@@ -57,6 +68,9 @@ let supplierName = "BikeParts GmbH";
 let gambleCost = 10000;
 let vibrate = true;
 
+const workerLevel = {
+  worker1: 0,  worker2: 0,  worker3: 0,  worker4: 0,
+};
 const workerIntervals = {
   worker1: 665, worker2: 665, worker3: 665, worker4: 665,
 };
@@ -75,11 +89,17 @@ function saveProgress() {
     upgradeCoinsI, upgradeCoinsCostI, upgradeCoinsLevelI,
     upgradeStrengthPlayerI, upgradeStrengthPlayerCostI, upgradeStrengthPlayerLevelI,
     upgradeJobI, upgradeJobCostI, upgradeJobLevelI,
-    upgradeCoinsII, upgradeCoinsCostII, upgradeCoinsLevelII,
     upgradeCoinsPlayerII, upgradeCoinsPlayerCostII, upgradeCoinsPlayerLevelII,
+    upgradeCoinsII, upgradeCoinsCostII, upgradeCoinsLevelII,
     upgradeStrengthWorkerII, upgradeStrengthWorkerCostII, upgradeStrengthWorkerLevelII,
     upgradeDeliveryChanceII, upgradeDeliveryChanceCostII, upgradeDeliveryChanceLevelII,
     upgradeJobII, upgradeJobCostII, upgradeJobLevelII,
+    upgradeCoinsIII, upgradeCoinsCostIII, upgradeCoinsLevelIII,
+    upgradeStrengthPlayerIII, upgradeStrengthPlayerCostIII, upgradeStrengthPlayerLevelIII,
+    upgradeDeliveryIII, upgradeDeliveryCostIII, upgradeDeliveryLevelIII,
+    upgradeCoinsWorkerIII, upgradeCoinsWorkerCostIII, upgradeCoinsWorkerLevelIII,
+    upgradeJobIII, upgradeJobCostIII, upgradeJobLevelIII,
+    workerLevel,
     workerIntervals,
     workerUpgradeCost,
     day, month, year,
@@ -110,19 +130,19 @@ function loadProgress() {
     upgradeCoinsI = progress.upgradeCoinsI || 1;
     upgradeCoinsCostI = progress.upgradeCoinsCostI || 50;
     upgradeCoinsLevelI = progress.upgradeCoinsLevelI || 0;
-    upgradeStrengthPlayerI = progress.upgradeStrengthPlayerI || 1;
+    upgradeStrengthPlayerI = progress.upgradeStrengthPlayerI || 0;
     upgradeStrengthPlayerCostI = progress.upgradeStrengthPlayerCostI || 100;
     upgradeStrengthPlayerLevelI = progress.upgradeStrengthPlayerLevelI || 0;
     upgradeJobI = progress.upgradeJobI || 10;
     upgradeJobCostI = progress.upgradeJobCostI || 250;
     upgradeJobLevelI = progress.upgradeJobLevelI || 0;
-    upgradeCoinsII = progress.upgradeCoinsII || 1;
-    upgradeCoinsCostII = progress.upgradeCoinsCostII || 500;
-    upgradeCoinsLevelII = progress.upgradeCoinsLevelII || 0;
     upgradeCoinsPlayerII = progress.upgradeCoinsPlayerII || 1;
-    upgradeCoinsPlayerCostII = progress.upgradeCoinsPlayerCostII || 750;
+    upgradeCoinsPlayerCostII = progress.upgradeCoinsPlayerCostII || 500;
     upgradeCoinsPlayerLevelII = progress.upgradeCoinsPlayerLevelII || 0;
-    upgradeStrenthWorkerII = progress.upgradeStrengthWorkerII || 1;
+    upgradeCoinsII = progress.upgradeCoinsII || 1;
+    upgradeCoinsCostII = progress.upgradeCoinsCostII || 750;
+    upgradeCoinsLevelII = progress.upgradeCoinsLevelII || 0;
+    upgradeStrengthWorkerII = progress.upgradeStrengthWorkerII || 1;
     upgradeStrengthWorkerCostII = progress.upgradeStrengthWorkerCostII || 1000;
     upgradeStrengthWorkerLevelII = progress.upgradeStrengthWorkerLevelII || 0;
     upgradeDeliveryChanceII = progress.upgradeDeliveryChanceII || 50;
@@ -131,6 +151,21 @@ function loadProgress() {
     upgradeJobII = progress.upgradeJobII || 10;
     upgradeJobCostII = progress.upgradeJobCostII || 2500;
     upgradeJobLevelII = progress.upgradeJobLevelII || 0;
+    upgradeCoinsIII = progress.upgradeCoinsIII || 1;
+    upgradeCoinsCostIII = progress.upgradeCoinsCostIII || 5000;
+    upgradeCoinsLevelIII = progress.upgradeCoinsLevelIII || 0;
+    upgradeStrengthPlayerIII = progress.upgradeStrengthPlayerIII || 0;
+    upgradeStrengthPlayerCostIII = progress.upgradeStrengthPlayerCostIII || 7500;
+    upgradeStrengthPlayerLevelIII = progress.upgradeStrengthPlayerLevelIII || 0;
+    upgradeDeliveryIII = progress.upgradeDeliveryIII || 1;
+    upgradeDeliveryCostIII = progress.upgradeDeliveryCostIII || 10000;
+    upgradeDeliveryLevelIII = progress.upgradeDeliveryLevelIII || 0;
+    upgradeCoinsWorkerIII = progress.upgradeCoinsWorkerIII || 1;
+    upgradeCoinsWorkerCostIII = progress.upgradeCoinsWorkerCostIII || 15000;
+    upgradeCoinsWorkerLevelIII = progress.upgradeCoinsWorkerLevelIII || 0;
+    upgradeJobIII = progress.upgradeJobIII || 10;
+    upgradeJobCostIII = progress.upgradeJobCostIII || 25000;
+    upgradeJobLevelIII = progress.upgradeJobLevelIII || 0;
     day = progress.day || 1;
     month = progress.month || 1;
     year = progress.year || 2050;
@@ -140,6 +175,7 @@ function loadProgress() {
     loyalCustomerActivated = progress.loyalCustomerActivated;
     supplierName = progress.supplierName;
     gambleCost = progress.gambleCost || 10000;
+    Object.assign(workerLevel, progress.workerLevel || {});
     Object.assign(workerIntervals, progress.workerIntervals || {});
     Object.assign(workerUpgradeCost, progress.workerUpgradeCost || {});
   }
@@ -147,20 +183,19 @@ function loadProgress() {
   updatePrestige();
   updateGamble();
   updateDate();
-  updateWorkerDisplay();
-  updateWorkerButtons();
   updateUpgradeButtons();
   updateBar('progressFillQuality', qualityValue);
   updateBar('progressFillCost', costValue);
   updatePercentageElements();
   checkLoyalCustomerStatus();
   updateDeliveryName();
+  updateDivs();
 
   startLoading(0);
 
   startSaveInterval();
   
-  volume = 0.5;
+  volume = 0;
   
   const backgroundMusic = new Howl({
     src: ['background-game.mp3'],
@@ -175,12 +210,14 @@ document.getElementById('coins').textContent = formatNumber(coins);
 updateUpgradeButtons();
         }
 function updatePrestige() {
+  var roundedPrestigeCost = prestigeCost / (costValue * upgradeDeliveryIII);
+  roundedPrestigeCost = roundPrestigeCost(roundedPrestigeCost);
 document.getElementById('prestigeCount').textContent = formatNumber(prestigeCount);
 document.getElementById('prestigeLevel').textContent = formatNumber(prestigeCount);
 document.getElementById('newPrestigeCount').textContent = formatNumber(prestigeCount + 1);
 document.getElementById('prestigeMultiplier').textContent = formatNumber(prestigeMultiplier);
 document.getElementById('newPrestigeMultiplier').textContent = formatNumber(prestigeMultiplier * 2);
-document.getElementById('prestigeCost').textContent = formatNumber(prestigeCost / costValue);
+document.getElementById('prestigeCost').textContent = formatNumber(roundedPrestigeCost);
         }
 function updateGamble() {
   document.getElementById('gambleCost').textContent = formatNumber(gambleCost);
@@ -198,30 +235,6 @@ function formatNumber(number) {
     return (number.toFixed(2) + suffixes[i]).replace('.00', '');
 }
 
-function updateWorkerDisplay() {
-  for (const workerId in workerIntervals) {
-    const interval = workerIntervals[workerId];
-
-    const workerDisplay = document.getElementById(`workerTimeDisplay${workerId.slice(-1)}`);
-    
-    if (workerDisplay) {
-      const clicksPerSecond = (1000 / interval).toFixed(2);
-
-      workerDisplay.innerHTML = `${clicksPerSecond}`;
-    }
-  }
-}
-
-function updateWorkerButtons() {
-  for (const workerId in workerUpgradeCost) {
-    const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
-    if (upgradeButton) {
-      const formattedCost = formatNumber(workerUpgradeCost[workerId]);
-      upgradeButton.innerHTML = `Ausbilden:<br>${formattedCost}€`;
-    }
-  }
-}
-
 function updateUpgradeButtons() {
   document.getElementById('upgradeCoinsPlayerLevelI').textContent = formatNumber(upgradeCoinsPlayerLevelI); 
   document.getElementById('upgradeCoinsWorkerLevelI').textContent = formatNumber(upgradeCoinsWorkerLevelI); 
@@ -233,6 +246,17 @@ function updateUpgradeButtons() {
   document.getElementById('upgradeStrengthWorkerLevelII').textContent = formatNumber(upgradeStrengthWorkerLevelII);
   document.getElementById('upgradeDeliveryChanceLevelII').textContent = formatNumber(upgradeDeliveryChanceLevelII);
   document.getElementById('upgradeJobLevelII').textContent = formatNumber(upgradeJobLevelII);
+  document.getElementById('upgradeCoinsLevelIII').textContent = formatNumber(upgradeCoinsLevelIII);
+  document.getElementById('upgradeStrengthPlayerLevelIII').textContent = formatNumber(upgradeStrengthPlayerLevelIII); 
+  document.getElementById('upgradeDeliveryLevelIII').textContent = formatNumber(upgradeDeliveryLevelIII);
+  document.getElementById('upgradeCoinsWorkerLevelIII').textContent = formatNumber(upgradeCoinsWorkerLevelIII); 
+  document.getElementById('upgradeJobLevelIII').textContent = formatNumber(upgradeJobLevelIII);
+  Object.keys(workerLevel).forEach(workerId => {
+  const element = document.getElementById(`${workerId}Level`);
+  if (element) {
+    element.textContent = formatNumber(workerLevel[workerId]);
+  }
+  });
   document.getElementById('currentUpgradeCoinsPlayerI').textContent = formatNumber((upgradeCoinsPlayerI - 1) * 100); 
   document.getElementById('nextUpgradeCoinsPlayerI').textContent = formatNumber((upgradeCoinsPlayerI - 1) * 100 + (5 * currentUpgradeMultiplier)); 
   document.getElementById('currentUpgradeCoinsWorkerI').textContent = formatNumber((upgradeCoinsWorkerI - 1) * 100); 
@@ -247,95 +271,173 @@ function updateUpgradeButtons() {
   document.getElementById('currentUpgradeCoinsII').textContent = formatNumber((upgradeCoinsII - 1) * 100); 
   document.getElementById('nextUpgradeCoinsII').textContent = formatNumber((upgradeCoinsII - 1) * 100 + (10 * currentUpgradeMultiplier)); 
   document.getElementById('currentUpgradeCoinsPlayerII').textContent = formatNumber((upgradeCoinsPlayerII - 1) * 100); 
-  document.getElementById('nextUpgradeCoinsPlayerII').textContent = formatNumber((upgradeCoinsPlayerII - 1) * 100 + (10 * currentUpgradeMultiplier));
+  document.getElementById('nextUpgradeCoinsPlayerII').textContent = formatNumber((upgradeCoinsPlayerII - 1) * 100 + (5 * currentUpgradeMultiplier));
   document.getElementById('currentUpgradeStrengthWorkerII').textContent = formatNumber(upgradeStrengthWorkerII); 
-  document.getElementById('nextUpgradeStrengthWorkerII').textContent = formatNumber(upgradeStrengthWorkerII + (0.1 * currentUpgradeMultiplier));
+  document.getElementById('nextUpgradeStrengthWorkerII').textContent = formatNumber(upgradeStrengthWorkerII + (0.2 * currentUpgradeMultiplier));
   document.getElementById('currentUpgradeDeliveryChanceII').textContent = formatNumber(upgradeDeliveryChanceII); 
   //Sicherung bei maximaler Stufe
   document.getElementById('nextUpgradeDeliveryChanceII').textContent = formatNumber(upgradeDeliveryChanceII + 2.5);
   document.getElementById('currentUpgradeJobII').textContent = formatNumber(upgradeJobII); 
   //Sicherung bei maximaler Stufe
   document.getElementById('nextUpgradeJobII').textContent = formatNumber(upgradeJobII - 1);
-  document.getElementById('upgradeCoinsPlayerCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsPlayerCostI / costValue), 1.15, currentUpgradeMultiplier)); 
-  document.getElementById('upgradeCoinsWorkerCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsWorkerCostI / costValue), 1.15, currentUpgradeMultiplier));
-  document.getElementById('upgradeCoinsCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsCostI / costValue), 1.2, currentUpgradeMultiplier));
-  document.getElementById('upgradeStrengthPlayerCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeStrengthPlayerCostI / costValue), 4, currentUpgradeMultiplier));
+  document.getElementById('currentUpgradeCoinsIII').textContent = formatNumber((upgradeCoinsIII - 1) * 100); 
+  document.getElementById('nextUpgradeCoinsIII').textContent = formatNumber((upgradeCoinsIII - 1) * 100 + (5 * currentUpgradeMultiplier));
+  document.getElementById('currentUpgradeStrengthPlayerIII').textContent = formatNumber(upgradeStrengthPlayerIII); 
+  document.getElementById('nextUpgradeStrengthPlayerIII').textContent = formatNumber(upgradeStrengthPlayerIII + (1 * currentUpgradeMultiplier));
+  document.getElementById('currentUpgradeDeliveryIII').textContent = formatNumber((upgradeDeliveryIII - 1) * 100); 
+  document.getElementById('nextUpgradeDeliveryIII').textContent = formatNumber((upgradeDeliveryIII - 1) * 100 + (5 * currentUpgradeMultiplier));
+  document.getElementById('currentUpgradeCoinsWorkerIII').textContent = formatNumber((upgradeCoinsWorkerIII - 1) * 100); 
+  //Sicherung bei maximaler Stufe
+  document.getElementById('nextUpgradeCoinsWorkerIII').textContent = formatNumber((upgradeCoinsWorkerIII - 1) * 100 + 200);
+
+  document.getElementById('currentUpgradeJobIII').textContent = formatNumber(upgradeJobIII); 
+  //Sicherung bei maximaler Stufe
+  document.getElementById('nextUpgradeJobIII').textContent = formatNumber(upgradeJobIII - 1);
+  Object.keys(workerIntervals).forEach(workerId => {
+  const element1 = document.getElementById(`current${workerId}`);
+  const element2 = document.getElementById(`next${workerId}`);
+  if (element1) {
+    element1.textContent = formatNumber(workerIntervals[workerId] / 1000);
+  }
+  if (element2) {
+    element2.textContent = formatNumber((workerIntervals[workerId] * 0.8) / 1000);
+  }
+  });
+  document.getElementById('upgradeCoinsPlayerCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsPlayerCostI / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier)); 
+  document.getElementById('upgradeCoinsWorkerCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsWorkerCostI / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier));
+  document.getElementById('upgradeCoinsCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsCostI / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier));
+  document.getElementById('upgradeStrengthPlayerCostI').textContent = formatNumber(getTotalUpgradeCost((upgradeStrengthPlayerCostI / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier));
   document.getElementById('upgradeJobCostI').textContent = formatNumber(upgradeJobCostI / costValue);
-  document.getElementById('upgradeCoinsCostII').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsCostII / costValue), 1.2, currentUpgradeMultiplier));
-  document.getElementById('upgradeCoinsPlayerCostII').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsPlayerCostII / costValue), 1.15, currentUpgradeMultiplier)); 
-  document.getElementById('upgradeStrengthWorkerCostII').textContent = formatNumber(getTotalUpgradeCost((upgradeStrengthWorkerCostII / costValue), 5, currentUpgradeMultiplier));
-  document.getElementById('upgradeDeliveryChanceCostII').textContent = formatNumber(upgradeDeliveryChanceCostII / costValue);
-  document.getElementById('upgradeJobCostII').textContent = formatNumber(upgradeJobCostII / costValue);
+  document.getElementById('upgradeCoinsCostII').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsCostII / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier));
+  document.getElementById('upgradeCoinsPlayerCostII').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsPlayerCostII / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier)); 
+  document.getElementById('upgradeStrengthWorkerCostII').textContent = formatNumber(getTotalUpgradeCost((upgradeStrengthWorkerCostII / (costValue * upgradeDeliveryIII)), 5, currentUpgradeMultiplier));
+  document.getElementById('upgradeDeliveryChanceCostII').textContent = formatNumber(upgradeDeliveryChanceCostII / (costValue * upgradeDeliveryIII));
+  document.getElementById('upgradeJobCostII').textContent = formatNumber(upgradeJobCostII / (costValue * upgradeDeliveryIII));
+  document.getElementById('upgradeCoinsCostIII').textContent = formatNumber(getTotalUpgradeCost((upgradeCoinsCostIII / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier));
+  document.getElementById('upgradeStrengthPlayerCostIII').textContent = formatNumber(getTotalUpgradeCost((upgradeStrengthPlayerCostIII / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier));
+  document.getElementById('upgradeDeliveryCostIII').textContent = formatNumber(getTotalUpgradeCost((upgradeDeliveryCostIII / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier));
+  document.getElementById('upgradeCoinsWorkerCostIII').textContent = formatNumber(upgradeCoinsWorkerCostIII / (costValue * upgradeDeliveryIII));
+  document.getElementById('upgradeJobCostIII').textContent = formatNumber(upgradeJobCostIII / (costValue * upgradeDeliveryIII));
   
-  if (coins >= getTotalUpgradeCost((upgradeCoinsPlayerCostI / costValue), 1.15, currentUpgradeMultiplier)) {
+  if (coins >= getTotalUpgradeCost((upgradeCoinsPlayerCostI / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier)) {
     document.getElementById('upgradeCoinsPlayerI').style.borderColor = "var(--color)";
     document.getElementById('upgradeCoinsPlayerI').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeCoinsPlayerI').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeCoinsPlayerI').style.color = "#7A7A7A";
   }
-  if (coins >= getTotalUpgradeCost((upgradeCoinsWorkerCostI / costValue), 1.15, currentUpgradeMultiplier)) {
+  if (coins >= getTotalUpgradeCost((upgradeCoinsWorkerCostI / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier)) {
     document.getElementById('upgradeCoinsWorkerI').style.borderColor = "var(--color)";
     document.getElementById('upgradeCoinsWorkerI').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeCoinsWorkerI').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeCoinsWorkerI').style.color = "#7A7A7A";
   }
-  if (coins >= getTotalUpgradeCost((upgradeCoinsCostI / costValue), 1.2, currentUpgradeMultiplier)) { 
+  if (coins >= getTotalUpgradeCost((upgradeCoinsCostI / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier)) { 
     document.getElementById('upgradeCoinsI').style.borderColor = "var(--color)";
     document.getElementById('upgradeCoinsI').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeCoinsI').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeCoinsI').style.color = "#7A7A7A";
   }
-  if (coins >= getTotalUpgradeCost((upgradeStrengthPlayerCostI / costValue), 4, currentUpgradeMultiplier)) {
+  if (coins >= getTotalUpgradeCost((upgradeStrengthPlayerCostI / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier)) {
     document.getElementById('upgradeStrengthPlayerI').style.borderColor = "var(--color)";
     document.getElementById('upgradeStrengthPlayerI').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeStrengthPlayerI').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeStrengthPlayerI').style.color = "#7A7A7A";
   }
-  if (coins >= upgradeJobCostI / costValue) {
+  if (coins >= upgradeJobCostI / (costValue * upgradeDeliveryIII)) {
     document.getElementById('upgradeJobI').style.borderColor = "var(--color)";
     document.getElementById('upgradeJobI').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeJobI').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeJobI').style.color = "#7A7A7A";
   }
-  if (coins >= getTotalUpgradeCost((upgradeCoinsCostII / costValue), 1.2, currentUpgradeMultiplier)) {
+  if (coins >= getTotalUpgradeCost((upgradeCoinsCostII / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier)) {
     document.getElementById('upgradeCoinsII').style.borderColor = "var(--color)";
     document.getElementById('upgradeCoinsII').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeCoinsII').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeCoinsII').style.color = "#7A7A7A";
   }
-  if (coins >= getTotalUpgradeCost((upgradeCoinsPlayerCostII / costValue), 1.15, currentUpgradeMultiplier)) {
+  if (coins >= getTotalUpgradeCost((upgradeCoinsPlayerCostII / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier)) {
     document.getElementById('upgradeCoinsPlayerII').style.borderColor = "var(--color)";
     document.getElementById('upgradeCoinsPlayerII').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeCoinsPlayerII').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeCoinsPlayerII').style.color = "#7A7A7A";
   }
-  if (coins >= getTotalUpgradeCost((upgradeStrengthWorkerCostII / costValue), 5, currentUpgradeMultiplier)) {
+  if (coins >= getTotalUpgradeCost((upgradeStrengthWorkerCostII / (costValue * upgradeDeliveryIII)), 5, currentUpgradeMultiplier)) {
     document.getElementById('upgradeStrengthWorkerII').style.borderColor = "var(--color)";
     document.getElementById('upgradeStrengthWorkerII').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeStrengthWorkerII').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeStrengthWorkerII').style.color = "#7A7A7A";
   }
-  if (coins >= upgradeDeliveryChanceCostII / costValue) {
+  if (coins >= upgradeDeliveryChanceCostII / (costValue * upgradeDeliveryIII)) {
     document.getElementById('upgradeDeliveryChanceII').style.borderColor = "var(--color)";
     document.getElementById('upgradeDeliveryChanceII').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeDeliveryChanceII').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeDeliveryChanceII').style.color = "#7A7A7A";
   }
-  if (coins >= upgradeJobCostII / costValue) {
+  if (coins >= upgradeJobCostII / (costValue * upgradeDeliveryIII)) {
     document.getElementById('upgradeJobII').style.borderColor = "var(--color)";
     document.getElementById('upgradeJobII').style.color = "var(--color)";
   } else {
     document.getElementById('upgradeJobII').style.borderColor = "#7A7A7A";
     document.getElementById('upgradeJobII').style.color = "#7A7A7A";
+  }
+  if (coins >= getTotalUpgradeCost((upgradeCoinsCostIII / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier)) {
+    document.getElementById('upgradeCoinsIII').style.borderColor = "var(--color)";
+    document.getElementById('upgradeCoinsIII').style.color = "var(--color)";
+  } else {
+    document.getElementById('upgradeCoinsIII').style.borderColor = "#7A7A7A";
+    document.getElementById('upgradeCoinsIII').style.color = "#7A7A7A";
+  }
+  if (coins >= getTotalUpgradeCost((upgradeStrengthPlayerCostIII / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier)) {
+    document.getElementById('upgradeStrengthPlayerIII').style.borderColor = "var(--color)";
+    document.getElementById('upgradeStrengthPlayerIII').style.color = "var(--color)";
+  } else {
+    document.getElementById('upgradeStrengthPlayerIII').style.borderColor = "#7A7A7A";
+    document.getElementById('upgradeStrengthPlayerIII').style.color = "#7A7A7A";
+  }
+  if (coins >= getTotalUpgradeCost((upgradeDeliveryCostIII / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier)) {
+    document.getElementById('upgradeDeliveryIII').style.borderColor = "var(--color)";
+    document.getElementById('upgradeDeliveryIII').style.color = "var(--color)";
+  } else {
+    document.getElementById('upgradeDeliveryIII').style.borderColor = "#7A7A7A";
+    document.getElementById('upgradeDeliveryIII').style.color = "#7A7A7A";
+  }
+  if (coins >= upgradeCoinsWorkerCostIII / (costValue * upgradeDeliveryIII)) {
+    document.getElementById('upgradeCoinsWorkerIII').style.borderColor = "var(--color)";
+    document.getElementById('upgradeCoinsWorkerIII').style.color = "var(--color)";
+  } else {
+    document.getElementById('upgradeCoinsWorkerIII').style.borderColor = "#7A7A7A";
+    document.getElementById('upgradeCoinsWorkerIII').style.color = "#7A7A7A";
+  }
+  if (coins >= upgradeJobCostIII / (costValue * upgradeDeliveryIII)) {
+    document.getElementById('upgradeJobIII').style.borderColor = "var(--color)";
+    document.getElementById('upgradeJobIII').style.color = "var(--color)";
+  } else {
+    document.getElementById('upgradeJobIII').style.borderColor = "#7A7A7A";
+    document.getElementById('upgradeJobIII').style.color = "#7A7A7A";
+  }
+  for (const workerId in workerUpgradeCost) {
+    const upgradeCost = document.getElementById(`upgradeCost${workerId}`);
+    const upgradeButton = document.getElementById(`workerUpgrade_${workerId}`);
+    if (upgradeCost) {
+      const formattedCost = formatNumber(workerUpgradeCost[workerId] / (costValue * upgradeDeliveryIII));
+      upgradeCost.textContent = formattedCost;
+      if (coins > (workerUpgradeCost[workerId] / (costValue * upgradeDeliveryIII))) {
+        upgradeButton.style.borderColor = "var(--color)";
+        upgradeButton.style.color = "var(--color)";
+      } else {
+        upgradeButton.style.borderColor = "#7A7A7A";
+        upgradeButton.style.color = "#7A7A7A";
+      }
+    }
   }
   if (prestigeCount < 6) {
     document.getElementById('upgradeIILock').style.display = "block";
@@ -343,6 +445,13 @@ function updateUpgradeButtons() {
   } else {
     document.getElementById('upgradeIILock').style.display = "none";
     document.getElementById('upgradeIIUnlock').style.display = "flex";
+  }
+  if (prestigeCount < 12) {
+    document.getElementById('upgradeIIILock').style.display = "block";
+    document.getElementById('upgradeIIIUnlock').style.display = "none";
+  } else {
+    document.getElementById('upgradeIIILock').style.display = "none";
+    document.getElementById('upgradeIIIUnlock').style.display = "flex";
   }
 }
 
@@ -374,10 +483,17 @@ function updateDate() {
 
 setInterval(updateDate, 5000);
 
-function updatePrestigeProgressBar() {                   
-            const progressBar = document.querySelector('.prestige-progress-fill');
-            const progress = (coins / (prestigeCost / costValue)) * 100;
-            progressBar.style.width = progress + '%';
+function updatePrestigeProgressBar() {    
+  var roundedPrestigeCost = prestigeCost / (costValue * upgradeDeliveryIII);
+  roundedPrestigeCost = roundPrestigeCost(roundedPrestigeCost);
+  const progressBar = document.querySelector('.prestige-progress-fill');
+  const progress = (coins / roundedPrestigeCost) * 100;
+        progressBar.style.width = progress + '%';
+        if (coins >= roundedPrestigeCost) {
+      progressBar.classList.add('blinking');
+    } else {
+      progressBar.classList.remove('blinking');
+    }
         }
         setInterval(updatePrestigeProgressBar, 100);
 
@@ -443,15 +559,13 @@ let currentWorker = {
 function upgradeWorker(workerId) {
   if (workerIntervals[workerId] !== undefined) {
     
-    if (coins >= workerUpgradeCost[workerId]) {
-      coins -= workerUpgradeCost[workerId];
+    if (coins >= (workerUpgradeCost[workerId] / (costValue * upgradeDeliveryIII))) {
+      coins -= (workerUpgradeCost[workerId] / (costValue * upgradeDeliveryIII));
       workerIntervals[workerId] *= 0.8;
-      workerUpgradeCost[workerId] *= 10;      
+      workerUpgradeCost[workerId] *= 10; 
+      workerLevel[workerId]++;
       updateCoins();
-      updateWorkerDisplay();
-      updateWorkerButtons();
-    } else {
-      alert("Nicht genug € für eine Ausblidung!");
+      updateUpgradeButtons();
     }
   } 
 }
@@ -466,6 +580,36 @@ const workerDivs = {
   worker4: document.getElementById("worker4"),
 };
 
+function updateDivs() {
+  playerDiv.classList.add("passive");
+  const playerStrength = 1 + upgradeStrengthPlayerI + upgradeStrengthPlayerIII;
+    playerDiv.innerHTML = `
+    <strong style="margin-top: calc(var(--base-size) * -0.5); margin-bottom: calc(var(--base-size) * 0.5); font-size: calc(var(--base-size) * 1);">Kein Job</strong>
+    <div style="display: flex; flex-direction: row;">
+    <div class="order-info-container">
+    <img class="field-icon" src="tap.png">
+    <p>${formatNumber(playerStrength)}</p>
+    </div>
+    </div>
+    `;
+  Object.keys(workerDivs).forEach(worker => {
+  const div = workerDivs[worker];
+  if (div) {
+    div.classList.add("passive");
+    const workerStrength = upgradeStrengthWorkerII * (1000 / workerIntervals[worker]);
+    div.innerHTML = `
+      <strong style="margin-top: calc(var(--base-size) * -0.5); margin-bottom: calc(var(--base-size) * 0.5); font-size: calc(var(--base-size) * 1);">Kein Job</strong>
+      <div style="display: flex; flex-direction: row;">
+        <div class="order-info-container">
+          <img class="field-icon" src="tap.png">
+          <p>${formatNumber(workerStrength)}/s</p>
+        </div>
+      </div>
+    `;
+  }
+});
+}
+
 const jobs = [
   { name: "Ketten ölen", work: 10, payment: 10 },
   { name: "Fahrrad putzen", work: 25, payment: (25 * 1.1) },
@@ -473,6 +617,8 @@ const jobs = [
   { name: "Federung tauschen", work: 100, payment: (100 * 1.3) },
   { name: "Rahmen schweißen", work: 250, payment: (250 * 1.4) },
   { name: "Neu lackieren", work: 500, payment: (500 * 1.5) },
+  { name: "Fahrrad tunen", work: 1000, payment: (1000 * 1.75) },
+  { name: "Custom Paintjob", work: 2500, payment: (2500 * 2) },
 ];
 
 const jobStages = {
@@ -480,10 +626,12 @@ const jobStages = {
   2: [jobs[1], jobs[2], jobs[3]],
   3: [jobs[2], jobs[3], jobs[4]],
   4: [jobs[3], jobs[4], jobs[5]],
+  5: [jobs[4], jobs[5], jobs[6]],
+  6: [jobs[5], jobs[6], jobs[7]],
 };
 
 function changeJobStage(newStage) {
-  if (newStage < 1 || newStage > 4) {
+  if (newStage < 1 || newStage > 6) {
     return;
   }
   
@@ -494,11 +642,19 @@ function changeJobStage(newStage) {
   case 2:
     jobStageText1.style.display = "block";
     jobStageText2.style.display = "none";
+    jobStageText3.style.display = "none";
     break;
   case 3:
   case 4:
     jobStageText1.style.display = "none";
     jobStageText2.style.display = "block";
+    jobStageText3.style.display = "none";
+    break;
+  case 5:
+  case 6:
+    jobStageText1.style.display = "none";
+    jobStageText2.style.display = "none";
+    jobStageText3.style.display = "block";
     break;
 }
   updateJobStage();
@@ -511,14 +667,18 @@ const jobStageJobs = [
   jobStageJob3, 
   jobStageJob4, 
   jobStageJob5, 
-  jobStageJob6
+  jobStageJob6,
+  jobStageJob7, 
+  jobStageJob8
 ];
 
 const visibilityMap = {
   1: [1, 2, 3],
   2: [2, 3, 4],
   3: [3, 4, 5],
-  4: [4, 5, 6]
+  4: [4, 5, 6],
+  5: [5, 6, 7],
+  6: [6, 7, 8]
 };
 
   function updateJobStageJobDisplay(stage) {
@@ -561,11 +721,19 @@ function openJobStage() {
   case 2:
     jobStageText1.style.display = "block";
     jobStageText2.style.display = "none";
+    jobStageText3.style.display = "none";
     break;
   case 3:
   case 4:
     jobStageText1.style.display = "none";
     jobStageText2.style.display = "block";
+    jobStageText3.style.display = "none";
+    break;
+  case 5:
+  case 6:
+    jobStageText1.style.display = "none";
+    jobStageText2.style.display = "none";
+    jobStageText3.style.display = "block";
     break;
   }
   
@@ -574,6 +742,13 @@ function openJobStage() {
     jobStageButton3.disabled = "true";
     jobStageButton4.classList.add('locked');  
     jobStageButton4.disabled = "true";
+  }
+  
+  if (prestigeCount < 12) {
+    jobStageButton5.classList.add('locked');
+    jobStageButton5.disabled = "true";
+    jobStageButton6.classList.add('locked');  
+    jobStageButton6.disabled = "true";
   }
 
 
@@ -602,6 +777,7 @@ buttons.forEach(button => {
 function getJobUpgradeTime(stage) {
   if (stage <= 2) return upgradeJobI;
   if (stage <= 4) return upgradeJobII;
+  if (stage <= 6) return upgradeJobIII;
   return upgradeJobI;
 }
 
@@ -626,7 +802,7 @@ function startLoading(index) {
       spawnJob(order);
       findNextPassiveJob();
     }
-  }, 1000);
+  }, 800);
 }
 
 function findNextPassiveJob() {
@@ -649,12 +825,16 @@ function spawnJob(order) {
   const availableJobs = jobStages[currentJobStage];
   const job = availableJobs[Math.floor(Math.random() * availableJobs.length)];
 
-  order.classList.remove("loading");
+  order.classList.remove("passive");
   order.classList.add("job");
   order.innerHTML = `
-    <strong style="margin-top: -0.25em; font-size: 1.1em;">${job.name}</strong>
-    <div style="background-color: gold; height: 0.15em; width: 80%; border-radius: 0.5em; margin: 0.4em; margin-top: 0.4em;"></div>
-    <p>Arbeit: <br> ${job.work}</p>
+    <strong style="margin-top: calc(var(--base-size) * -0.25); margin-bottom: calc(var(--base-size) * 0.5); font-size: calc(var(--base-size) * 1);">${job.name}</strong>
+    <div style="display: flex; flex-direction: row;">
+    <div class="order-info-container">
+    <img class="field-icon" src="work.png">
+    <p>${job.work}</p>
+    </div>
+    </div>
   `;
   order.dataset.work = job.work;
   order.dataset.progress = 0;
@@ -735,14 +915,28 @@ function player() {
   
   const job = extractJobData(selectedOrder);
   playerDiv.dataset.job = JSON.stringify(job);
-  playerDiv.innerHTML = `
-    <strong style="margin-top: -0.5em; font-size: 1.1em;">${job.name}</strong>
-    <div style="background-color: gold; height: 0.15em; width: 80%; border-radius: 0.5em; margin: 0.8em;"></div>
-    <p>Bezahlung: ${formatNumber(job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * (upgradeCoinsPlayerII * upgradeCoinsII) * prestigeMultiplier) * qualityValue)} Coins</p>
-    <div class="progress-bar">
-      <div class="progress-bar-fill" style="width: 0%;"></div>
-    </div>
-  `;
+  playerDiv.classList.remove("passive");
+  playerDiv.classList.add("job");
+    playerDiv.innerHTML = `
+        <strong style="margin-top: calc(var(--base-size) * -0.5); margin-bottom: calc(var(--base-size) * 0.25); font-size: calc(var(--base-size) * 1);">${job.name}</strong>
+        <div style="display: flex; flex-direction: row;">
+            <div class="order-info-container">
+                <img class="field-icon" src="coin.png">
+                <p>${formatNumber(job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * (upgradeCoinsPlayerII * upgradeCoinsII) * upgradeCoinsIII * prestigeMultiplier) * (qualityValue * upgradeDeliveryIII))}</p>
+            </div>
+            <div class="order-info-container">
+                <img class="field-icon" src="tap.png">
+                <p>${formatNumber(1 + upgradeStrengthPlayerI + upgradeStrengthPlayerIII)}</p>
+            </div>
+            <div style="display: flex; flex-direction: row;">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    
   resetJob(selectedOrder);
   playerDiv.addEventListener("click", handlePlayerClick);
   document.getElementById("selectorContainer").style.display = "none";
@@ -754,7 +948,7 @@ function player() {
 function handlePlayerClick() {
   const job = JSON.parse(playerDiv.dataset.job);
   let progress = parseFloat(job.progress) || 0;
-  progress += upgradeStrengthPlayerI;
+  progress += (1 + upgradeStrengthPlayerI + upgradeStrengthPlayerIII);
   progress = Math.round(progress * 10) / 10;
   
   if (navigator.vibrate && vibrate) {   
@@ -769,9 +963,19 @@ function handlePlayerClick() {
     currentPlayer = false;
     const statusFinished = document.getElementById("playerStatus");
     statusFinished.style.backgroundColor = "#2E7D32";
-    coins += (job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * (upgradeCoinsPlayerII * upgradeCoinsII) * prestigeMultiplier) * qualityValue);
-    playerDiv.dataset.job = "";  // Job zurücksetzen
-    playerDiv.innerHTML = "Spieler: Kein Job";
+    coins += (job.payment * ((upgradeCoinsPlayerI * upgradeCoinsI) * (upgradeCoinsPlayerII * upgradeCoinsII) * upgradeCoinsIII * prestigeMultiplier) * (qualityValue * upgradeDeliveryIII));
+    playerDiv.dataset.job = "";
+    playerDiv.classList.remove("job");
+    playerDiv.classList.add("passive");
+    playerDiv.innerHTML = `
+    <strong style="margin-top: calc(var(--base-size) * -0.5); margin-bottom: calc(var(--base-size) * 0.5); font-size: calc(var(--base-size) * 1);">Kein Job</strong>
+    <div style="display: flex; flex-direction: row;">
+    <div class="order-info-container">
+    <img class="field-icon" src="tap.png">
+    <p>${formatNumber(1 + upgradeStrengthPlayerI + upgradeStrengthPlayerIII)}</p>
+    </div>
+    </div>
+    `;
     playerDiv.removeEventListener("click", handlePlayerClick); // Event-Listener entfernen
     updateCoins();  // Coins aktualisieren
   } else {
@@ -819,13 +1023,24 @@ function assignJob(workerDiv, workerId) {
   currentWorker[workerId] = true;
 
   const job = extractJobData(selectedOrder);
+  const workerStrength = upgradeStrengthWorkerII * (1000 / workerIntervals[workerId]);
   workerDiv.dataset.job = JSON.stringify(job);
+  workerDiv.classList.remove("passive");
+  workerDiv.classList.add("job");
   workerDiv.innerHTML = `
-    <strong style="margin-top: -0.25em; font-size: 1.1em;">${job.name}</strong>
-    <div style="background-color: gold; height: 0.15em; width: 80%; border-radius: 0.5em; margin: 0.4em; margin-top: 0.4em;"></div>
-    <p>Bezahlung: <br> ${formatNumber(job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI)  * upgradeCoinsII * prestigeMultiplier) * qualityValue)} Coins</p>
+    <strong style="margin-top: calc(var(--base-size) * -0.5); margin-bottom: calc(var(--base-size) * 0.15); font-size: calc(var(--base-size) * 1);">${job.name}</strong>
+    <div style="display: flex; flex-direction: column;">
+    <div class="order-info-container">
+    <img class="field-icon" src="coin.png">
+    <p>${formatNumber(job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI) * upgradeCoinsII * (upgradeCoinsWorkerIII * upgradeCoinsIII) * prestigeMultiplier) * (qualityValue * upgradeDeliveryIII))}</p>
+    </div>
+    <div class="order-info-container">
+    <img class="field-icon" src="tap.png">
+    <p>${formatNumber(workerStrength)}/s</p>
+    </div>
+    <div style="display: flex; flex-direction: row;">
     <div class="progress-bar">
-      <div class="progress-bar-fill" style="width: 0%;"></div>
+    <div class="progress-bar-fill" style="width: 0%;"></div>
     </div>
   `;
   resetJob(selectedOrder);
@@ -850,9 +1065,19 @@ function assignJob(workerDiv, workerId) {
   currentWorker[workerId] = false;
   clearInterval(interval);
   delete activeIntervals[workerId];
-  coins += (job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI) * upgradeCoinsII * prestigeMultiplier) * qualityValue);
+  coins += (job.payment * ((upgradeCoinsWorkerI * upgradeCoinsI) * upgradeCoinsII * (upgradeCoinsWorkerIII * upgradeCoinsIII) * prestigeMultiplier) * (qualityValue * upgradeDeliveryIII));
   workerDiv.dataset.job = "";
-  workerDiv.innerHTML = "Kein Job";
+  workerDiv.classList.remove("job");
+  workerDiv.classList.add("passive");
+  workerDiv.innerHTML = `
+      <strong style="margin-top: calc(var(--base-size) * -0.5); margin-bottom: calc(var(--base-size) * 0.5); font-size: calc(var(--base-size) * 1);">Kein Job</strong>
+      <div style="display: flex; flex-direction: row;">
+        <div class="order-info-container">
+          <img class="field-icon" src="tap.png">
+          <p>${formatNumber(workerStrength)}/s</p>
+        </div>
+      </div>
+    `;
   updateCoins();
 }
 
@@ -927,7 +1152,7 @@ function getTotalUpgradeCost(baseCost, costMultiplier, levels) {
 
 
 function buyUpgradeCoinsPlayerI() {
-  const totalCost = getTotalUpgradeCost((upgradeCoinsPlayerCostI / costValue), 1.15, currentUpgradeMultiplier);
+  const totalCost = getTotalUpgradeCost((upgradeCoinsPlayerCostI / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier);
 
   if (coins >= totalCost) {
     coins -= totalCost;
@@ -940,7 +1165,7 @@ function buyUpgradeCoinsPlayerI() {
 }
 
 function buyUpgradeCoinsWorkerI() {
-  const totalCost = getTotalUpgradeCost((upgradeCoinsWorkerCostI / costValue), 1.15, currentUpgradeMultiplier);
+  const totalCost = getTotalUpgradeCost((upgradeCoinsWorkerCostI / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier);
   if (coins >= totalCost) {
     coins -= totalCost;
     upgradeCoinsWorkerI += 0.05 * currentUpgradeMultiplier;
@@ -952,7 +1177,7 @@ function buyUpgradeCoinsWorkerI() {
 }
 
 function buyUpgradeCoinsI() {
-  const totalCost = getTotalUpgradeCost((upgradeCoinsCostI / costValue), 1.2, currentUpgradeMultiplier);
+  const totalCost = getTotalUpgradeCost((upgradeCoinsCostI / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier);
 
   if (coins >= totalCost) {
     coins -= totalCost;
@@ -966,7 +1191,7 @@ function buyUpgradeCoinsI() {
 }
 
 function buyUpgradeStrengthPlayerI() {
-  const totalCost = getTotalUpgradeCost((upgradeStrengthPlayerCostI / costValue), 4, currentUpgradeMultiplier);
+  const totalCost = getTotalUpgradeCost((upgradeStrengthPlayerCostI / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier);
 
   if (coins >= totalCost) {
     coins -= totalCost;
@@ -983,8 +1208,8 @@ function buyUpgradeJobI() {
   if (upgradeJobI == 1) {
       return;
   }
-  if (coins >= (upgradeJobCostI / costValue)) {
-    coins -= (upgradeJobCostI / costValue);
+  if (coins >= (upgradeJobCostI / (costValue * upgradeDeliveryIII))) {
+    coins -= (upgradeJobCostI / (costValue * upgradeDeliveryIII));
     upgradeJobI--;
     upgradeJobLevelI++;
     if (upgradeJobI <= 4) {
@@ -999,9 +1224,22 @@ function buyUpgradeJobI() {
   updateUpgradeButtons();
 }
 
+function buyUpgradeCoinsPlayerII() {
+  const totalCost = getTotalUpgradeCost((upgradeCoinsPlayerCostII / (costValue * upgradeDeliveryIII)), 1.15, currentUpgradeMultiplier);
+
+  if (coins >= totalCost) {
+    coins -= totalCost;
+    upgradeCoinsPlayerII += 0.05 * currentUpgradeMultiplier;
+    upgradeCoinsPlayerLevelII += currentUpgradeMultiplier;
+    upgradeCoinsPlayerCostII *= Math.pow(1.15, currentUpgradeMultiplier);
+
+    updateCoins();
+    updateUpgradeButtons();
+  }
+}
 
 function buyUpgradeCoinsII() {
-  const totalCost = getTotalUpgradeCost((upgradeCoinsCostII / costValue), 1.2, currentUpgradeMultiplier);
+  const totalCost = getTotalUpgradeCost((upgradeCoinsCostII / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier);
 
   if (coins >= totalCost) {
     coins -= totalCost;
@@ -1014,26 +1252,12 @@ function buyUpgradeCoinsII() {
   }
 }
 
-function buyUpgradeCoinsPlayerII() {
-  const totalCost = getTotalUpgradeCost((upgradeCoinsPlayerCostII / costValue), 1.15, currentUpgradeMultiplier);
-
-  if (coins >= totalCost) {
-    coins -= totalCost;
-    upgradeCoinsPlayerII += 0.1 * currentUpgradeMultiplier;
-    upgradeCoinsPlayerLevelII += currentUpgradeMultiplier;
-    upgradeCoinsPlayerCostII *= Math.pow(1.15, currentUpgradeMultiplier);
-
-    updateCoins();
-    updateUpgradeButtons();
-  }
-}
-
 function buyUpgradeStrengthWorkerII() {
-  const totalCost = getTotalUpgradeCost((upgradeStrengthWorkerCostII / costValue), 5, currentUpgradeMultiplier);
+  const totalCost = getTotalUpgradeCost((upgradeStrengthWorkerCostII / (costValue * upgradeDeliveryIII)), 5, currentUpgradeMultiplier);
 
   if (coins >= totalCost) {
     coins -= totalCost;
-    upgradeStrengthWorkerII += 0.1 * currentUpgradeMultiplier;
+    upgradeStrengthWorkerII += 0.2 * currentUpgradeMultiplier;
     upgradeStrengthWorkerLevelII += currentUpgradeMultiplier;
     upgradeStrengthWorkerCostII *= Math.pow(5, currentUpgradeMultiplier);
 
@@ -1046,8 +1270,8 @@ function buyUpgradeDeliveryChanceII() {
   if (upgradeDeliveryChanceII == 80) {
       return;
   }
-  if (coins >= (upgradeDeliveryChanceCostII / costValue)) {
-    coins -= (upgradeDeliveryChanceCostII / costValue);
+  if (coins >= (upgradeDeliveryChanceCostII / (costValue * upgradeDeliveryIII))) {
+    coins -= (upgradeDeliveryChanceCostII / (costValue * upgradeDeliveryIII));
     upgradeDeliveryChanceII += 2.5;
     upgradeDeliveryChanceLevelII++;
     upgradeDeliveryChanceCostII *= 10;
@@ -1060,8 +1284,8 @@ function buyUpgradeJobII() {
   if (upgradeJobII == 1) {
       return;
   }
-  if (coins >= (upgradeJobCostII / costValue)) {
-    coins -= (upgradeJobCostII / costValue);
+  if (coins >= (upgradeJobCostII / (costValue * upgradeDeliveryIII))) {
+    coins -= (upgradeJobCostII / (costValue * upgradeDeliveryIII));
     upgradeJobII--;
     upgradeJobLevelII++;
     if (upgradeJobII <= 4) {
@@ -1070,6 +1294,83 @@ function buyUpgradeJobII() {
       upgradeJobCostII *= 20;
     } else {
       upgradeJobCostII *= 10;
+    }
+  }
+  updateCoins();
+  updateUpgradeButtons();
+}
+
+function buyUpgradeCoinsIII() {
+  const totalCost = getTotalUpgradeCost((upgradeCoinsCostIII / (costValue * upgradeDeliveryIII)), 1.2, currentUpgradeMultiplier);
+
+  if (coins >= totalCost) {
+    coins -= totalCost;
+    upgradeCoinsIII += 0.05 * currentUpgradeMultiplier;
+    upgradeCoinsLevelIII += currentUpgradeMultiplier;
+    upgradeCoinsCostIII *= Math.pow(1.2, currentUpgradeMultiplier);
+
+    updateCoins();
+    updateUpgradeButtons();
+  }
+}
+
+function buyUpgradeStrengthPlayerIII() {
+  const totalCost = getTotalUpgradeCost((upgradeStrengthPlayerCostIII / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier);
+
+  if (coins >= totalCost) {
+    coins -= totalCost;
+    upgradeStrengthPlayerIII += 1 * currentUpgradeMultiplier;
+    upgradeStrengthPlayerLevelIII += currentUpgradeMultiplier;
+    upgradeStrengthPlayerCostIII *= Math.pow(4, currentUpgradeMultiplier);
+
+    updateCoins();
+    updateUpgradeButtons();
+  }
+}
+
+function buyUpgradeDeliveryIII() {
+  const totalCost = getTotalUpgradeCost((upgradeDeliveryCostIII / (costValue * upgradeDeliveryIII)), 4, currentUpgradeMultiplier);
+
+  if (coins >= totalCost) {
+    coins -= totalCost;
+    upgradeDeliveryIII += 0.05 * currentUpgradeMultiplier;
+    upgradeDeliveryLevelIII += currentUpgradeMultiplier;
+    upgradeDeliveryCostIII *= Math.pow(4, currentUpgradeMultiplier);
+
+    updateCoins();
+    updateUpgradeButtons();
+    updatePrestige();
+  }
+}
+
+function buyUpgradeCoinsWorkerIII() {
+  if (upgradeCoinsWorkerLevelIII == 10) {
+      return;
+  }
+  if (coins >= (upgradeCoinsWorkerCostIII / (costValue * upgradeDeliveryIII))) {
+    coins -= (upgradeCoinsWorkerCostIII / (costValue * upgradeDeliveryIII));
+    upgradeCoinsWorkerIII += 2;
+    upgradeCoinsWorkerLevelIII++;
+    upgradeCoinsWorkerCostIII *= 35;
+  }
+  updateCoins();
+  updateUpgradeButtons();
+}
+
+function buyUpgradeJobIII() {
+  if (upgradeJobIII == 1) {
+      return;
+  }
+  if (coins >= (upgradeJobCostIII / (costValue * upgradeDeliveryIII))) {
+    coins -= (upgradeJobCostIII / (costValue * upgradeDeliveryIII));
+    upgradeJobIII--;
+    upgradeJobLevelIII++;
+    if (upgradeJobIII <= 4) {
+      upgradeJobCostIII *= 30;
+    } else if (upgradeJobIII <= 7) {
+      upgradeJobCostIII *= 20;
+    } else {
+      upgradeJobCostIII *= 10;
     }
   }
   updateCoins();
@@ -1273,18 +1574,21 @@ function gambleDelivery() {
 
 // Prestige 
 
-let jobStageReset = false;
-
-function handleCheckboxChange(checkbox) {
-  jobStageReset = checkbox.checked;
+function roundPrestigeCost(prestigeCost) {
+  if (prestigeCost < 10) return Math.round(prestigeCost);
+  
+  const magnitude = Math.pow(10, Math.floor(Math.log10(prestigeCost)));
+  return Math.round(prestigeCost / magnitude) * magnitude;
 }
 
 function buyPrestige() {
-  if (coins >= (prestigeCost / costValue)) {
-    coins -= (prestigeCost / costValue);
+  var roundedPrestigeCost = prestigeCost / (costValue * upgradeDeliveryIII);
+  roundedPrestigeCost = roundPrestigeCost(roundedPrestigeCost);
+  if (coins >= roundedPrestigeCost) {
+    coins = 0;
     prestigeCount++;
     prestigeMultiplier *= 2;
-    prestigeCost *= 5;
+    prestigeCost *= 6;
     coins = 0;
     upgradeCoinsPlayerI = 1;
     upgradeCoinsPlayerLevelI = 0;
@@ -1295,18 +1599,18 @@ function buyPrestige() {
     upgradeCoinsI = 1;
     upgradeCoinsLevelI = 0;
     upgradeCoinsCostI = 50;
-    upgradeStrengthPlayerI = 1;
+    upgradeStrengthPlayerI = 0;
     upgradeStrengthPlayerLevelI = 0;
     upgradeStrengthPlayerCostI = 100;
     upgradeJobI = 10;
     upgradeJobLevelI = 0;
     upgradeJobCostI = 250;
-    upgradeCoinsII = 1;
-    upgradeCoinsLevelII = 0;
-    upgradeCoinsCostII = 500;
     upgradeCoinsPlayerII = 1;
     upgradeCoinsPlayerLevelII = 0;
-    upgradeCoinsPlayerCostII = 750;
+    upgradeCoinsPlayerCostII = 500;
+    upgradeCoinsII = 1;
+    upgradeCoinsLevelII = 0;
+    upgradeCoinsCostII = 750;
     upgradeStrengthWorkerII = 1;
     upgradeStrengthWorkerLevelII = 0;
     upgradeStrengthWorkerCostII = 1000;
@@ -1316,6 +1620,30 @@ function buyPrestige() {
     upgradeJobII = 10;
     upgradeJobLevelII = 0;
     upgradeJobCostII = 2500;
+    upgradeCoinsIII = 1;
+    upgradeCoinsLevelIII = 0;
+    upgradeCoinsCostIII = 5000;
+    upgradeStrengthPlayerIII = 0;
+    upgradeStrengthPlayerLevelIII = 0;
+    upgradeStrengthPlayerCostIII = 7500;
+    upgradeDeliveryIII = 1;
+    upgradeDeliveryLevelIII = 0;
+    upgradeDeliveryCostIII = 10000;
+    upgradeCoinsWorkerIII = 1;
+    upgradeCoinsWorkerLevelIII = 0;
+    upgradeCoinsWorkerCostIII = 15000;
+    upgradeJobIII = 10;
+    upgradeJobLevelIII = 0;
+    upgradeJobCostIII = 25000;
+    Object.keys(workerLevel).forEach(workerId => {
+    workerLevel[workerId] = 0;
+    });
+    Object.keys(workerIntervals).forEach(workerId => {
+    workerIntervals[workerId] = 665;
+    });
+    Object.keys(workerUpgradeCost).forEach(workerId => {
+    workerUpgradeCost[workerId] = 100;
+    });
     if (jobStageReset) {
       currentJobStage = 1;
     }

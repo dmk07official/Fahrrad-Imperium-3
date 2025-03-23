@@ -45,7 +45,6 @@ p, h1, h2 {
   left: 0;
   width: 100%;
   height: calc(var(--base-size) * 0.5);
-  border-bottom: solid var(--color) calc(var(--base-size) * 0.05);
   background-color: rgba(20, 20, 20, 0.5);
   z-index: 998;
   margin: 0;
@@ -58,11 +57,25 @@ p, h1, h2 {
   transition: width 0.5s ease;
 }
 
+@keyframes blinkOpacity {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 
+  .blinking {
+    animation: blinkOpacity 1.5s infinite;
+  }
 
 .window-header {
-  margin-top: calc(var(--base-size) * 1.5);
-  margin-bottom: calc(var(--base-size) * 0.5);
+  margin-top: calc(var(--base-size) * 1);
+  margin-bottom: calc(var(--base-size) * 1);
 }
 
 .blur {
@@ -91,6 +104,7 @@ p, h1, h2 {
 }
 
 .ui-element {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -103,29 +117,48 @@ p, h1, h2 {
   margin: calc(var(--base-size) * 3);
 }
 
+.ui-icon {
+  width: calc(var(--base-size) * 1.35);
+  position: absolute;
+  left: calc(var(--base-size) * 0.75);
+}
+
+.field-icon {
+  width: calc(var(--base-size) * 1);
+  margin-right: calc(var(--base-size) * 0.35);
+}
+
 .window-choose-button,
 .job-stage-button {
-  width: calc(var(--base-size) * 7.8);
-  height: calc(var(--base-size) * 1.8);
-  font-size: calc(var(--base-size) * 0.75);
+  width: calc(var(--base-size) * 9);
+  height: calc(var(--base-size) * 1.75);
+  font-size: calc(var(--base-size) * 0.85);
   font-weight: bold;
   margin: calc(var(--base-size) * 0.2) calc(var(--base-size) * 0.5) calc(var(--base-size) * 0.25) calc(var(--base-size) * 0.5);
   background-color: #444;
   color: var(--color);
   border: solid calc(var(--base-size) * 0.1) var(--color);
-  border-radius: calc(var(--base-size) * 1);
+  border-radius: calc(var(--base-size) * 0.5);
 }
 .window-choose-button.active,
 .job-stage-button.active {
+  width: calc(var(--base-size) * 9.5);
+  height: calc(var(--base-size) * 1.85);
+  background-color: var(--color);
+  color: #333;
+  border: none;
+}
+.job-stage-button.active {
   width: calc(var(--base-size) * 8);
   height: calc(var(--base-size) * 2);
-  background-color: var(--color);
-  color: #444;
-  border: none;
 }
 .job-stage-button.locked {
   color: #7A7A7A;
   border: solid calc(var(--base-size) * 0.1) #7A7A7A;
+}
+.job-stage-button {
+  width: calc(var(--base-size) * 7.8);
+  border-radius: calc(var(--base-size) * 0.75);
 }
 .window {
   width: 100%;
@@ -137,7 +170,8 @@ p, h1, h2 {
   box-sizing: border-box;
 }
 .top-line {
-  width: 100%;
+  width: 98%;
+  margin-left: 1%;
   display: flex;
   flex-direction: row;
   margin-bottom: calc(var(--base-size) * 1);
@@ -151,12 +185,12 @@ p, h1, h2 {
   
 }
 .order-container {
-  width: calc(var(--base-size) * 29);
+  width: calc(var(--base-size) * 28);
   height: calc(var(--base-size) * 15);
   border: calc(var(--base-size) * 0.1) solid var(--color);
   background-color: #222;
   border-radius: calc(var(--base-size) * 0.5);
-  margin: calc(var(--base-size) * 0.2);
+  margin: calc(var(--base-size) * 0.15);
   font-size: calc(var(--base-size) * 0.8);
   display: flex;
   flex-direction: column;  
@@ -176,7 +210,7 @@ p, h1, h2 {
 }
 .player {
   position: relative;
-  width: calc(var(--base-size) * 29);
+  width: calc(var(--base-size) * 28);
   height: calc(var(--base-size) * 15);
   display: flex;
   flex-direction: column;
@@ -188,14 +222,15 @@ p, h1, h2 {
   overflow: hidden;
 }
 #workers {
-  width: 100%;
+  width: 98%;
+  margin-left: 1%;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   margin-bottom: calc(var(--base-size) * 1);
 }
 .order {
-  width: calc(var(--base-size) * 8.5);
+  width: calc(var(--base-size) * 12.75);
   height: calc(var(--base-size) * 6);
   display: flex;
   flex-direction: column;
@@ -205,12 +240,24 @@ p, h1, h2 {
   margin: calc(var(--base-size) * 0.25);
   font-size: calc(var(--base-size) * 0.8);
 }
+.order-info-container {
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  border: solid calc(var(--base-size) * 0.15) var(--color); 
+  padding-left: calc(var(--base-size) * 0.7); 
+  padding-right: calc(var(--base-size) * 0.7);
+  padding-top: calc(var(--base-size) * 0.2); 
+  padding-bottom: calc(var(--base-size) * 0.2); 
+  border-radius: calc(var(--base-size) * 0.3); 
+  margin: calc(var(--base-size) * 0.25); 
+}
 .passive {
   border: calc(var(--base-size) * 0.15) solid #555;
   background-color: #333;
 }
 .loading {
-  border: calc(var(--base-size) * 0.15) solid #444;
+  border: calc(var(--base-size) * 0.15) solid #4A4A4A;
   background-color: #111;
 }
 .job {
@@ -219,47 +266,46 @@ p, h1, h2 {
 }
 .worker {
   position: relative;
-  width: calc(var(--base-size) * 12.5);
-  height: calc(var(--base-size) * 16);
+  width: calc(var(--base-size) * 13.5);
+  height: calc(var(--base-size) * 12.5);
   display: flex;
   flex-direction: column;
   align-items: center;
   border: calc(var(--base-size) * 0.1) solid var(--color);
   background-color: #222;
   border-radius: calc(var(--base-size) * 0.5);
-  margin: calc(var(--base-size) * 0.25);
+  margin: calc(var(--base-size) * 0.15);
   font-size: calc(var(--base-size) * 0.8);
   overflow: hidden;
 }
 .player-status,
 .worker-status {
-  width: calc(var(--base-size) * 12.5);
-  height: calc(var(--base-size) * 0.4);
+  width: calc(var(--base-size) * 13.5);
+  height: calc(var(--base-size) * 0.35);
   margin-top: 0;
   margin-bottom: calc(var(--base-size) * 0.5);
   border-bottom: solid var(--color) calc(var(--base-size) * 0.075);
   background-color: #2E7D32;
 }
 .player-status {
-  width: calc(var(--base-size) * 29);
+  width: calc(var(--base-size) * 28);
 }
 .player-header,
 .worker-header {
   font-size: calc(var(--base-size) * 1.2);
   margin: 0;
   margin-top: calc(var(--base-size) * 0.25);
-  margin-bottom: calc(var(--base-size) * 0.5);
+  margin-bottom: calc(var(--base-size) * 0.25);
 }
 .player-field,
 .worker-field {
   position: relative;
   width: calc(var(--base-size) * 10);
-  height: calc(var(--base-size) * 6.5);
+  height: calc(var(--base-size) * 7.75);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #444;
   border-radius: calc(var(--base-size) * 0.6);
   margin: calc(var(--base-size) * 0.4);
   font-size: calc(var(--base-size) * 0.8);
@@ -319,9 +365,9 @@ p, h1, h2 {
 }
 .job-stage-info-container {
   width: calc(var(--base-size) * 45);
-  height: calc(var(--base-size) * 11);
+  height: calc(var(--base-size) * 11.5);
   margin-top: calc(var(--base-size) * 0.5);
-  margin-bottom: calc(var(--base-size) * 0.5);
+  margin-bottom: calc(var(--base-size) * 0.25);
   display: flex;
   flex-direction: row;
   border: solid calc(var(--base-size) * 0.05) var(--color);
@@ -339,7 +385,7 @@ p, h1, h2 {
 }
 .job-stage-job-container {
   width: calc(var(--base-size) * 25);
-  height: calc(var(--base-size) * 10);
+  height: calc(var(--base-size) * 9.5);
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -361,7 +407,7 @@ p, h1, h2 {
   flex-direction: column;
 }
 .job-stage-job-info {
-  font-size: calc(var(--base-size) * 0.75);
+  font-size: calc(var(--base-size) * 0.7);
 }
 .job-stage-job-header {
   font-size: calc(var(--base-size) * 0.85);
@@ -560,8 +606,8 @@ p, h1, h2 {
   background-color: #222;
   border-radius: calc(var(--base-size) * 1);
   width: calc(var(--base-size) * 40);
-  height: calc(var(--base-size) * 28);
-  margin: calc(var(--base-size) * 2.5) auto;
+  height: calc(var(--base-size) * 28.75);
+  margin: calc(var(--base-size) * 2) auto;
 }
 
 .upgrade {
@@ -600,13 +646,18 @@ p, h1, h2 {
 .upgrade-button {
   width: calc(var(--base-size) * 9);
   height: calc(var(--base-size) * 3);
-  font-size: calc(var(--base-size) * 0.8);
   font-weight: bold;
   margin: calc(var(--base-size) * 0.2) calc(var(--base-size) * 0.5) calc(var(--base-size) * 0.25) calc(var(--base-size) * 0.5);
   background-color: #444;
   color: var(--color);
   border: solid calc(var(--base-size) * 0.1) var(--color);
   border-radius: calc(var(--base-size) * 0.5);
+}
+
+.upgrade-icon {
+  position: absolute;
+  width: calc(var(--base-size) * 1.5);
+  right: calc(var(--base-size) * 0.75);
 }
 
 .upgrade-button-ui-left,
@@ -638,7 +689,7 @@ p, h1, h2 {
   background-color: #222;
   border-radius: calc(var(--base-size) * 1);
   width: calc(var(--base-size) * 22.5);
-  height: calc(var(--base-size) * 5.5);
+  height: calc(var(--base-size) * 6);
   margin: calc(var(--base-size) * -1) auto;
 }
 
@@ -647,7 +698,7 @@ p, h1, h2 {
   height: calc(var(--base-size) * 2.5);
   font-size: calc(var(--base-size) * 0.8);
   font-weight: bold;
-  margin: calc(var(--base-size) * 0.25) calc(var(--base-size) * 0.5) calc(var(--base-size) * 0.75) calc(var(--base-size) * 0.5);
+  margin: calc(var(--base-size) * 0.25) calc(var(--base-size) * 0.5) calc(var(--base-size) * 0.25) calc(var(--base-size) * 0.5);
   background-color: #444;
   color: var(--color);
   border: solid calc(var(--base-size) * 0.1) var(--color);
@@ -659,4 +710,307 @@ p, h1, h2 {
   height:  calc(var(--base-size) * 3);
   position: relative;
   top: calc(var(--base-size) * 0.375);
+}
+
+.online-container {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+  
+.online-container-header {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: calc(var(--base-size) * 0.45);
+  margin-bottom: calc(var(--base-size) * 0.25);
+}
+  
+  .chat-container {
+    background-color: #222;
+    box-shadow: black 0 0 calc(var(--base-size) * 0.5) calc(var(--base-size) * 0.3) inset;
+    width: calc(var(--base-size) * 55);
+    height: calc(var(--base-size) * 17.5);
+    border-radius: calc(var(--base-size) * 1.5);
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    border: solid gold;
+    border-width: calc(var(--base-size) * 0.1);
+    overflow: hidden;
+  }
+  
+  .container-chat {
+    width: calc(var(--base-size) * 40);
+    height: 95%;    
+  }
+  
+  .container-member {
+    width: calc(var(--base-size) * 15);
+    height: 100%;
+    background-color: #2A2A2A;
+    border-left: solid gold;
+    border-width: calc(var(--base-size) * 0.1);
+    padding-top: calc(var(--base-size) * 0.25);
+    overflow-y: auto;
+}
+  
+  .button-row-container-rank-coins,
+  .button-row-container-rank-prestige-level {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #222;
+    width: calc(var(--base-size) * 27.5);
+    height: calc(var(--base-size) * 16.5);
+    border-radius: calc(var(--base-size) * 1);
+    padding-top: calc(var(--base-size) * 0.5);
+    padding-bottom: calc(var(--base-size) * 0.5);
+    margin-left: calc(var(--base-size) * 0.5);
+    margin-right: calc(var(--base-size) * 0.5);
+    position: relative; 
+    border: calc(var(--base-size) * 0.1) solid var(--color);
+  }
+  
+  .button-row-header {
+    width: calc(var(--base-size) * 27.5);
+    margin-left: calc(var(--base-size) * 0.5);
+    margin-right: calc(var(--base-size) * 0.5);
+  }
+
+.chat-box {
+    height: calc(var(--base-size) * 13);
+    width: 90%;
+    margin: auto;
+    margin-top: calc(var(--base-size) * 0.2);
+    overflow-y: auto;
+}
+
+  .chat-input-container {    
+    display: flex;    
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--base-size) * 30);
+    height: calc(var(--base-size) * 2.6);
+    padding: 0;
+    margin: auto;
+    margin-top: calc(var(--base-size) * 0.5);
+    margin-bottom: calc(var(--base-size) * -0.25);
+  }
+
+  .message-input {
+    background-color: #3A3A3A;
+    color: var(--color);
+    width: calc(var(--base-size) * 21);
+    height: calc(var(--base-size) * 2.5);
+    padding-left: calc(var(--base-size) * 0.5);
+    border: calc(var(--base-size) * 0.15) solid var(--color); 
+    border-radius: calc(var(--base-size) * 0.5);
+    margin: 0;
+    margin-right: calc(var(--base-size) * 0.5);
+  }
+  
+  input:focus {
+    outline: none;
+  }
+
+  ::placeholder {
+    color: var(--color);
+    font-style: italic;
+  }
+  
+  .send-button {
+    background-color: var(--color);
+    width: calc(var(--base-size) * 8);
+    height: calc(var(--base-size) * 2.8);
+    border-radius: calc(var(--base-size) * 0.5);
+    margin: 0;
+    margin-left: calc(var(--base-size) * 0.5);
+    border: none;
+    display: flex;    
+    align-items: center;
+    justify-content: center;
+}
+
+.send-text {
+    color: #3A3A3A;
+    font-size: calc(var(--base-size) * 1.1);
+    font-weight: bold;
+}
+
+.my-message {
+  width: 55%;
+  margin: 0;
+  margin-left: 40%;
+  margin-bottom: calc(var(--base-size) * 0.75);
+  text-align: left;
+  word-wrap: break-word;
+}
+
+.other-message {
+  width: 55%;
+  margin: 0;
+  margin-right: 40%;
+  margin-bottom: calc(var(--base-size) * 0.75);
+  text-align: left;
+  word-wrap: break-word;
+}
+
+.message-container {
+  background-color: #333;
+  border-radius: calc(var(--base-size) * 0.75);
+  padding: 2.5%;
+  width: 100%;
+}
+
+.my-message-sender {
+  font-size: 0;
+  margin: 0;
+  opacity: 0;
+  display: none;
+}
+
+.other-message-sender {
+  font-size: calc(var(--base-size) * 0.9);
+  font-weight: bold;
+  text-align: left;
+  margin-left: 2.5%;
+}
+
+.my-message-timestamp {
+  font-size: calc(var(--base-size) * 0.75);
+  font-weight: bold;
+  color: #777;
+  text-align: left;
+}
+
+.other-message-timestamp {
+  font-size: calc(var(--base-size) * 0.75);
+  font-weight: bold;
+  color: #777;
+  text-align: right;
+}
+
+.online-status-dot {
+  width: calc(var(--base-size) * 1.2);
+  height: calc(var(--base-size) * 1.2);
+  border-radius: 50%;
+  margin-left: calc(var(--base-size) * 0.75);
+}
+
+.online-dot {
+  background-color: #25dd28;
+  box-shadow: #444 0 0 calc(var(--base-size) * 0.2) calc(var(--base-size) * 0.05) inset;
+}
+
+.offline-dot {
+  background-color: #666;
+  box-shadow: #222 0 0 calc(var(--base-size) * 0.2) calc(var(--base-size) * 0.05) inset;
+}
+  
+.leaderboard-entry {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    height: calc(var(--base-size) * 3);
+    width: 80%;
+    margin: auto;
+    margin-left: 10%;
+    margin-top: calc(var(--base-size) * 0.25);
+    margin-bottom: calc(var(--base-size) * 0.25);
+    background-color: #3A3A3A;
+    border-radius: calc(var(--base-size) * 0.75);
+}
+
+.rank {
+    grid-row: 1 / span 2;
+    font-size: calc(var(--base-size) * 1.5);
+    margin-left: calc(var(--base-size) * 1);
+}
+
+.username, .coins {
+    width: 100%;
+}
+
+.username {
+    grid-column: 2;
+    grid-row: 1;
+    font-weight: bold;
+    font-size: calc(var(--base-size) * 0.8);
+}
+
+.coins {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: calc(var(--base-size) * 0.9);
+}  
+
+.username-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;  
+  flex-direction: column;
+  z-index: 9998;
+}
+
+.username-popup {
+  background-color: rgba(0, 0, 0, 1);
+}
+
+.username-popup-content {
+  background-color: #2A2A2A;
+  width: calc(var(--base-size) * 45);
+  height: 70%;
+  border-radius: calc(var(--base-size) * 1);
+  border: calc(var(--base-size) * 0.2) solid var(--color);
+  margin: auto;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-shadow: rgb(0, 0, 0) 0 0 calc(var(--base-size) * 0.75) calc(var(--base-size) * 0.15) inset;
+}
+
+.username-input {
+  background-color: #3A3A3A;
+  color: var(--color);
+  width: calc(var(--base-size) * 35);
+  height: calc(var(--base-size) * 3);
+  padding: calc(var(--base-size) * 0.25);
+  border: calc(var(--base-size) * 0.2) solid var(--color);
+  border-radius: calc(var(--base-size) * 0.75);
+  margin: 0;
+}
+  
+.username-button {
+  background-color: var(--color);
+  color: #333;
+  border: none;
+  border-radius: calc(var(--base-size) * 0.5);
+  width: calc(var(--base-size) * 18);
+  height: calc(var(--base-size) * 2.25);
+  font-weight: bold;
+  margin: calc(var(--base-size) * 0.75);
+  margin-top: calc(var(--base-size) * 1.5);
+  transition: 0.2s ease;
+}
+
+.username-button:active {
+  width: calc(var(--base-size) * 17.5);
+  height: calc(var(--base-size) * 2);
+  background-color: #333;
+  color: var(--color);
+  border: calc(var(--base-size) * 0.1) solid var(--color);
 }
