@@ -274,57 +274,6 @@ function hidePing() {
     const pingDiv = document.getElementById('ping');
     pingDiv.style.display = 'none';
 }      
-
-onChildAdded(ref(db, 'messages'), (snapshot) => {
-    const data = snapshot.val();
-
-    // Nachrichten-Anzeige
-    const messageContainerTop = document.createElement('div');
-    messageContainerTop.className = (data.sender === customUserName) ? 'my-message' : 'other-message';
-
-    const senderDiv = document.createElement('div');
-    senderDiv.className = (data.sender === customUserName) ? 'my-message-sender' : 'other-message-sender';
-    senderDiv.textContent = data.sender;
-
-    const messageContainer = document.createElement('div');
-    messageContainer.className = 'message-container';
-
-    const textDiv = document.createElement('div');
-    textDiv.className = 'message-text';
-    textDiv.textContent = data.message;
-
-    const timeDiv = document.createElement('div');
-    timeDiv.className = (data.sender === customUserName) ? 'my-message-timestamp' : 'other-message-timestamp';
-    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    messageContainer.appendChild(textDiv);
-    messageContainer.appendChild(timeDiv);
-
-    messageContainerTop.appendChild(senderDiv);
-    messageContainerTop.appendChild(messageContainer);
-
-    document.getElementById('chatBox').appendChild(messageContainerTop);
-
-    // Wenn customUserName noch nicht geladen ist -> später aktualisieren
-    if (!customUserName) {
-        getCustomUserName(auth.currentUser).then((name) => {
-            customUserName = name;
-
-            // Nachrichten nachträglich korrekt markieren
-            const allMessages = document.querySelectorAll('.message-container');
-            allMessages.forEach((msg) => {
-                const sender = msg.parentElement.querySelector('.my-message-sender, .other-message-sender');
-                if (sender.textContent === customUserName) {
-                    msg.parentElement.className = 'my-message';
-                    sender.className = 'my-message-sender';
-                    msg.querySelector('.message-timestamp').className = 'my-message-timestamp';
-                }
-            });
-        });
-    }
-
-    scrollToBottom();
-});
         
 
 function scrollToBottom() {
