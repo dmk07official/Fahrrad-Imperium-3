@@ -1644,9 +1644,6 @@ function buyPrestige() {
     Object.keys(workerUpgradeCost).forEach(workerId => {
     workerUpgradeCost[workerId] = 100;
     });
-    if (jobStageReset) {
-      currentJobStage = 1;
-    }
     saveProgress();
     const prestigeFade = document.querySelector(".prestige-fade");
 if (prestigeFade) {
