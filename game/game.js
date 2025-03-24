@@ -539,13 +539,12 @@ function toggleActiveWindowChoose(buttonId) {
     }
 
     document.querySelectorAll('.window').forEach(div => {
-        div.style.width = '0';
-        div.style.display = 'block';
+        div.style.display = 'none';
     });
 
     const correspondingDiv = document.getElementById('window' + buttonId.charAt(0).toUpperCase() + buttonId.slice(1));
     if (correspondingDiv) {
-        correspondingDiv.style.width = '100%';
+        correspondingDiv.style.display = 'block';
     }
 }
 
