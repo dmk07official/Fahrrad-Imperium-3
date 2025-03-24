@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-
+        
 import { getDatabase, ref, set, get, query, orderByChild, limitToLast, onValue, onChildAdded, onChildRemoved, push, onDisconnect } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
         
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
@@ -141,66 +141,29 @@ function updateOnlineStatus() {
     } 
 }
                         
-        // Benutzername direkt beim Login laden und speichern
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        customUserName = await getCustomUserName(user);
-        console.log("Benutzername geladen:", customUserName);
-
-        // Nachrichten erst laden, wenn Benutzername verfügbar ist
-        loadMessages();
-    }
-});
-
-function loadMessages() {
-    onChildAdded(ref(db, 'messages'), (snapshot) => {
-        const data = snapshot.val();
-
-        const messageContainerTop = document.createElement('div');
-        const isMyMessage = (data.sender === customUserName);
-        messageContainerTop.className = isMyMessage ? 'my-message' : 'other-message';
-
-        const senderDiv = document.createElement('div');
-        senderDiv.className = isMyMessage ? 'my-message-sender' : 'other-message-sender';
-        senderDiv.textContent = data.sender;
-
-        const messageContainer = document.createElement('div');
-        messageContainer.className = 'message-container';
-
-        const textDiv = document.createElement('div');
-        textDiv.className = 'message-text';
-        textDiv.textContent = data.message;
-
-        const timeDiv = document.createElement('div');
-        timeDiv.className = isMyMessage ? 'my-message-timestamp' : 'other-message-timestamp';
-        timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        messageContainer.appendChild(textDiv);
-        messageContainer.appendChild(timeDiv);
-
-        messageContainerTop.appendChild(senderDiv);
-        messageContainerTop.appendChild(messageContainer);
-
-        document.getElementById('chatBox').appendChild(messageContainerTop);
-
-        scrollToBottom();
-    });
-}
-
-function getCustomUserName(user) {
-    return new Promise((resolve, reject) => {
-        const userRef = ref(db, `users/${user.uid}/username`);
-        onValue(userRef, (snapshot) => {
-            const username = snapshot.val();
-            if (username) {
-                resolve(username);
-            } else {
-                reject("Kein Benutzername gefunden");
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadUserDataFromFirebase(user.uid);
+                getCustomUserName(user).then((name) => {
+                    customUserName = name;                                   
+                });
+            } else {                
+                currentUser = null;
+                customUserName = null;                
             }
         });
-    });
-}
 
+        function getCustomUserName(user) {
+            const userRef = ref(db, 'users/' + user.uid);
+            return get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    return snapshot.val().customUserName;
+                } else {
+                    return user.email;
+                }
+            });
+        }
         
 function checkOnlineStatus() {
     const containerRef = query(ref(db, 'users'));
@@ -273,8 +236,48 @@ function showPing() {
 function hidePing() {
     const pingDiv = document.getElementById('ping');
     pingDiv.style.display = 'none';
-}      
-        
+}
+
+const sessionStartTime = new Date().getTime();                
+
+onChildAdded(ref(db, 'messages'), (snapshot) => {
+            const data = snapshot.val();
+            if (data.timestamp >= sessionStartTime) {
+            
+        if (!chatBoxVisible) {
+            unreadMessages++;
+            showPing();
+        }
+            
+const messageContainerTop = document.createElement('div');
+messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+
+const senderDiv = document.createElement('div');
+senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+senderDiv.textContent = data.sender;
+
+const messageContainer = document.createElement('div');
+messageContainer.className = 'message-container';
+
+const textDiv = document.createElement('div');
+textDiv.className = 'message-text';
+textDiv.textContent = data.message;
+
+const timeDiv = document.createElement('div');
+timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+messageContainer.appendChild(textDiv);
+messageContainer.appendChild(timeDiv);
+
+messageContainerTop.appendChild(senderDiv);
+messageContainerTop.appendChild(messageContainer);
+
+document.getElementById('chatBox').appendChild(messageContainerTop);
+scrollToBottom();
+
+            }
+        });        
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
