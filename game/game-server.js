@@ -284,10 +284,10 @@ function loadAllMessages() {
 // Direkt beim Start ausführen
 loadAllMessages();
 
-// Nachrichten-Listener für neue Nachrichten (nach Start)
 onChildAdded(ref(db, 'messages'), (snapshot) => {
     const data = snapshot.val();
 
+    // Nachricht anzeigen, egal ob chatBox sichtbar oder nicht
     const messageContainerTop = document.createElement('div');
     messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
@@ -308,14 +308,64 @@ onChildAdded(ref(db, 'messages'), (snapshot) => {
 
     messageContainer.appendChild(textDiv);
     messageContainer.appendChild(timeDiv);
-
     messageContainerTop.appendChild(senderDiv);
     messageContainerTop.appendChild(messageContainer);
 
     document.getElementById('chatBox').appendChild(messageContainerTop);
-    
     scrollToBottom();
+
+    // Wenn die Nachricht nicht vom aktuellen Benutzer ist und der Chat nicht sichtbar ist => ungelesene Nachrichten erhöhen
+    if (data.sender !== customUserName && !chatBoxVisible) {
+        unreadMessages++;
+        showPing();
+    }
 });
+
+function sendMessage() {
+    var audio = new Audio('tap.mp3');
+    audio.play();
+
+    const message = messageInput.value.trim();
+    if (message) {
+        const timestamp = new Date().getTime();
+        
+        // Nachricht direkt anzeigen, ohne auf Firebase zu warten
+        const messageContainerTop = document.createElement('div');
+        messageContainerTop.className = 'my-message';
+
+        const senderDiv = document.createElement('div');
+        senderDiv.className = 'my-message-sender';
+        senderDiv.textContent = customUserName;
+
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
+        textDiv.textContent = message;
+
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'my-message-timestamp';
+        timeDiv.textContent = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        messageContainer.appendChild(textDiv);
+        messageContainer.appendChild(timeDiv);
+        messageContainerTop.appendChild(senderDiv);
+        messageContainerTop.appendChild(messageContainer);
+
+        document.getElementById('chatBox').appendChild(messageContainerTop);
+        scrollToBottom();
+
+        // Nachricht in die Datenbank schreiben
+        set(ref(db, 'messages/' + timestamp), {
+            message: message,
+            sender: customUserName,
+            timestamp: timestamp
+        });
+
+        messageInput.value = '';
+    }
+}
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
@@ -329,21 +379,6 @@ messageInput.addEventListener('keypress', function(e) {
         sendMessage();
     }
 });
-
-function sendMessage() {
-var audio = new Audio('tap.mp3');
-  audio.play();
-    const message = messageInput.value.trim();
-    if (message) {
-        const timestamp = new Date().getTime();
-        set(ref(db, 'messages/' + timestamp), {
-            message: message,
-            sender: customUserName,
-            timestamp: timestamp
-        });
-        messageInput.value = '';
-    }
-}
 
 document.getElementById('sendButton').addEventListener('click', sendMessage);
 
