@@ -227,9 +227,61 @@ checkOnlineStatus();
         let unreadMessages = 0;
         let chatBoxVisible = false;
 
+let unreadMessages = [];
+let chatBoxVisible = false;
+
+// Nachrichten speichern, selbst wenn der Chat nicht sichtbar ist
+onChildAdded(ref(db, 'messages'), (snapshot) => {
+    const data = snapshot.val();
+
+    if (data.timestamp >= sessionStartTime) {
+        if (!chatBoxVisible) {
+            unreadMessages.push(data);
+            showPing();
+        } else {
+            displayMessage(data);
+        }
+    }
+});
+
+function displayMessage(data) {
+    const messageContainerTop = document.createElement('div');
+    messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+
+    const senderDiv = document.createElement('div');
+    senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+    senderDiv.textContent = data.sender;
+
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = data.message;
+
+    const timeDiv = document.createElement('div');
+    timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    messageContainer.appendChild(textDiv);
+    messageContainer.appendChild(timeDiv);
+
+    messageContainerTop.appendChild(senderDiv);
+    messageContainerTop.appendChild(messageContainer);
+
+    document.getElementById('chatBox').appendChild(messageContainerTop);
+
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const chatBox = document.getElementById('chatBox');
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
 function showPing() {
     const pingDiv = document.getElementById('ping');
-    pingDiv.textContent = unreadMessages;
+    pingDiv.textContent = unreadMessages.length;
     pingDiv.style.display = 'flex';
 }
 
@@ -238,51 +290,27 @@ function hidePing() {
     pingDiv.style.display = 'none';
 }
 
-const sessionStartTime = new Date().getTime();                
+// Sichtbarkeit des Chats überwachen
+const chatBoxObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            chatBoxVisible = true;
 
-onChildAdded(ref(db, 'messages'), (snapshot) => {
-            const data = snapshot.val();
-            if (data.timestamp >= sessionStartTime) {
-            
-        if (!chatBoxVisible) {
-            unreadMessages++;
-            showPing();
+            // Zeige gespeicherte Nachrichten an, wenn der Chat sichtbar wird
+            unreadMessages.forEach(message => {
+                displayMessage(message);
+            });
+
+            unreadMessages = []; // Nach Anzeige zurücksetzen
+            hidePing();
+        } else {
+            chatBoxVisible = false;
         }
-            
-const messageContainerTop = document.createElement('div');
-messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+    });
+}, { threshold: 0.75 });
 
-const senderDiv = document.createElement('div');
-senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-senderDiv.textContent = data.sender;
+chatBoxObserver.observe(document.getElementById('chatBox'));
 
-const messageContainer = document.createElement('div');
-messageContainer.className = 'message-container';
-
-const textDiv = document.createElement('div');
-textDiv.className = 'message-text';
-textDiv.textContent = data.message;
-
-const timeDiv = document.createElement('div');
-timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-messageContainer.appendChild(textDiv);
-messageContainer.appendChild(timeDiv);
-
-messageContainerTop.appendChild(senderDiv);
-messageContainerTop.appendChild(messageContainer);
-
-document.getElementById('chatBox').appendChild(messageContainerTop);
-scrollToBottom();
-
-            }
-        });        
-
-function scrollToBottom() {
-    const chatBox = document.getElementById('chatBox');
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
 
 const messageInput = document.getElementById('messageInput');
 messageInput.addEventListener('keypress', function(e) {
