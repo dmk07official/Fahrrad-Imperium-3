@@ -240,44 +240,72 @@ function hidePing() {
 
 const sessionStartTime = new Date().getTime();                
 
+let messageQueue = [];
+
 onChildAdded(ref(db, 'messages'), (snapshot) => {
-            const data = snapshot.val();
-            if (data.timestamp >= sessionStartTime) {
-            
+    const data = snapshot.val();
+    if (data.timestamp >= sessionStartTime) {
         if (!chatBoxVisible) {
             unreadMessages++;
             showPing();
+            // Nachrichten in die Warteschlange speichern
+            messageQueue.push(data);
+        } else {
+            addMessageToChat(data);
         }
-            
-const messageContainerTop = document.createElement('div');
-messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+    }
+});
 
-const senderDiv = document.createElement('div');
-senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-senderDiv.textContent = data.sender;
+function addMessageToChat(data) {
+    const messageContainerTop = document.createElement('div');
+    messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
-const messageContainer = document.createElement('div');
-messageContainer.className = 'message-container';
+    const senderDiv = document.createElement('div');
+    senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+    senderDiv.textContent = data.sender;
 
-const textDiv = document.createElement('div');
-textDiv.className = 'message-text';
-textDiv.textContent = data.message;
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
 
-const timeDiv = document.createElement('div');
-timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = data.message;
 
-messageContainer.appendChild(textDiv);
-messageContainer.appendChild(timeDiv);
+    const timeDiv = document.createElement('div');
+    timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-messageContainerTop.appendChild(senderDiv);
-messageContainerTop.appendChild(messageContainer);
+    messageContainer.appendChild(textDiv);
+    messageContainer.appendChild(timeDiv);
 
-document.getElementById('chatBox').appendChild(messageContainerTop);
-scrollToBottom();
+    messageContainerTop.appendChild(senderDiv);
+    messageContainerTop.appendChild(messageContainer);
 
-            }
-        });        
+    document.getElementById('chatBox').appendChild(messageContainerTop);
+    scrollToBottom();
+}
+
+// Beim Öffnen des Chat-Fensters zwischengespeicherte Nachrichten nachträglich anzeigen
+function displayQueuedMessages() {
+    while (messageQueue.length > 0) {
+        const message = messageQueue.shift(); // Erste Nachricht entfernen
+        addMessageToChat(message);
+    }
+}
+
+function checkVisibility(entries) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+            chatBoxVisible = true;
+            hidePing();
+            unreadMessages = 0;
+            displayQueuedMessages(); // Puffer ausgeben
+        } else {
+            chatBoxVisible = false;
+        }
+    });
+}
+
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
