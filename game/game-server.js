@@ -240,23 +240,54 @@ function hidePing() {
 
 const sessionStartTime = new Date().getTime();                
 
-let messageQueue = [];
+// Nachrichten aus der DB laden (beim Start der Seite)
+function loadAllMessages() {
+    const messagesRef = query(ref(db, 'messages'), orderByChild('timestamp'));
+    onValue(messagesRef, (snapshot) => {
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML = ''; // Vorherige Nachrichten leeren
 
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+
+            const messageContainerTop = document.createElement('div');
+            messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+
+            const senderDiv = document.createElement('div');
+            senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+            senderDiv.textContent = data.sender;
+
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container';
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'message-text';
+            textDiv.textContent = data.message;
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+            timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageContainer.appendChild(textDiv);
+            messageContainer.appendChild(timeDiv);
+
+            messageContainerTop.appendChild(senderDiv);
+            messageContainerTop.appendChild(messageContainer);
+
+            chatBox.appendChild(messageContainerTop);
+        });
+
+        scrollToBottom(); // Automatisches Scrollen nach unten
+    });
+}
+
+// Direkt beim Start ausführen
+loadAllMessages();
+
+// Nachrichten-Listener für neue Nachrichten (nach Start)
 onChildAdded(ref(db, 'messages'), (snapshot) => {
     const data = snapshot.val();
-    if (data.timestamp >= sessionStartTime) {
-        if (!chatBoxVisible) {
-            unreadMessages++;
-            showPing();
-            // Nachrichten in die Warteschlange speichern
-            messageQueue.push(data);
-        } else {
-            addMessageToChat(data);
-        }
-    }
-});
 
-function addMessageToChat(data) {
     const messageContainerTop = document.createElement('div');
     messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
@@ -282,30 +313,9 @@ function addMessageToChat(data) {
     messageContainerTop.appendChild(messageContainer);
 
     document.getElementById('chatBox').appendChild(messageContainerTop);
+    
     scrollToBottom();
-}
-
-// Beim Öffnen des Chat-Fensters zwischengespeicherte Nachrichten nachträglich anzeigen
-function displayQueuedMessages() {
-    while (messageQueue.length > 0) {
-        const message = messageQueue.shift(); // Erste Nachricht entfernen
-        addMessageToChat(message);
-    }
-}
-
-function checkVisibility(entries) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
-            chatBoxVisible = true;
-            hidePing();
-            unreadMessages = 0;
-            displayQueuedMessages(); // Puffer ausgeben
-        } else {
-            chatBoxVisible = false;
-        }
-    });
-}
-
+});
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
