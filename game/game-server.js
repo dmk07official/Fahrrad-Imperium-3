@@ -224,8 +224,7 @@ function checkOnlineStatus() {
 checkOnlineStatus();
 
         
-        let unreadMessages = 0;
-        let chatBoxVisible = false;
+let unreadMessages = 0;
 
 function showPing() {
     const pingDiv = document.getElementById('ping');
@@ -243,11 +242,6 @@ const sessionStartTime = new Date().getTime();
 onChildAdded(ref(db, 'messages'), (snapshot) => {
             const data = snapshot.val();
             if (data.timestamp >= sessionStartTime) {
-            
-        if (!chatBoxVisible) {
-            unreadMessages++;
-            showPing();
-        }
             
 const messageContainerTop = document.createElement('div');
 messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
@@ -293,8 +287,6 @@ messageInput.addEventListener('keypress', function(e) {
 });
 
 function sendMessage() {
-var audio = new Audio('tap.mp3');
-  audio.play();
     const message = messageInput.value.trim();
     if (message) {
         const timestamp = new Date().getTime();
@@ -308,25 +300,6 @@ var audio = new Audio('tap.mp3');
 }
 
 document.getElementById('sendButton').addEventListener('click', sendMessage);
-
-function checkVisibility(entries) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
-            chatBoxVisible = true;
-            hidePing();
-            unreadMessages = 0;
-        } else {
-            chatBoxVisible = false;            
-        }
-    });
-}
-
-const options = {
-    threshold: 0.75 
-};
-
-const chatBoxObserver = new IntersectionObserver(checkVisibility, options);
-chatBoxObserver.observe(document.getElementById('chatBox'));
 
         function updateLeaderboardCoins() {
     const leaderboardRef = query(ref(db, 'users'), orderByChild('coins'), limitToLast(5));

@@ -168,6 +168,8 @@ p, h1, h2 {
   padding-top: calc(var(--base-size) * 2.5);
   padding-bottom: calc(var(--base-size) * 2.5);
   box-sizing: border-box;
+  opacity: 0;
+  position: absolute;
 }
 .top-line {
   width: 98%;
