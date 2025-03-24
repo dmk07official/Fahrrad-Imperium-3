@@ -284,42 +284,49 @@ function loadAllMessages() {
 // Direkt beim Start ausführen
 loadAllMessages();
 
-onChildAdded(ref(db, 'messages'), (snapshot) => {
-    const data = snapshot.val();
+// Lade alle Nachrichten beim Start
+get(query(ref(db, 'messages'), orderByChild('timestamp'))).then((snapshot) => {
+    if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
 
-    // Nachricht anzeigen, egal ob chatBox sichtbar oder nicht
-    const messageContainerTop = document.createElement('div');
-    messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+            // Eigene Nachricht erkennen
+            const isOwnMessage = data.sender === customUserName;
 
-    const senderDiv = document.createElement('div');
-    senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-    senderDiv.textContent = data.sender;
+            const messageContainerTop = document.createElement('div');
+            messageContainerTop.className = isOwnMessage ? 'my-message' : 'other-message';
 
-    const messageContainer = document.createElement('div');
-    messageContainer.className = 'message-container';
+            const senderDiv = document.createElement('div');
+            senderDiv.className = isOwnMessage ? 'my-message-sender' : 'other-message-sender';
+            senderDiv.textContent = data.sender;
 
-    const textDiv = document.createElement('div');
-    textDiv.className = 'message-text';
-    textDiv.textContent = data.message;
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container';
 
-    const timeDiv = document.createElement('div');
-    timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const textDiv = document.createElement('div');
+            textDiv.className = 'message-text';
+            textDiv.textContent = data.message;
 
-    messageContainer.appendChild(textDiv);
-    messageContainer.appendChild(timeDiv);
-    messageContainerTop.appendChild(senderDiv);
-    messageContainerTop.appendChild(messageContainer);
+            const timeDiv = document.createElement('div');
+            timeDiv.className = isOwnMessage ? 'my-message-timestamp' : 'other-message-timestamp';
+            timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    document.getElementById('chatBox').appendChild(messageContainerTop);
-    scrollToBottom();
+            messageContainer.appendChild(textDiv);
+            messageContainer.appendChild(timeDiv);
 
-    // Wenn die Nachricht nicht vom aktuellen Benutzer ist und der Chat nicht sichtbar ist => ungelesene Nachrichten erhöhen
-    if (data.sender !== customUserName && !chatBoxVisible) {
-        unreadMessages++;
-        showPing();
+            messageContainerTop.appendChild(senderDiv);
+            messageContainerTop.appendChild(messageContainer);
+
+            document.getElementById('chatBox').appendChild(messageContainerTop);
+        });
+
+        // Automatisch nach unten scrollen
+        scrollToBottom();
     }
+}).catch((error) => {
+    console.error('Fehler beim Laden der Nachrichten:', error);
 });
+
 
 function sendMessage() {
     var audio = new Audio('tap.mp3');
