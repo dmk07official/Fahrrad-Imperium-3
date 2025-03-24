@@ -236,48 +236,45 @@ function showPing() {
 function hidePing() {
     const pingDiv = document.getElementById('ping');
     pingDiv.style.display = 'none';
-}
-
-const sessionStartTime = new Date().getTime();                
+}      
 
 onChildAdded(ref(db, 'messages'), (snapshot) => {
-            const data = snapshot.val();
-            if (data.timestamp >= sessionStartTime) {
-            
-        if (!chatBoxVisible) {
-            unreadMessages++;
-            showPing();
-        }
-            
-const messageContainerTop = document.createElement('div');
-messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+    const data = snapshot.val();
 
-const senderDiv = document.createElement('div');
-senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-senderDiv.textContent = data.sender;
+    if (!chatBoxVisible) {
+        unreadMessages++;
+        showPing();
+    }
 
-const messageContainer = document.createElement('div');
-messageContainer.className = 'message-container';
+    const messageContainerTop = document.createElement('div');
+    messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
-const textDiv = document.createElement('div');
-textDiv.className = 'message-text';
-textDiv.textContent = data.message;
+    const senderDiv = document.createElement('div');
+    senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+    senderDiv.textContent = data.sender;
 
-const timeDiv = document.createElement('div');
-timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
 
-messageContainer.appendChild(textDiv);
-messageContainer.appendChild(timeDiv);
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = data.message;
 
-messageContainerTop.appendChild(senderDiv);
-messageContainerTop.appendChild(messageContainer);
+    const timeDiv = document.createElement('div');
+    timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-document.getElementById('chatBox').appendChild(messageContainerTop);
-scrollToBottom();
+    messageContainer.appendChild(textDiv);
+    messageContainer.appendChild(timeDiv);
 
-            }
-        });        
+    messageContainerTop.appendChild(senderDiv);
+    messageContainerTop.appendChild(messageContainer);
+
+    document.getElementById('chatBox').appendChild(messageContainerTop);
+
+    scrollToBottom();
+});
+        
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
