@@ -1,3 +1,5 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+
 import { getDatabase, ref, set, get, query, orderByChild, limitToLast, onValue, onChildAdded, onChildRemoved, push, onDisconnect } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
         
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
