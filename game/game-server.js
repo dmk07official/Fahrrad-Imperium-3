@@ -1,5 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        
 import { getDatabase, ref, set, get, query, orderByChild, limitToLast, onValue, onChildAdded, onChildRemoved, push, onDisconnect } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
         
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
@@ -240,139 +238,44 @@ function hidePing() {
 
 const sessionStartTime = new Date().getTime();                
 
-// Nachrichten aus der DB laden (beim Start der Seite)
-function loadAllMessages() {
-    const messagesRef = query(ref(db, 'messages'), orderByChild('timestamp'));
-    onValue(messagesRef, (snapshot) => {
-        const chatBox = document.getElementById('chatBox');
-        chatBox.innerHTML = ''; // Vorherige Nachrichten leeren
+onChildAdded(ref(db, 'messages'), (snapshot) => {
+            const data = snapshot.val();
+            if (data.timestamp >= sessionStartTime) {
+            
+        if (!chatBoxVisible) {
+            unreadMessages++;
+            showPing();
+        }
+            
+const messageContainerTop = document.createElement('div');
+messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
-        snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
+const senderDiv = document.createElement('div');
+senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+senderDiv.textContent = data.sender;
 
-            const messageContainerTop = document.createElement('div');
-            messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+const messageContainer = document.createElement('div');
+messageContainer.className = 'message-container';
 
-            const senderDiv = document.createElement('div');
-            senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-            senderDiv.textContent = data.sender;
+const textDiv = document.createElement('div');
+textDiv.className = 'message-text';
+textDiv.textContent = data.message;
 
-            const messageContainer = document.createElement('div');
-            messageContainer.className = 'message-container';
+const timeDiv = document.createElement('div');
+timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            const textDiv = document.createElement('div');
-            textDiv.className = 'message-text';
-            textDiv.textContent = data.message;
+messageContainer.appendChild(textDiv);
+messageContainer.appendChild(timeDiv);
 
-            const timeDiv = document.createElement('div');
-            timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-            timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+messageContainerTop.appendChild(senderDiv);
+messageContainerTop.appendChild(messageContainer);
 
-            messageContainer.appendChild(textDiv);
-            messageContainer.appendChild(timeDiv);
+document.getElementById('chatBox').appendChild(messageContainerTop);
+scrollToBottom();
 
-            messageContainerTop.appendChild(senderDiv);
-            messageContainerTop.appendChild(messageContainer);
-
-            chatBox.appendChild(messageContainerTop);
-        });
-
-        scrollToBottom(); // Automatisches Scrollen nach unten
-    });
-}
-
-// Direkt beim Start ausführen
-loadAllMessages();
-
-// Lade alle Nachrichten beim Start
-get(query(ref(db, 'messages'), orderByChild('timestamp'))).then((snapshot) => {
-    if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
-
-            // Eigene Nachricht erkennen
-            const isOwnMessage = data.sender === customUserName;
-
-            const messageContainerTop = document.createElement('div');
-            messageContainerTop.className = isOwnMessage ? 'my-message' : 'other-message';
-
-            const senderDiv = document.createElement('div');
-            senderDiv.className = isOwnMessage ? 'my-message-sender' : 'other-message-sender';
-            senderDiv.textContent = data.sender;
-
-            const messageContainer = document.createElement('div');
-            messageContainer.className = 'message-container';
-
-            const textDiv = document.createElement('div');
-            textDiv.className = 'message-text';
-            textDiv.textContent = data.message;
-
-            const timeDiv = document.createElement('div');
-            timeDiv.className = isOwnMessage ? 'my-message-timestamp' : 'other-message-timestamp';
-            timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            messageContainer.appendChild(textDiv);
-            messageContainer.appendChild(timeDiv);
-
-            messageContainerTop.appendChild(senderDiv);
-            messageContainerTop.appendChild(messageContainer);
-
-            document.getElementById('chatBox').appendChild(messageContainerTop);
-        });
-
-        // Automatisch nach unten scrollen
-        scrollToBottom();
-    }
-}).catch((error) => {
-    console.error('Fehler beim Laden der Nachrichten:', error);
-});
-
-
-function sendMessage() {
-    var audio = new Audio('tap.mp3');
-    audio.play();
-
-    const message = messageInput.value.trim();
-    if (message) {
-        const timestamp = new Date().getTime();
-        
-        // Nachricht direkt anzeigen, ohne auf Firebase zu warten
-        const messageContainerTop = document.createElement('div');
-        messageContainerTop.className = 'my-message';
-
-        const senderDiv = document.createElement('div');
-        senderDiv.className = 'my-message-sender';
-        senderDiv.textContent = customUserName;
-
-        const messageContainer = document.createElement('div');
-        messageContainer.className = 'message-container';
-
-        const textDiv = document.createElement('div');
-        textDiv.className = 'message-text';
-        textDiv.textContent = message;
-
-        const timeDiv = document.createElement('div');
-        timeDiv.className = 'my-message-timestamp';
-        timeDiv.textContent = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        messageContainer.appendChild(textDiv);
-        messageContainer.appendChild(timeDiv);
-        messageContainerTop.appendChild(senderDiv);
-        messageContainerTop.appendChild(messageContainer);
-
-        document.getElementById('chatBox').appendChild(messageContainerTop);
-        scrollToBottom();
-
-        // Nachricht in die Datenbank schreiben
-        set(ref(db, 'messages/' + timestamp), {
-            message: message,
-            sender: customUserName,
-            timestamp: timestamp
-        });
-
-        messageInput.value = '';
-    }
-}
+            }
+        });        
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
@@ -386,6 +289,21 @@ messageInput.addEventListener('keypress', function(e) {
         sendMessage();
     }
 });
+
+function sendMessage() {
+var audio = new Audio('tap.mp3');
+  audio.play();
+    const message = messageInput.value.trim();
+    if (message) {
+        const timestamp = new Date().getTime();
+        set(ref(db, 'messages/' + timestamp), {
+            message: message,
+            sender: customUserName,
+            timestamp: timestamp
+        });
+        messageInput.value = '';
+    }
+}
 
 document.getElementById('sendButton').addEventListener('click', sendMessage);
 
