@@ -1,4 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+Ich habe ein Problem. Ich habe keine Seite mehr auf der alle Elemente sind, sondern ein Windows Kategorien System in meinem Spiel. Das führt dazu, das chatcontainer und so die meiste Zeit Display none sind. Problem jetzt ist aber man bekommt nur Nachrichten von anderen angezeigt, während chatcontainer Style Display hat. Sprich ist man in einem anderen Window und wechselt dann zu dem wo der Chat drin ist, sieht man keine Nachrichten, die in der Zwichenzeit geschrieben wurden:
+
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         
 import { getDatabase, ref, set, get, query, orderByChild, limitToLast, onValue, onChildAdded, onChildRemoved, push, onDisconnect } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
         
@@ -224,55 +226,12 @@ function checkOnlineStatus() {
 checkOnlineStatus();
 
         
-let chatBoxVisible = false;
-let sessionStartTime = new Date().getTime(); 
-let unreadMessages = [];
-
-onChildAdded(ref(db, 'messages'), (snapshot) => {
-    const data = snapshot.val();
-
-    if (data.timestamp >= sessionStartTime) {
-        if (!chatBoxVisible) {
-            unreadMessages.push(data);
-            showPing();
-        } else {
-            displayMessage(data);
-        }
-    }
-});
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        loadUserDataFromFirebase(user.uid);
-        getCustomUserName(user).then((name) => {
-            customUserName = name;
-            document.getElementById('usernameDisplay').textContent = name;
-        });
-
-        // Online-Status aktualisieren und bei Verbindungsabbruch zurücksetzen
-        const userOnlineRef = ref(db, `users/${user.uid}/online`);
-        set(userOnlineRef, new Date().getTime());
-        onDisconnect(userOnlineRef).set(0);
-    } else {                
-        currentUser = null;
-        customUserName = null;
-    }
-});
-
-signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        localStorage.setItem('username', username);
-        loadUserDataFromFirebase(userCredential.user.uid);
-    })
-    .catch((error) => {
-        document.getElementById('usernamePopup').style.display = 'block';
-        console.error("Fehler bei der Anmeldung: ", error);
-    });
+        let unreadMessages = 0;
+        let chatBoxVisible = false;
 
 function showPing() {
     const pingDiv = document.getElementById('ping');
-    pingDiv.textContent = unreadMessages.length;
+    pingDiv.textContent = unreadMessages;
     pingDiv.style.display = 'flex';
 }
 
@@ -281,59 +240,51 @@ function hidePing() {
     pingDiv.style.display = 'none';
 }
 
-function displayMessage(data) {
-    const messageContainerTop = document.createElement('div');
-    messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+const sessionStartTime = new Date().getTime();                
 
-    const senderDiv = document.createElement('div');
-    senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-    senderDiv.textContent = data.sender;
+onChildAdded(ref(db, 'messages'), (snapshot) => {
+            const data = snapshot.val();
+            if (data.timestamp >= sessionStartTime) {
+            
+        if (!chatBoxVisible) {
+            unreadMessages++;
+            showPing();
+        }
+            
+const messageContainerTop = document.createElement('div');
+messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
-    const messageContainer = document.createElement('div');
-    messageContainer.className = 'message-container';
+const senderDiv = document.createElement('div');
+senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+senderDiv.textContent = data.sender;
 
-    const textDiv = document.createElement('div');
-    textDiv.className = 'message-text';
-    textDiv.textContent = data.message;
+const messageContainer = document.createElement('div');
+messageContainer.className = 'message-container';
 
-    const timeDiv = document.createElement('div');
-    timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const textDiv = document.createElement('div');
+textDiv.className = 'message-text';
+textDiv.textContent = data.message;
 
-    messageContainer.appendChild(textDiv);
-    messageContainer.appendChild(timeDiv);
+const timeDiv = document.createElement('div');
+timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    messageContainerTop.appendChild(senderDiv);
-    messageContainerTop.appendChild(messageContainer);
+messageContainer.appendChild(textDiv);
+messageContainer.appendChild(timeDiv);
 
-    document.getElementById('chatBox').appendChild(messageContainerTop);
+messageContainerTop.appendChild(senderDiv);
+messageContainerTop.appendChild(messageContainer);
 
-    scrollToBottom();
-}
+document.getElementById('chatBox').appendChild(messageContainerTop);
+scrollToBottom();
+
+            }
+        });        
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-const chatBoxObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            chatBoxVisible = true;
-            hidePing();
-            unreadMessages.forEach(message => {
-                displayMessage(message);
-            });
-            unreadMessages = [];
-        } else {
-            chatBoxVisible = false;
-        }
-    });
-}, { threshold: 0.75 });
-
-chatBoxObserver.observe(document.getElementById('chatBox'));
-
-
 
 const messageInput = document.getElementById('messageInput');
 messageInput.addEventListener('keypress', function(e) {
@@ -359,6 +310,25 @@ var audio = new Audio('tap.mp3');
 }
 
 document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+function checkVisibility(entries) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+            chatBoxVisible = true;
+            hidePing();
+            unreadMessages = 0;
+        } else {
+            chatBoxVisible = false;            
+        }
+    });
+}
+
+const options = {
+    threshold: 0.75 
+};
+
+const chatBoxObserver = new IntersectionObserver(checkVisibility, options);
+chatBoxObserver.observe(document.getElementById('chatBox'));
 
         function updateLeaderboardCoins() {
     const leaderboardRef = query(ref(db, 'users'), orderByChild('coins'), limitToLast(5));
