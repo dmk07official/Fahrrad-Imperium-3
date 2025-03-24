@@ -1,6 +1,4 @@
-Ich habe ein Problem. Ich habe keine Seite mehr auf der alle Elemente sind, sondern ein Windows Kategorien System in meinem Spiel. Das führt dazu, das chatcontainer und so die meiste Zeit Display none sind. Problem jetzt ist aber man bekommt nur Nachrichten von anderen angezeigt, während chatcontainer Style Display hat. Sprich ist man in einem anderen Window und wechselt dann zu dem wo der Chat drin ist, sieht man keine Nachrichten, die in der Zwichenzeit geschrieben wurden:
-
- import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         
 import { getDatabase, ref, set, get, query, orderByChild, limitToLast, onValue, onChildAdded, onChildRemoved, push, onDisconnect } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
         
