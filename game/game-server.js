@@ -236,8 +236,8 @@ function hidePing() {
     const pingDiv = document.getElementById('ping');
     pingDiv.style.display = 'none';
 }
-
-const sessionStartTime = new Date().getTime();                
+ 
+const sessionStartTime = new Date().getTime() - (3 * 60 * 60 * 1000);
 
 onChildAdded(ref(db, 'messages'), (snapshot) => {
             const data = snapshot.val();
