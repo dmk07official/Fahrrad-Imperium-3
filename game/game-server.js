@@ -142,17 +142,17 @@ function updateOnlineStatus() {
 }
                         
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                loadUserDataFromFirebase(user.uid);
-                getCustomUserName(user).then((name) => {
-                    customUserName = name;                                   
-                });
-            } else {                
-                currentUser = null;
-                customUserName = null;                
-            }
+    if (user) {
+        currentUser = user;
+        getCustomUserName(user).then((name) => {
+            customUserName = name;
+            console.log('Custom username loaded:', customUserName); // Debug-Log hinzufügen
         });
+    } else {
+        currentUser = null;
+        customUserName = null;
+    }
+});
 
         function getCustomUserName(user) {
             const userRef = ref(db, 'users/' + user.uid);
@@ -236,47 +236,61 @@ function hidePing() {
     const pingDiv = document.getElementById('ping');
     pingDiv.style.display = 'none';
 }
- 
+
 const sessionStartTime = new Date().getTime() - (3 * 60 * 60 * 1000);
 
 onChildAdded(ref(db, 'messages'), (snapshot) => {
-            const data = snapshot.val();
-            if (data.timestamp >= sessionStartTime) {
-            
-const messageContainerTop = document.createElement('div');
-messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
+    const data = snapshot.val();
 
-const senderDiv = document.createElement('div');
-senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
-senderDiv.textContent = data.sender;
+    if (data.timestamp >= sessionStartTime) {
+        // Warten, bis customUserName verfügbar ist
+        if (!customUserName) {
+            const checkInterval = setInterval(() => {
+                if (customUserName) {
+                    clearInterval(checkInterval);
+                    displayMessage(data);
+                }
+            }, 100);
+        } else {
+            displayMessage(data);
+        }
+    }
+});
 
-const messageContainer = document.createElement('div');
-messageContainer.className = 'message-container';
+function displayMessage(data) {
+    const messageContainerTop = document.createElement('div');
+    messageContainerTop.className = data.sender === customUserName ? 'my-message' : 'other-message';
 
-const textDiv = document.createElement('div');
-textDiv.className = 'message-text';
-textDiv.textContent = data.message;
+    const senderDiv = document.createElement('div');
+    senderDiv.className = data.sender === customUserName ? 'my-message-sender' : 'other-message-sender';
+    senderDiv.textContent = data.sender;
 
-const timeDiv = document.createElement('div');
-timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
-timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
 
-messageContainer.appendChild(textDiv);
-messageContainer.appendChild(timeDiv);
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = data.message;
 
-messageContainerTop.appendChild(senderDiv);
-messageContainerTop.appendChild(messageContainer);
+    const timeDiv = document.createElement('div');
+    timeDiv.className = data.sender === customUserName ? 'my-message-timestamp' : 'other-message-timestamp';
+    timeDiv.textContent = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-document.getElementById('chatBox').appendChild(messageContainerTop);
-scrollToBottom();
+    messageContainer.appendChild(textDiv);
+    messageContainer.appendChild(timeDiv);
 
-            }
-        });        
+    messageContainerTop.appendChild(senderDiv);
+    messageContainerTop.appendChild(messageContainer);
+
+    document.getElementById('chatBox').appendChild(messageContainerTop);
+    scrollToBottom();
+}
 
 function scrollToBottom() {
     const chatBox = document.getElementById('chatBox');
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
 
 const messageInput = document.getElementById('messageInput');
 messageInput.addEventListener('keypress', function(e) {
