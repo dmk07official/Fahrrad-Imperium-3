@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /game/game.html
+Disallow: /game/game
+Allow: /
+Sitemap: https://fahrrad-imperium-3.pages.dev/sitemap.xml
