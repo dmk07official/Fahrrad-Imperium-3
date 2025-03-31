@@ -1,16 +1,3 @@
-function checkOrientation() {
-  if (window.innerHeight > window.innerWidth) {
-    document.getElementById('customAlert').style.display = 'flex';
-  } else {
-    document.getElementById('customAlert').style.display = 'none';
-  }
-}
-
-window.addEventListener('resize', checkOrientation);
-window.addEventListener('orientationchange', checkOrientation);
-
-checkOrientation();
-
 document.addEventListener("DOMContentLoaded", function() {
     const loadingOverlay = document.getElementById("loadingOverlay");
     
