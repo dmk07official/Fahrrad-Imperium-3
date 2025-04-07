@@ -154,34 +154,38 @@ function openTiktok() {
   window.open('', '_blank');
 }
 
-    const filesToCache = [
-      '/global-css-variables.css',
-      '/index.css',
-      '/index.html',
-      '/index.js',
-      '/lore.txt',
-      '/manifest.json',
-      '/robots.txt',
-      '/sitemap.xml',
-      '/sw.js',
-      '/index/discord-logo.png',
-      '/index/logo.png',
-      '/index/main-theme.mp3',
-      '/index/tap.mp3',
-      '/index/tiktok-logo.png',
-      '/game/background-game.mp3',
-      '/game/coin.png',
-      '/game/coin_disabled.png',
-      '/game/game-server.js',
-      '/game/game.css',
-      '/game/game.html',
-      '/game/game.js',
-      '/game/gold-arrow.png',
-      '/game/green-arrow.png',
-      '/game/prestige.png',
-      '/game/tap.png',
-      '/game/work.png',
-    ];
+const CACHE_NAME = 'my-game-cache-v2';
+const BASE_PATH = '/Fahrrad-Imperium-3/';
+
+const filesToCache = [
+  'global-css-variables.css',
+  'index.css',
+  'index.html',
+  'index.js',
+  'lore.txt',
+  'manifest.json',
+  'robots.txt',
+  'sitemap.xml',
+  'sw.js',
+  'index/discord-logo.png',
+  'index/logo.png',
+  'index/main-theme.mp3',
+  'index/tap.mp3',
+  'index/tiktok-logo.png',
+  'game/background-game.mp3',
+  'game/coin.png',
+  'game/coin_disabled.png',
+  'game/game-server.js',
+  'game/game.css',
+  'game/game.html',
+  'game/game.js',
+  'game/gold-arrow.png',
+  'game/green-arrow.png',
+  'game/prestige.png',
+  'game/tap.png',
+  'game/work.png',
+].map(file => BASE_PATH + file); // Fügt den BASE_PATH zu jedem File hinzu
+
 
     async function startDownload() {
       const cache = await caches.open('my-game-cache-v1');
