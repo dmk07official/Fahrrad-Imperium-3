@@ -154,22 +154,14 @@ function openTiktok() {
   window.open('', '_blank');
 }
 
-const CACHE_NAME = 'my-game-cache-v2';
 const filesToCache = [
-  'global-css-variables.css',
-  'index.css',
   'index.html',
+  'index.css',
   'index.js',
-  'lore.txt',
-  'manifest.json',
-  'robots.txt',
-  'sitemap.xml',
-  'sw.js',
-  'index/discord-logo.png',
-  'index/logo.png',
   'index/main-theme.mp3',
   'index/tap.mp3',
-  'index/tiktok-logo.png',
+  'index/discord-logo.png',
+  'index/logo.png',
   'game/background-game.mp3',
   'game/coin.png',
   'game/coin_disabled.png',
@@ -182,7 +174,15 @@ const filesToCache = [
   'game/prestige.png',
   'game/tap.png',
   'game/work.png',
+  'global-css-variables.css',
+  'manifest.json',
+  'robots.txt',
+  'sitemap.xml',
+  'sw.js'
 ];
+
+// Weitere Logik in deinem `index.js` bleibt unverändert
+
 
 // Start des Caching-Prozesses
 async function startDownload() {
@@ -213,12 +213,21 @@ async function startDownload() {
   }
 }
 
-// Service Worker registrieren
+// Service Worker registrieren und mit den Dateien cachen
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
-    .then(() => console.log('Service Worker aktiviert'))
+    .then((registration) => {
+      console.log('Service Worker aktiviert');
+      
+      // Sende die Liste der Dateien an den Service Worker, sobald er aktiv ist
+      registration.active.postMessage({
+        action: 'cacheFiles',
+        files: filesToCache
+      });
+    })
     .catch(err => console.error('SW Fehler:', err));
 }
+
 
 // Installations-Prompt abfangen
 let deferredPrompt;
