@@ -164,7 +164,7 @@ function loadProgress() {
   backgroundMusic.play();
 }
 
-function loadProgress();
+loadProgress();
 
 function updateCoins() {
 document.getElementById('coins').textContent = formatNumber(coins);
