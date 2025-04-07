@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v2';
+const CACHE_NAME = 'my-cf-game-v3';
 const urlsToCache = [
   '/', // wichtig für index.html
   '/index.html',
@@ -29,10 +29,12 @@ const urlsToCache = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);  // Alle URLs im Cache speichern
+    })
   );
 });
+
 
 self.addEventListener('fetch', event => {
   event.respondWith(
