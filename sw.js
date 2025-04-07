@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v4';
+const CACHE_NAME = 'my-cf-game-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -27,21 +27,47 @@ const urlsToCache = [
   '/sw.js',
 ];
 
-// Install Event
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching files during install');
-      return cache.addAll(urlsToCache);  // Alle URLs im Cache speichern
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Caching important files first');
+      // Zuerst kritische Dateien cachen, dann die anderen
+      return cache.addAll([
+        '/',
+  '/index.html',
+  '/index.css',
+  '/index.js',
+  '/index/main-theme.mp3',
+  '/index/tap.mp3',
+  '/index/discord-logo.png',
+  '/index/logo.png',
+  '/game/background-game.mp3',
+  '/game/coin.png',
+  '/game/coin_disabled.png',
+  '/game/game-server.js',
+  '/game/game.css',
+  '/game/game.html',
+  '/game/game.js',
+  '/game/gold-arrow.png',
+  '/game/green-arrow.png',
+  '/game/prestige.png',
+  '/game/tap.png',
+  '/game/work.png',
+  '/global-css-variables.css',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/manifest.json',
+  '/sw.js',
+      ]);
     })
   );
 });
 
-// Fetch Event
+
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Wenn die Datei im Cache ist, gibt sie zurück
+      // Wenn die Datei im Cache ist, gib sie zurück
       if (cachedResponse) {
         return cachedResponse;
       }
@@ -57,20 +83,18 @@ self.addEventListener('fetch', (event) => {
           event.request.url.endsWith('.mp3')
         ) {
           caches.open(CACHE_NAME).then((cache) => {
+            console.log('Caching:', event.request.url);
             cache.put(event.request, networkResponse.clone()); // Datei in den Cache legen
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Falls der Netzwerkaufruf fehlschlägt, kann optional etwas anderes zurückgegeben werden
-        // Da du aber keine offline.html verwendest, lassen wir das hier aus
-        console.log("Netzwerkfehler beim Abrufen von:", event.request.url);
+      }).catch((error) => {
+        console.log('Fehler beim Abrufen von', event.request.url, error);
       });
     })
   );
 });
 
-// Activate Event - Alte Caches löschen
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keyList) => {
