@@ -20,7 +20,6 @@ const filesToCache = [
   'game/tap.png',
   'game/work.png',
   'global-css-variables.css',
-  'manifest.json',
   'robots.txt',
   'sitemap.xml',
   'sw.js'
