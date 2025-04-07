@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v7';
+const CACHE_NAME = 'my-cf-game-v8';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -32,15 +32,26 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('[SW] Caching initial files:');
-      console.table(urlsToCache);
-      return cache.addAll(urlsToCache);
+    caches.open(CACHE_NAME).then(async cache => {
+      console.log('[SW] Caching files manually to avoid redirects...');
+      for (const url of urlsToCache) {
+        try {
+          const response = await fetch(url);
+          if (response.ok && !response.redirected) {
+            await cache.put(url, response.clone());
+            console.log('[SW] Cached:', url);
+          } else {
+            console.warn('[SW] Skipped (bad or redirected):', url, response.status);
+          }
+        } catch (err) {
+          console.error('[SW] Failed to fetch & cache:', url, err);
+        }
+      }
     }).catch(err => {
-      console.error('[SW] Error during install cache.addAll():', err);
+      console.error('[SW] Error opening cache during install:', err);
     })
   );
-  self.skipWaiting(); // sofort aktivieren
+  self.skipWaiting(); // Sofort aktivieren ohne warten
 });
 
 // FETCH
@@ -50,16 +61,20 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] Serving from cache:', event.request.url);
+        console.log('[SW] 🟢 Serving from cache:', event.request.url);
         return cachedResponse;
       }
 
-      console.log('[SW] Not in cache, fetching from network:', event.request.url);
+      console.log('[SW] 🔄 Not in cache, fetching from network:', event.request.url);
 
       return fetch(event.request).then(networkResponse => {
-        // Sicherstellen, dass die Response klonbar ist
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          console.warn('[SW] Network response invalid:', event.request.url, networkResponse);
+        if (
+          !networkResponse ||
+          networkResponse.status !== 200 ||
+          networkResponse.type !== 'basic' ||
+          networkResponse.redirected
+        ) {
+          console.warn('[SW] ⚠️ Network response invalid or redirected:', event.request.url);
           return networkResponse;
         }
 
@@ -73,17 +88,19 @@ self.addEventListener('fetch', event => {
             event.request.url.endsWith('.png') ||
             event.request.url.endsWith('.mp3')
           ) {
-            console.log('[SW] Caching fetched file:', event.request.url);
-            cache.put(event.request, responseClone);
+            console.log('[SW] 💾 Caching network response:', event.request.url);
+            cache.put(event.request, responseClone).catch(err => {
+              console.error('[SW] ❌ Failed to put in cache:', event.request.url, err);
+            });
           }
         });
 
         return networkResponse;
       }).catch(error => {
-        console.error('[SW] Network fetch failed for:', event.request.url, error);
+        console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
       });
     }).catch(cacheError => {
-      console.error('[SW] Cache match failed:', event.request.url, cacheError);
+      console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
     })
   );
 });
@@ -91,19 +108,18 @@ self.addEventListener('fetch', event => {
 // ACTIVATE
 self.addEventListener('activate', event => {
   console.log('[SW] Activating new Service Worker...');
-
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', key);
+            console.log('[SW] 🧹 Deleting old cache:', key);
             return caches.delete(key);
           }
         })
       );
     }).then(() => {
-      console.log('[SW] Activation complete. Clients now controlled.');
+      console.log('[SW] ✅ Activation complete. Clients now controlled.');
       return self.clients.claim();
     })
   );
