@@ -1,59 +1,16 @@
 document.addEventListener("DOMContentLoaded", function() {
   const fadeIn = document.getElementById("fadeIn");
-  
-  function preloadFiles() {
-    const files = ['index/logo.png', 'index/discord-logo.png', 'index/tiktok-logo.png', 'index/main-theme.mp3', 'index/tap.mp3'];
-    const totalFiles = files.length;
-    let loadedFiles = 0;
+  const loadingScreen = document.getElementById("loadingScreen"); // Falls du 'loadingScreen' ansprechen willst
 
-    files.forEach(file => {
-      const fileType = file.split('.').pop();
-      const preloadElement = fileType === 'mp3' ? new Audio() : new Image();
+  loadingScreen.style.display = 'none'; // Hier wird der Ladebildschirm ausgeblendet
+  playTheme(); // Wenn das eine Funktion ist, die du schon hast und Musik startet
 
-      if (fileType === 'mp3') {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', file, true);
-        xhr.responseType = 'blob';
-
-        xhr.onload = function() {
-          if (this.status === 200) {
-            const blob = this.response;
-            preloadElement.src = URL.createObjectURL(blob);
-            loadedFiles++;
-            updateLoadingProgress(loadedFiles, totalFiles);
-          }
-        };
-
-        xhr.onerror = function() {
-          console.error(`Error: Failed to load ${file}`);
-        };
-
-        xhr.send();
-      } else {
-        preloadElement.onload = () => {
-          loadedFiles++;
-          updateLoadingProgress(loadedFiles, totalFiles);
-        };
-        preloadElement.src = file;
-      }
-    });
-  }
-
-  function updateLoadingProgress(loadedFiles, totalFiles) {
-    const loadingScreen = document.getElementById('loadingScreen');
-  
-    if (loadedFiles === totalFiles) {
-      loadingScreen.style.display = 'none';
-      playTheme();
-      fadeIn.classList.add('fadeout');
-      fadeIn.addEventListener("animationend", function() {
-        fadeIn.style.display = "none";
-      });
-    }
-  }
-
-  preloadFiles();
+  fadeIn.classList.add('fadeout'); // 'fadeout' animiert den fadeIn Effekt
+  fadeIn.addEventListener("animationend", function() {
+    fadeIn.style.display = "none"; // Versteckt den FadeIn-Element, wenn die Animation endet
+  });
 });
+
 
 function playTheme() {
   var sound = new Howl({
@@ -196,3 +153,88 @@ function openTiktok() {
   });
   window.open('', '_blank');
 }
+
+    const filesToCache = [
+      '/index.html',
+      '/index.css',
+      '/index.js',
+      '/global-css-variables.css',
+      '/index/discord-logo.png',
+      '/index/tiktok-logo.png',
+      '/index/logo.png',
+      '/index/main-theme.mp3',
+      '/index/tap.mp3',
+      '/game/game.html',
+      '/game/game.css',
+      '/game/game.js',
+      '/game/game-server.js',
+      '/game/coin.png',
+      '/game/prestige.png',
+      '/game/work.png',
+      '/game/tap.png',
+      '/game/green-arrow.png',
+      '/game/gold-arrow.png',
+      '/game/background.mp3',
+    ];
+
+    async function startDownload() {
+      const cache = await caches.open('my-game-cache-v1');
+      let completed = 0;
+      const total = filesToCache.length;
+
+      document.getElementById('progressBox').style.display = 'block';
+
+      for (const file of filesToCache) {
+        try {
+          const response = await fetch(file);
+          await cache.put(file, response.clone());
+          completed++;
+          const percent = Math.floor((completed / total) * 100);
+          document.getElementById('progress').textContent = `${percent}%`;
+        } catch (err) {
+          console.error(`Fehler beim Cachen von ${file}:`, err);
+        }
+      }
+
+      localStorage.setItem('offlineReady', 'true');
+      alert('Download komplett! Spiel ist jetzt offline spielbar.');
+
+      if (window.matchMedia('(display-mode: browser)').matches) {
+        showInstallPrompt();
+      }
+    }
+
+    // Service Worker registrieren
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('Service Worker aktiviert'))
+        .catch(err => console.error('SW Fehler:', err));
+    }
+
+    // PWA Install prompt catchen
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    function showInstallPrompt() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+          if (choice.outcome === 'accepted') {
+            console.log('PWA installiert');
+          } else {
+            console.log('PWA abgelehnt');
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+
+    // Beim Start checken ob offline ready
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('offlineReady')) {
+        console.log('Offline-Mode aktiviert – alles wird aus Cache gezogen.');
+      }
+    });
