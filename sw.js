@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-game-cache-v1';
+const CACHE_NAME = 'my-game-cache-v2';
 
 self.addEventListener('install', (event) => {
   console.log('[ServiceWorker] Installiert');
@@ -7,8 +7,18 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('[ServiceWorker] Aktiviert');
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.filter((name) => name !== CACHE_NAME) // Lösche alle anderen Caches
+          .map((name) => caches.delete(name))
+      );
+    }).then(() => {
+      return clients.claim(); // Macht den neuen SW aktiv
+    })
+  );
 });
+
 
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
