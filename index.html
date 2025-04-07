@@ -7,11 +7,21 @@
     <meta name="author" content="Dein Fahrrad Imperium Team"> 
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0f0">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <title>Fahrrad Imperium / Menü</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../global-css-variables.css">
     <link rel="stylesheet" href="index.css">
+    <script>
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registered 🛠️', reg))
+        .catch(err => console.error('SW registration failed 💀', err));
+    });
+  }
+</script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>  
   </head>
