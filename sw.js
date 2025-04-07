@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cache-v1'; // Version des Caches
+const CACHE_NAME = 'my-cache-v1';
 const filesToCache = [
   'index.html',
   'index.css',
@@ -36,7 +36,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Aktivierungsereignis - Alte Caches löschen, wenn sie nicht mehr gebraucht werden
+// Aktivierungsereignis - Alte Caches löschen
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   
@@ -54,20 +54,33 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch-Ereignis - Wenn der Nutzer offline ist, serve die gecachten Dateien
+// Fetch-Ereignis - Stellt sicher, dass der Service Worker die gecachten Dateien liefert
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Wenn die Antwort im Cache vorhanden ist, nutze sie
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      
-      // Andernfalls, versuche die Anfrage über das Netzwerk zu holen
-      return fetch(event.request).catch(() => {
-        // Falls der Benutzer offline ist und keine Netzwerkanfrage funktioniert, hole die gecachten Dateien
-        return caches.match('index.html'); // Beispiel: Stelle sicher, dass die index.html geladen wird
-      });
-    })
-  );
+  // Falls die Anfrage nach einer Seite (navigate) kommt, gebe immer die gecachte index.html zurück
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('index.html').then((cachedResponse) => {
+        // Wenn die index.html im Cache ist, gebe sie zurück
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // Falls die index.html nicht im Cache ist, gebe eine Fallback-Seite zurück (optional)
+        return caches.match('index.html'); // Alternativ könnte hier eine Fehlerseite kommen
+      })
+    );
+  } else {
+    // Für andere Anfragen wie Bilder oder Skripte, hole sie entweder aus dem Cache oder vom Netzwerk
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        return fetch(event.request).catch(() => {
+          // Falls die Datei nicht im Cache ist und keine Netzwerkverbindung besteht, gebe die index.html zurück
+          return caches.match('index.html');
+        });
+      })
+    );
+  }
 });
