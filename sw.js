@@ -1,5 +1,6 @@
-const CACHE_NAME = 'my-cache-v1'; // Version des Caches
-const filesToCache = [
+const CACHE_NAME = 'my-cf-game-v1';
+const urlsToCache = [
+  '/', // wichtig für index.html
   'index.html',
   'index.css',
   'index.js',
@@ -22,51 +23,38 @@ const filesToCache = [
   'global-css-variables.css',
   'robots.txt',
   'sitemap.xml',
-  'sw.js'
+  'manifest.json',
+  'sw.js',
 ];
 
-// Installiere den Service Worker und cache alle Dateien
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching assets...');
-      return cache.addAll(filesToCache);
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    }).catch(() => {
+      // Optional: fallback.html oder ein Offline-Bild
     })
   );
 });
 
-// Aktivierungsereignis - Alte Caches löschen, wenn sie nicht mehr gebraucht werden
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-  
+self.addEventListener('activate', event => {
+  // Optional: alte Caches löschen
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            console.log(`Lösche alten Cache: ${cacheName}`);
-            return caches.delete(cacheName);
+    caches.keys().then(keyList =>
+      Promise.all(
+        keyList.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
-      );
-    })
-  );
-});
-
-// Fetch-Ereignis - Wenn der Nutzer offline ist, serve die gecachten Dateien
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Wenn die Antwort im Cache vorhanden ist, nutze sie
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      
-      // Andernfalls, versuche die Anfrage über das Netzwerk zu holen
-      return fetch(event.request).catch(() => {
-        // Falls der Benutzer offline ist und keine Netzwerkanfrage funktioniert, hole die gecachten Dateien
-        return caches.match('index.html'); // Beispiel: Stelle sicher, dass die index.html geladen wird
-      });
-    })
+      )
+    )
   );
 });
