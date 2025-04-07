@@ -10,7 +10,7 @@ const urlsToCache = [
   '/index/logo.png',
   '/game/background-game.mp3',
   '/game/coin.png',
-  '/ame/coin_disabled.png',
+  '/game/coin_disabled.png',
   '/game/game-server.js',
   '/game/game.css',
   '/game/game.html',
