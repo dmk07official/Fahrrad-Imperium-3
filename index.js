@@ -155,8 +155,6 @@ function openTiktok() {
 }
 
 const CACHE_NAME = 'my-game-cache-v2';
-const BASE_PATH = '/Fahrrad-Imperium-3/';
-
 const filesToCache = [
   'global-css-variables.css',
   'index.css',
@@ -184,67 +182,68 @@ const filesToCache = [
   'game/prestige.png',
   'game/tap.png',
   'game/work.png',
-].map(file => BASE_PATH + file); // Fügt den BASE_PATH zu jedem File hinzu
+];
 
+// Start des Caching-Prozesses
+async function startDownload() {
+  const cache = await caches.open(CACHE_NAME);
+  let completed = 0;
+  const total = filesToCache.length;
 
-    async function startDownload() {
-      const cache = await caches.open('my-game-cache-v1');
-      let completed = 0;
-      const total = filesToCache.length;
+  document.getElementById('progressBox').style.display = 'block';
 
-      document.getElementById('progressBox').style.display = 'block';
-
-      for (const file of filesToCache) {
-        try {
-          const response = await fetch(file);
-          await cache.put(file, response.clone());
-          completed++;
-          const percent = Math.floor((completed / total) * 100);
-          document.getElementById('progress').textContent = `${percent}%`;
-        } catch (err) {
-          console.error(`Fehler beim Cachen von ${file}:`, err);
-        }
-      }
-
-      localStorage.setItem('offlineReady', 'true');
-      alert('Download komplett! Spiel ist jetzt offline spielbar.');
-
-      if (window.matchMedia('(display-mode: browser)').matches) {
-        showInstallPrompt();
-      }
+  for (const file of filesToCache) {
+    try {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error(`Fehler beim Laden der Datei: ${file}`);
+      await cache.put(file, response.clone());
+      completed++;
+      const percent = Math.floor((completed / total) * 100);
+      document.getElementById('progress').textContent = `${percent}%`;
+    } catch (err) {
+      console.error(`Fehler beim Cachen von ${file}:`, err);
     }
+  }
 
-    // Service Worker registrieren
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('Service Worker aktiviert'))
-        .catch(err => console.error('SW Fehler:', err));
-    }
+  localStorage.setItem('offlineReady', 'true');
+  alert('Download komplett! Spiel ist jetzt offline spielbar.');
 
-    // PWA Install prompt catchen
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
+  if (window.matchMedia('(display-mode: browser)').matches) {
+    showInstallPrompt();
+  }
+}
+
+// Service Worker registrieren
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('Service Worker aktiviert'))
+    .catch(err => console.error('SW Fehler:', err));
+}
+
+// Installations-Prompt abfangen
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+function showInstallPrompt() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        console.log('PWA installiert');
+      } else {
+        console.log('PWA abgelehnt');
+      }
+      deferredPrompt = null;
     });
+  }
+}
 
-    function showInstallPrompt() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choice => {
-          if (choice.outcome === 'accepted') {
-            console.log('PWA installiert');
-          } else {
-            console.log('PWA abgelehnt');
-          }
-          deferredPrompt = null;
-        });
-      }
-    }
-
-    // Beim Start checken ob offline ready
-    window.addEventListener('load', () => {
-      if (localStorage.getItem('offlineReady')) {
-        console.log('Offline-Mode aktiviert – alles wird aus Cache gezogen.');
-      }
-    });
+// Beim Laden checken, ob Offline-Modus aktiviert ist
+window.addEventListener('load', () => {
+  if (localStorage.getItem('offlineReady')) {
+    console.log('Offline-Mode aktiviert – alles wird aus Cache gezogen.');
+  }
+});
