@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v-13';
+'my-cf-game-v10';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -14,7 +14,7 @@ const urlsToCache = [
   '/game/coin_disabled.png',
   '/game/game-server.js',
   '/game/game.css',
-  '/game/game.html',  // Game HTML immer mit rein
+  '/game/game.html',
   '/game/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
@@ -33,86 +33,94 @@ self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
-      console.log('[SW] Caching files...');
+      console.log('[SW] Caching files manually to avoid redirects...');
       for (const url of urlsToCache) {
         try {
           const response = await fetch(url);
-          if (response.ok) {
+          if (response.ok && !response.redirected) {
             await cache.put(url, response.clone());
-            console.log('[SW] ✅ Cached:', url);
+            console.log('[SW] Cached:', url);
           } else {
-            console.warn('[SW] ⚠️ Skipped:', url, response.status);
+            console.warn('[SW] Skipped (bad or redirected):', url, response.status);
           }
         } catch (err) {
-          console.error('[SW] ❌ Failed to cache:', url, err);
+          console.error('[SW] Failed to fetch & cache:', url, err);
         }
       }
+    }).catch(err => {
+      console.error('[SW] Error opening cache during install:', err);
     })
   );
-  self.skipWaiting();
+  self.skipWaiting(); // Sofort aktivieren ohne warten
 });
 
 // FETCH
 self.addEventListener('fetch', event => {
-  const requestURL = new URL(event.request.url);
-  
-  // Überprüfen, ob es sich um die eigene Domain handelt
-  if (requestURL.origin !== location.origin) return;
-
-  const cleanPath = requestURL.pathname.replace(/\/+$/, '');  // Entfernen von Slashes, falls vorhanden
+  console.log('[SW] Fetching:', event.request.url);
 
   event.respondWith(
-    caches.match(cleanPath).then(cachedResponse => {
+    caches.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Serving from cache:', cleanPath);
-        return cachedResponse;  // Antworte direkt aus dem Cache
+        console.log('[SW] 🟢 Serving from cache:', event.request.url);
+        return cachedResponse;
       }
 
-      console.log('[SW] 🔄 Not cached, fetching:', cleanPath);
+      console.log('[SW] 🔄 Not in cache, fetching from network:', event.request.url);
 
-      return fetch(event.request)
-        .then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            console.warn('[SW] ⚠️ Bad response:', cleanPath);
-            return networkResponse;
+      return fetch(event.request).then(networkResponse => {
+        if (
+          !networkResponse ||
+          networkResponse.status !== 200 ||
+          networkResponse.type !== 'basic' ||
+          networkResponse.redirected
+        ) {
+          console.warn('[SW] ⚠️ Network response invalid or redirected:', event.request.url);
+          return networkResponse;
+        }
+
+        const responseClone = networkResponse.clone();
+
+        caches.open(CACHE_NAME).then(cache => {
+          if (
+            event.request.url.endsWith('.html') ||
+            event.request.url.endsWith('.css') ||
+            event.request.url.endsWith('.js') ||
+            event.request.url.endsWith('.png') ||
+            event.request.url.endsWith('.mp3')
+          ) {
+            console.log('[SW] 💾 Caching network response:', event.request.url);
+            cache.put(event.request, responseClone).catch(err => {
+              console.error('[SW] ❌ Failed to put in cache:', event.request.url, err);
+            });
           }
-
-          const responseClone = networkResponse.clone();
-
-          caches.open(CACHE_NAME).then(cache => {
-            // Sicherstellen, dass HTML-Dateien wie `game.html` immer gecacht werden
-            if (cleanPath.endsWith('.html') || cleanPath.endsWith('.css') || cleanPath.endsWith('.js') || cleanPath.endsWith('.png')) {
-              console.log('[SW] 💾 Caching network response:', cleanPath);
-              cache.put(cleanPath, responseClone).catch(err => {
-                console.error('[SW] ❌ Failed to cache:', cleanPath, err);
-              });
-            }
-          });
-
-          return networkResponse;  // Rückgabe der Netzwerkantwort
-        })
-        .catch(error => {
-          console.error('[SW] ❌ Fetch failed for:', cleanPath, error);
-          // Stelle sicher, dass bei Offline-Zugriff die gecachte Version zurückgegeben wird
-          return caches.match(cleanPath);  // Falls offline, die gecachte Version zurückgeben
         });
+
+        return networkResponse;
+      }).catch(error => {
+        console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
+      });
+    }).catch(cacheError => {
+      console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
     })
   );
 });
 
 // ACTIVATE
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating...');
+  console.log('[SW] Activating new Service Worker...');
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
+    caches.keys().then(keys => {
+      return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] 🧹 Removing old cache:', key);
+            console.log('[SW] 🧹 Deleting old cache:', key);
             return caches.delete(key);
           }
         })
-      )
-    ).then(() => self.clients.claim())
+      );
+    }).then(() => {
+      console.log('[SW] ✅ Activation complete. Clients now controlled.');
+      return self.clients.claim();
+    })
   );
 });
