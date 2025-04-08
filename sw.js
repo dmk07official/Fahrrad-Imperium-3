@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v-final';
+const CACHE_NAME = 'my-cf-game-v11';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -14,7 +14,7 @@ const urlsToCache = [
   '/game/coin_disabled.png',
   '/game/game-server.js',
   '/game/game.css',
-  '/game/game.html',  // Game HTML immer mit rein
+  '/game/game.html',
   '/game/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
@@ -36,15 +36,16 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          const response = await fetch(url);
+          const response = await fetch(url, { cache: 'no-cache' }); // umgeht evtl. redirect cache
           if (response.ok) {
-            await cache.put(url, response.clone());
-            console.log('[SW] ✅ Cached:', url);
+            const cleanURL = new URL(url, self.location).pathname;
+            await cache.put(cleanURL, response.clone());
+            console.log('[SW] ✅ Cached:', cleanURL);
           } else {
-            console.warn('[SW] ⚠️ Skipped:', url, response.status);
+            console.warn('[SW] ⚠️ Skipped (not ok):', url, response.status);
           }
         } catch (err) {
-          console.error('[SW] ❌ Failed to cache:', url, err);
+          console.error('[SW] ❌ Error fetching:', url, err);
         }
       }
     })
@@ -54,51 +55,51 @@ self.addEventListener('install', event => {
 
 // FETCH
 self.addEventListener('fetch', event => {
-  const requestURL = new URL(event.request.url);
-  
-  // Überprüfen, ob es sich um die eigene Domain handelt
-  if (requestURL.origin !== location.origin) return;
+  const reqURL = new URL(event.request.url);
 
-  const cleanPath = requestURL.pathname.replace(/\/+$/, '');  // Entfernen von Slashes, falls vorhanden
+  if (reqURL.origin !== location.origin) return;
+
+  const cleanPath = reqURL.pathname;
 
   event.respondWith(
     caches.match(cleanPath).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Serving from cache:', cleanPath);
-        return cachedResponse;  // Antworte direkt aus dem Cache
+        console.log('[SW] 🟢 Cache hit:', cleanPath);
+        return cachedResponse;
       }
 
-      console.log('[SW] 🔄 Not cached, fetching:', cleanPath);
-
+      console.log('[SW] 🔄 Cache miss, fetching:', cleanPath);
       return fetch(event.request)
         .then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200) {
+          if (
+            !networkResponse ||
+            networkResponse.status !== 200 ||
+            networkResponse.redirected
+          ) {
             console.warn('[SW] ⚠️ Bad response:', cleanPath);
             return networkResponse;
           }
 
-          const responseClone = networkResponse.clone();
+          const responseClone = networkResponse.clone(); // ✅ FIX
 
           caches.open(CACHE_NAME).then(cache => {
-            // Sicherstellen, dass HTML-Dateien wie `game.html` immer gecacht werden
-            if (cleanPath.endsWith('.html') || cleanPath.endsWith('.css') || cleanPath.endsWith('.js') || cleanPath.endsWith('.png')) {
-              console.log('[SW] 💾 Caching network response:', cleanPath);
-              cache.put(cleanPath, responseClone).catch(err => {
-                console.error('[SW] ❌ Failed to cache:', cleanPath, err);
-              });
-            }
+            cache.put(cleanPath, responseClone).catch(err => {
+              console.error('[SW] ❌ Failed to cache:', cleanPath, err);
+            });
           });
 
-          return networkResponse;  // Rückgabe der Netzwerkantwort
+          return networkResponse; // Original untouched
         })
         .catch(error => {
-          console.error('[SW] ❌ Fetch failed for:', cleanPath, error);
-          // Stelle sicher, dass bei Offline-Zugriff die gecachte Version zurückgegeben wird
-          return caches.match(cleanPath);  // Falls offline, die gecachte Version zurückgeben
+          console.error('[SW] ❌ Fetch failed:', cleanPath, error);
+          return new Response('<h1>Offline 💀</h1><p>Diese Seite ist offline nicht verfügbar.</p>', {
+            headers: { 'Content-Type': 'text/html' },
+          });
         });
     })
   );
 });
+
 
 // ACTIVATE
 self.addEventListener('activate', event => {
@@ -108,7 +109,7 @@ self.addEventListener('activate', event => {
       Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] 🧹 Removing old cache:', key);
+            console.log('[SW] 🧹 Deleting old cache:', key);
             return caches.delete(key);
           }
         })
@@ -116,3 +117,4 @@ self.addEventListener('activate', event => {
     ).then(() => self.clients.claim())
   );
 });
+
