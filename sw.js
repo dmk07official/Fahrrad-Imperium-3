@@ -8,7 +8,7 @@ const urlsToCache = [
   '/index/tap.mp3',
   '/index/discord-logo.png',
   '/index/logo.png',
-  '/index/tiktok.png',
+  '/index/tiktok-logo.png',
   '/game/background-game.mp3',
   '/game/coin.png',
   '/game/coin_disabled.png',
