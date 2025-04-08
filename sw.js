@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v11';
+const CACHE_NAME = 'my-cf-game-v12';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -55,50 +55,36 @@ self.addEventListener('install', event => {
 
 // FETCH
 self.addEventListener('fetch', event => {
-  const reqURL = new URL(event.request.url);
+  const requestURL = new URL(event.request.url);
 
-  if (reqURL.origin !== location.origin) return;
+  // Überprüfen, ob es sich um die eigene Domain handelt
+  if (requestURL.origin !== location.origin) return;
 
-  const cleanPath = reqURL.pathname;
+  const cleanPath = requestURL.pathname.replace(/\/+$/, '');  // Entfernen von Slashes
 
   event.respondWith(
-    caches.match(cleanPath).then(cachedResponse => {
+    caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Cache hit:', cleanPath);
-        return cachedResponse;
+        console.log('[SW] 🟢 Serving from cache:', event.request.url);
+        return cachedResponse;  // Antworte direkt aus dem Cache
       }
 
-      console.log('[SW] 🔄 Cache miss, fetching:', cleanPath);
-      return fetch(event.request)
-        .then(networkResponse => {
-          if (
-            !networkResponse ||
-            networkResponse.status !== 200 ||
-            networkResponse.redirected
-          ) {
-            console.warn('[SW] ⚠️ Bad response:', cleanPath);
-            return networkResponse;
-          }
+      // Wenn keine gecachte Antwort da ist und offline, dann fallback
+      if (!navigator.onLine) {
+        console.warn('[SW] ⚠️ Offline und keine gecachte Antwort, versuche es später.');
+        return caches.match('/offline.html');  // Optional: eine Offline-Fehlerseite
+      }
 
-          const responseClone = networkResponse.clone(); // ✅ FIX
-
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(cleanPath, responseClone).catch(err => {
-              console.error('[SW] ❌ Failed to cache:', cleanPath, err);
-            });
-          });
-
-          return networkResponse; // Original untouched
-        })
-        .catch(error => {
-          console.error('[SW] ❌ Fetch failed:', cleanPath, error);
-          return new Response('<h1>Offline 💀</h1><p>Diese Seite ist offline nicht verfügbar.</p>', {
-            headers: { 'Content-Type': 'text/html' },
-          });
-        });
+      console.log('[SW] 🔄 Not cached, fetching:', event.request.url);
+      return fetch(event.request);
+    }).catch(err => {
+      console.error('[SW] ❌ Fetch failed for:', cleanPath, err);
+      // Stelle sicher, dass bei Offline-Zugriff die gecachte Version zurückgegeben wird
+      return caches.match(cleanPath);  // Falls offline, die gecachte Version zurückgeben
     })
   );
 });
+
 
 
 // ACTIVATE
