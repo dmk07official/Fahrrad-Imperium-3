@@ -1,60 +1,3 @@
-const CACHE_NAME = 'my-cf-game-v10';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/index.css',
-  '/index.js',
-  '/index/main-theme.mp3',
-  '/index/tap.mp3',
-  '/index/discord-logo.png',
-  '/index/logo.png',
-  '/index/tiktok.png',
-  '/game/background-game.mp3',
-  '/game/coin.png',
-  '/game/coin_disabled.png',
-  '/game/game-server.js',
-  '/game/game.css',
-  '/game/game.html',
-  '/game/game.js',
-  '/game/gold-arrow.png',
-  '/game/green-arrow.png',
-  '/game/prestige.png',
-  '/game/tap.png',
-  '/game/work.png',
-  '/global-css-variables.css',
-  '/robots.txt',
-  '/sitemap.xml',
-  '/manifest.json',
-  '/sw.js',
-];
-
-// INSTALL
-self.addEventListener('install', event => {
-  console.log('[SW] Installing Service Worker...');
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      console.log('[SW] Caching files manually to avoid redirects...');
-      for (const url of urlsToCache) {
-        try {
-          const response = await fetch(url);
-          if (response.ok && !response.redirected) {
-            await cache.put(url, response.clone());
-            console.log('[SW] Cached:', url);
-          } else {
-            console.warn('[SW] Skipped (bad or redirected):', url, response.status);
-          }
-        } catch (err) {
-          console.error('[SW] Failed to fetch & cache:', url, err);
-        }
-      }
-    }).catch(err => {
-      console.error('[SW] Error opening cache during install:', err);
-    })
-  );
-  self.skipWaiting(); // Sofort aktivieren ohne warten
-});
-
-// FETCH
 self.addEventListener('fetch', event => {
   console.log('[SW] Fetching:', event.request.url);
 
@@ -64,8 +7,6 @@ self.addEventListener('fetch', event => {
         console.log('[SW] 🟢 Serving from cache:', event.request.url);
         return cachedResponse;
       }
-
-      console.log('[SW] 🔄 Not in cache, fetching from network:', event.request.url);
 
       return fetch(event.request).then(networkResponse => {
         if (
@@ -98,29 +39,24 @@ self.addEventListener('fetch', event => {
         return networkResponse;
       }).catch(error => {
         console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
+
+        // 👇 OFFLINE FALLBACK HIER:
+        if (event.request.destination === 'document') {
+          if (event.request.url.includes('/game')) {
+            return caches.match('/game/game.html');
+          }
+          return caches.match('/index.html');
+        }
+
+        // für andere Typen:
+        return new Response('Offline', {
+          status: 503,
+          statusText: 'Offline',
+          headers: { 'Content-Type': 'text/plain' }
+        });
       });
     }).catch(cacheError => {
       console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
-    })
-  );
-});
-
-// ACTIVATE
-self.addEventListener('activate', event => {
-  console.log('[SW] Activating new Service Worker...');
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            console.log('[SW] 🧹 Deleting old cache:', key);
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('[SW] ✅ Activation complete. Clients now controlled.');
-      return self.clients.claim();
     })
   );
 });
