@@ -57,7 +57,6 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   const reqURL = new URL(event.request.url);
 
-  // Nur gleiche-Origin Sachen abfangen
   if (reqURL.origin !== location.origin) return;
 
   const cleanPath = reqURL.pathname;
@@ -81,13 +80,15 @@ self.addEventListener('fetch', event => {
             return networkResponse;
           }
 
+          const responseClone = networkResponse.clone(); // ✅ FIX
+
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(cleanPath, networkResponse.clone()).catch(err => {
+            cache.put(cleanPath, responseClone).catch(err => {
               console.error('[SW] ❌ Failed to cache:', cleanPath, err);
             });
           });
 
-          return networkResponse;
+          return networkResponse; // Original untouched
         })
         .catch(error => {
           console.error('[SW] ❌ Fetch failed:', cleanPath, error);
@@ -98,6 +99,7 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
 
 // ACTIVATE
 self.addEventListener('activate', event => {
