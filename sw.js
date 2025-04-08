@@ -1,6 +1,6 @@
-const CACHE_NAME = 'my-cf-game-v11'; // neue Version!
+const CACHE_NAME = 'my-cf-game-v11';
 const urlsToCache = [
-  '/', // wichtig: root
+  '/',
   '/index.html',
   '/index.css',
   '/index.js',
@@ -9,13 +9,13 @@ const urlsToCache = [
   '/index/discord-logo.png',
   '/index/logo.png',
   '/index/tiktok.png',
-  '/game/game.html',
-  '/game/game.js',
-  '/game/game.css',
-  '/game/game-server.js',
   '/game/background-game.mp3',
   '/game/coin.png',
   '/game/coin_disabled.png',
+  '/game/game-server.js',
+  '/game/game.css',
+  '/game/game.html',
+  '/game/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
   '/game/prestige.png',
@@ -25,86 +25,93 @@ const urlsToCache = [
   '/robots.txt',
   '/sitemap.xml',
   '/manifest.json',
-  '/sw.js'
+  '/sw.js',
 ];
 
 // INSTALL
 self.addEventListener('install', event => {
-  console.log('[SW] Install...');
+  console.log('[SW] Installing Service Worker...');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
+    caches.open(CACHE_NAME).then(async cache => {
+      console.log('[SW] Caching files...');
+      for (const url of urlsToCache) {
+        try {
+          const response = await fetch(url, { cache: 'no-cache' }); // umgeht evtl. redirect cache
+          if (response.ok) {
+            const cleanURL = new URL(url, self.location).pathname;
+            await cache.put(cleanURL, response.clone());
+            console.log('[SW] ✅ Cached:', cleanURL);
+          } else {
+            console.warn('[SW] ⚠️ Skipped (not ok):', url, response.status);
+          }
+        } catch (err) {
+          console.error('[SW] ❌ Error fetching:', url, err);
+        }
+      }
     })
   );
   self.skipWaiting();
 });
 
-// ACTIVATE
-self.addEventListener('activate', event => {
-  console.log('[SW] Activate...');
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            console.log('[SW] Removing old cache:', key);
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
-  );
-});
-
 // FETCH
 self.addEventListener('fetch', event => {
-  console.log('[SW] Fetching:', event.request.url);
+  const reqURL = new URL(event.request.url);
+
+  // Nur gleiche-Origin Sachen abfangen
+  if (reqURL.origin !== location.origin) return;
+
+  const cleanPath = reqURL.pathname;
 
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then(response => {
-      if (response) {
-        console.log('[SW] ✅ Serving from cache:', event.request.url);
-        return response;
+    caches.match(cleanPath).then(cachedResponse => {
+      if (cachedResponse) {
+        console.log('[SW] 🟢 Cache hit:', cleanPath);
+        return cachedResponse;
       }
 
+      console.log('[SW] 🔄 Cache miss, fetching:', cleanPath);
       return fetch(event.request)
         .then(networkResponse => {
-          // valid response
           if (
-            !networkResponse || 
-            networkResponse.status !== 200 || 
-            networkResponse.type !== 'basic'
+            !networkResponse ||
+            networkResponse.status !== 200 ||
+            networkResponse.redirected
           ) {
+            console.warn('[SW] ⚠️ Bad response:', cleanPath);
             return networkResponse;
           }
 
-          // Cache the new resource
-          const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
+            cache.put(cleanPath, networkResponse.clone()).catch(err => {
+              console.error('[SW] ❌ Failed to cache:', cleanPath, err);
+            });
           });
 
           return networkResponse;
         })
         .catch(error => {
-          console.warn('[SW] ⚠️ Network error:', event.request.url, error);
-
-          // Offline fallback ONLY for HTML documents
-          if (event.request.destination === 'document') {
-            if (event.request.url.includes('/game')) {
-              return caches.match('/game/game.html');
-            }
-            return caches.match('/index.html');
-          }
-
-          // Optional: fallback image/sound/text
-          return new Response('⚠️ Offline', {
-            status: 503,
-            headers: { 'Content-Type': 'text/plain' }
+          console.error('[SW] ❌ Fetch failed:', cleanPath, error);
+          return new Response('<h1>Offline 💀</h1><p>Diese Seite ist offline nicht verfügbar.</p>', {
+            headers: { 'Content-Type': 'text/html' },
           });
         });
     })
+  );
+});
+
+// ACTIVATE
+self.addEventListener('activate', event => {
+  console.log('[SW] Activating...');
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log('[SW] 🧹 Deleting old cache:', key);
+            return caches.delete(key);
+          }
+        })
+      )
+    ).then(() => self.clients.claim())
   );
 });
