@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", () => {
+  loadProgress();
+});
+
 //Speichern, Laden, Variablen
 let coins = 0;
 let prestigeCount = 0, prestigeMultiplier = 1, prestigeCost = 1000;
@@ -163,8 +167,6 @@ function loadProgress() {
   });
   backgroundMusic.play();
 }
-
-loadProgress();
 
 function updateCoins() {
 document.getElementById('coins').textContent = formatNumber(coins);
