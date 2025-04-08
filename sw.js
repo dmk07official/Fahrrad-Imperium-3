@@ -1,4 +1,4 @@
-'my-cf-game-v10';
+const 'my-cf-game-v10';
 const urlsToCache = [
   '/',
   '/index.html',
