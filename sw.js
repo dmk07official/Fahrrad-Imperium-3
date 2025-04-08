@@ -14,7 +14,7 @@ const urlsToCache = [
   '/game/coin_disabled.png',
   '/game/game-server.js',
   '/game/game.css',
-  '/game/game.html',
+  '/game/game.html',  // Game HTML immer mit rein
   '/game/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
@@ -36,7 +36,7 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          const response = await fetch(url, { redirect: 'follow' });
+          const response = await fetch(url);
           if (response.ok) {
             await cache.put(url, response.clone());
             console.log('[SW] ✅ Cached:', url);
@@ -55,34 +55,22 @@ self.addEventListener('install', event => {
 // FETCH
 self.addEventListener('fetch', event => {
   const requestURL = new URL(event.request.url);
-
-  // Nur eigene Seiten cachen
+  
+  // Überprüfen, ob es sich um die eigene Domain handelt
   if (requestURL.origin !== location.origin) return;
 
-  // Strip trailing slashes und Query-Params
-  const cleanPath = requestURL.pathname.replace(/\/+$/, '');
-
-  const cleanRequest = new Request(cleanPath, {
-    method: event.request.method,
-    headers: event.request.headers,
-    mode: event.request.mode,
-    credentials: event.request.credentials,
-    redirect: 'follow',
-    referrer: event.request.referrer,
-    integrity: event.request.integrity,
-    cache: 'default',
-  });
+  const cleanPath = requestURL.pathname.replace(/\/+$/, '');  // Entfernen von Slashes, falls vorhanden
 
   event.respondWith(
     caches.match(cleanPath).then(cachedResponse => {
       if (cachedResponse) {
         console.log('[SW] 🟢 Serving from cache:', cleanPath);
-        return cachedResponse;
+        return cachedResponse;  // Antworte direkt aus dem Cache
       }
 
       console.log('[SW] 🔄 Not cached, fetching:', cleanPath);
 
-      return fetch(cleanRequest)
+      return fetch(event.request)
         .then(networkResponse => {
           if (!networkResponse || networkResponse.status !== 200) {
             console.warn('[SW] ⚠️ Bad response:', cleanPath);
@@ -92,18 +80,21 @@ self.addEventListener('fetch', event => {
           const responseClone = networkResponse.clone();
 
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(cleanPath, responseClone).catch(err => {
-              console.error('[SW] ❌ Caching failed:', cleanPath, err);
-            });
+            // Sicherstellen, dass HTML-Dateien wie `game.html` immer gecacht werden
+            if (cleanPath.endsWith('.html') || cleanPath.endsWith('.css') || cleanPath.endsWith('.js') || cleanPath.endsWith('.png')) {
+              console.log('[SW] 💾 Caching network response:', cleanPath);
+              cache.put(cleanPath, responseClone).catch(err => {
+                console.error('[SW] ❌ Failed to cache:', cleanPath, err);
+              });
+            }
           });
 
-          return networkResponse;
+          return networkResponse;  // Rückgabe der Netzwerkantwort
         })
         .catch(error => {
-          console.error('[SW] ❌ Offline and not cached:', cleanPath, error);
-          return new Response(`<h1>⚠️ Offline</h1><p>Die Seite <code>${cleanPath}</code> ist offline nicht verfügbar.</p>`, {
-            headers: { 'Content-Type': 'text/html' },
-          });
+          console.error('[SW] ❌ Fetch failed for:', cleanPath, error);
+          // Stelle sicher, dass bei Offline-Zugriff die gecachte Version zurückgegeben wird
+          return caches.match(cleanPath);  // Falls offline, die gecachte Version zurückgeben
         });
     })
   );
