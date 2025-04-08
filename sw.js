@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v11';
+const CACHE_NAME = 'my-cf-game-v-final';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -36,16 +36,15 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          const response = await fetch(url, { cache: 'no-cache' }); // umgeht evtl. redirect cache
+          const response = await fetch(url, { redirect: 'follow' });
           if (response.ok) {
-            const cleanURL = new URL(url, self.location).pathname;
-            await cache.put(cleanURL, response.clone());
-            console.log('[SW] ✅ Cached:', cleanURL);
+            await cache.put(url, response.clone());
+            console.log('[SW] ✅ Cached:', url);
           } else {
-            console.warn('[SW] ⚠️ Skipped (not ok):', url, response.status);
+            console.warn('[SW] ⚠️ Skipped:', url, response.status);
           }
         } catch (err) {
-          console.error('[SW] ❌ Error fetching:', url, err);
+          console.error('[SW] ❌ Failed to cache:', url, err);
         }
       }
     })
@@ -55,51 +54,60 @@ self.addEventListener('install', event => {
 
 // FETCH
 self.addEventListener('fetch', event => {
-  const reqURL = new URL(event.request.url);
+  const requestURL = new URL(event.request.url);
 
-  if (reqURL.origin !== location.origin) return;
+  // Nur eigene Seiten cachen
+  if (requestURL.origin !== location.origin) return;
 
-  const cleanPath = reqURL.pathname;
+  // Strip trailing slashes und Query-Params
+  const cleanPath = requestURL.pathname.replace(/\/+$/, '');
+
+  const cleanRequest = new Request(cleanPath, {
+    method: event.request.method,
+    headers: event.request.headers,
+    mode: event.request.mode,
+    credentials: event.request.credentials,
+    redirect: 'follow',
+    referrer: event.request.referrer,
+    integrity: event.request.integrity,
+    cache: 'default',
+  });
 
   event.respondWith(
     caches.match(cleanPath).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Cache hit:', cleanPath);
+        console.log('[SW] 🟢 Serving from cache:', cleanPath);
         return cachedResponse;
       }
 
-      console.log('[SW] 🔄 Cache miss, fetching:', cleanPath);
-      return fetch(event.request)
+      console.log('[SW] 🔄 Not cached, fetching:', cleanPath);
+
+      return fetch(cleanRequest)
         .then(networkResponse => {
-          if (
-            !networkResponse ||
-            networkResponse.status !== 200 ||
-            networkResponse.redirected
-          ) {
+          if (!networkResponse || networkResponse.status !== 200) {
             console.warn('[SW] ⚠️ Bad response:', cleanPath);
             return networkResponse;
           }
 
-          const responseClone = networkResponse.clone(); // ✅ FIX
+          const responseClone = networkResponse.clone();
 
           caches.open(CACHE_NAME).then(cache => {
             cache.put(cleanPath, responseClone).catch(err => {
-              console.error('[SW] ❌ Failed to cache:', cleanPath, err);
+              console.error('[SW] ❌ Caching failed:', cleanPath, err);
             });
           });
 
-          return networkResponse; // Original untouched
+          return networkResponse;
         })
         .catch(error => {
-          console.error('[SW] ❌ Fetch failed:', cleanPath, error);
-          return new Response('<h1>Offline 💀</h1><p>Diese Seite ist offline nicht verfügbar.</p>', {
+          console.error('[SW] ❌ Offline and not cached:', cleanPath, error);
+          return new Response(`<h1>⚠️ Offline</h1><p>Die Seite <code>${cleanPath}</code> ist offline nicht verfügbar.</p>`, {
             headers: { 'Content-Type': 'text/html' },
           });
         });
     })
   );
 });
-
 
 // ACTIVATE
 self.addEventListener('activate', event => {
@@ -109,7 +117,7 @@ self.addEventListener('activate', event => {
       Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] 🧹 Deleting old cache:', key);
+            console.log('[SW] 🧹 Removing old cache:', key);
             return caches.delete(key);
           }
         })
