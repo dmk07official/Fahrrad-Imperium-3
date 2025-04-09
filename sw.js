@@ -1,7 +1,6 @@
 const CACHE_NAME = 'my-cf-game-v2';
 const urlsToCache = [
   '/',
-  '/game/',
   '/index.html',
   '/index.css',
   '/index.js',
@@ -15,7 +14,7 @@ const urlsToCache = [
   '/game/coin_disabled.png',
   '/game/game-server.js',
   '/game/game.css',
-  '/game/game.html', 
+  '/game/game.html',  // Die HTML-Dateien explizit sicherstellen
   '/game/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
@@ -33,36 +32,35 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
       console.log('[SW] Caching files manually...');
-      for (const url of urlsToCache) {
+      const cachePromises = urlsToCache.map(async url => {
         try {
-          const response = await fetch(url);
-          if (response.ok && !response.redirected) {
-            // Check if it's HTML before caching
-            if (url.endsWith('.html')) {
-              console.log('[SW] Caching HTML:', url);
-            }
+          const response = await fetch(url, { cache: 'reload' }); // Stelle sicher, dass keine Caching-Fehler auftreten
+          if (response.ok) {
             await cache.put(url, response.clone());
             console.log('[SW] Cached:', url);
           } else {
-            console.warn('[SW] Skipped (bad or redirected):', url, response.status);
+            console.warn('[SW] Skipped (bad response):', url, response.status);
           }
         } catch (err) {
           console.error('[SW] Failed to fetch & cache:', url, err);
         }
-      }
+      });
+
+      await Promise.all(cachePromises);
     }).catch(err => {
       console.error('[SW] Error opening cache during install:', err);
     })
   );
-  self.skipWaiting(); // Instantly activate the SW without waiting
+  self.skipWaiting(); // Sofort aktivieren ohne warten
 });
 
 // FETCH
 self.addEventListener('fetch', event => {
   console.log('[SW] Fetching:', event.request.url);
 
+  // Sicherstellen, dass HTML-Dateien auch im Cache verarbeitet werden
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
+    caches.match(event.request).then(async cachedResponse => {
       if (cachedResponse) {
         console.log('[SW] 🟢 Serving from cache:', event.request.url);
         return cachedResponse;
@@ -70,7 +68,8 @@ self.addEventListener('fetch', event => {
 
       console.log('[SW] 🔄 Not in cache, fetching from network:', event.request.url);
 
-      return fetch(event.request).then(networkResponse => {
+      try {
+        const networkResponse = await fetch(event.request);
         if (
           !networkResponse ||
           networkResponse.status !== 200 ||
@@ -81,28 +80,25 @@ self.addEventListener('fetch', event => {
           return networkResponse;
         }
 
+        // Sicherstellen, dass HTML-Dateien und andere Dateien auch gecacht werden
         const responseClone = networkResponse.clone();
+        const url = new URL(event.request.url);
 
-        caches.open(CACHE_NAME).then(cache => {
-          if (
-            event.request.url.endsWith('.html') ||
-            event.request.url.endsWith('.css') ||
-            event.request.url.endsWith('.js') ||
-            event.request.url.endsWith('.png') ||
-            event.request.url.endsWith('.mp3')
-          ) {
+        // Cache nur, wenn die Datei einer bestimmten Kategorie entspricht (HTML, CSS, JS, etc.)
+        if (url.pathname.endsWith('.html') || url.pathname.endsWith('.css') || url.pathname.endsWith('.js') || url.pathname.endsWith('.png') || url.pathname.endsWith('.mp3')) {
+          caches.open(CACHE_NAME).then(cache => {
             console.log('[SW] 💾 Caching network response:', event.request.url);
-            cache.put(event.request, responseClone).catch(err => {
-              console.error('[SW] ❌ Failed to put in cache:', event.request.url, err);
-            });
-          }
-        });
+            cache.put(event.request, responseClone);
+          }).catch(err => {
+            console.error('[SW] ❌ Failed to put in cache:', event.request.url, err);
+          });
+        }
 
         return networkResponse;
-      }).catch(error => {
+      } catch (error) {
         console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
 
-        // 🧭 CATCH-ALL FALLBACK BEI OFFLINE
+        // 🧭 Fallback-Mechanismus, wenn offline
         if (event.request.mode === 'navigate') {
           const url = new URL(event.request.url);
           if (url.pathname.startsWith('/game')) {
@@ -110,7 +106,7 @@ self.addEventListener('fetch', event => {
           }
           return caches.match('/index.html');
         }
-      });
+      }
     }).catch(cacheError => {
       console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
     })
