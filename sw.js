@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v17';
+const CACHE_NAME = 'my-cf-game-v18';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -28,7 +28,7 @@ const urlsToCache = [
   '/sw.js',
 ];
 
-// INSTALL - Alles cachen
+// INSTALL - Dateien cachen
 self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
@@ -53,22 +53,23 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// FETCH - Manuelle Umgehung von Redirects
+// FETCH - Redirects und Cache-Handhabung
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
 
+  // Wenn es bereits im Cache ist, holen wir die Datei
   event.respondWith(
     caches.match(request).then(cachedResponse => {
-      // Wenn es im Cache ist, geben wir es direkt aus
+      // Wenn wir den Cache treffen, gibt es die gecachte Version zurück
       if (cachedResponse) {
         console.log('[SW] 🟢 Cache hit:', url.pathname);
         return cachedResponse;
       }
 
-      // Manuelles Handling von Redirects
+      // Wenn keine Cache-Datei existiert, fetchen wir die Datei
       return fetch(request).then(response => {
-        // Wenn die Antwort redirected ist, holen wir die finale URL direkt
+        // Wenn die Antwort umgeleitet wird, behandeln wir sie
         if (response.redirected) {
           console.log('[SW] 🔄 Redirect detected, fetching final URL:', response.url);
           return fetch(response.url).then(finalResponse => {
@@ -121,7 +122,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// ACTIVATE - Entfernen des alten Caches
+// ACTIVATE - Entfernen alter Caches
 self.addEventListener('activate', event => {
   console.log('[SW] Activating...');
   event.waitUntil(
