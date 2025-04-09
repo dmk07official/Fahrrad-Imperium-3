@@ -1,4 +1,4 @@
-const  CACHE_NAME = 'my-cf-game-v10';
+const  CACHE_NAME = 'my-cf-game-v11';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -98,6 +98,15 @@ self.addEventListener('fetch', event => {
         return networkResponse;
       }).catch(error => {
         console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
+
+        // 🧭 CATCH-ALL FALLBACK BEI OFFLINE
+        if (event.request.mode === 'navigate') {
+          const url = new URL(event.request.url);
+          if (url.pathname.startsWith('/game')) {
+            return caches.match('/game/game.html');
+          }
+          return caches.match('/index.html');
+        }
       });
     }).catch(cacheError => {
       console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
