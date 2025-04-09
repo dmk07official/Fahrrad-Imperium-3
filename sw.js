@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v16';
+const CACHE_NAME = 'my-cf-game-v17';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -36,8 +36,7 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          // Aggressiver Fetch mit cache und redirect follow
-          const req = new Request(url, { cache: 'reload', redirect: 'follow' });
+          const req = new Request(url, { cache: 'reload' });
           const response = await fetch(req);
           if (response.ok) {
             await cache.put(url, response.clone());
@@ -54,43 +53,58 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// FETCH - Aggressive Redirect-Strategie
+// FETCH - Manuelle Umgehung von Redirects
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Wir fangen die Requests ab und bearbeiten sie
   event.respondWith(
     caches.match(request).then(cachedResponse => {
-      // Wenn der Cache einen Treffer liefert, verwenden wir ihn
+      // Wenn es im Cache ist, geben wir es direkt aus
       if (cachedResponse) {
         console.log('[SW] 🟢 Cache hit:', url.pathname);
         return cachedResponse;
       }
 
-      // Aggressiv den Request aus dem Netzwerk holen und Redirects folgen lassen
-      return fetch(request, { redirect: 'follow' }).then(response => {
-        // Wenn es ein Redirect ist, folgen wir ihm.
+      // Manuelles Handling von Redirects
+      return fetch(request).then(response => {
+        // Wenn die Antwort redirected ist, holen wir die finale URL direkt
         if (response.redirected) {
-          console.log('[SW] 🔄 Followed Redirect:', url.pathname);
+          console.log('[SW] 🔄 Redirect detected, fetching final URL:', response.url);
+          return fetch(response.url).then(finalResponse => {
+            // Wenn die finale Antwort gültig ist, speichern wir sie
+            if (finalResponse.ok) {
+              const cloned = finalResponse.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
+                  cache.put(request, cloned);
+                  console.log('[SW] 🔄 Cached final asset:', url.pathname);
+                }
+              });
+            }
+            return finalResponse;
+          }).catch(err => {
+            console.warn('[SW] ❌ Failed to fetch final URL:', err);
+            return new Response('Offline Error', { status: 503 });
+          });
         }
 
-        // Wenn die Antwort gut ist, speichern wir sie im Cache und geben sie zurück
-        if (response && response.status === 200) {
+        // Wenn keine Umleitung vorhanden ist, speichern wir die Antwort im Cache
+        if (response.ok) {
           const cloned = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
               cache.put(request, cloned);
-              console.log('[SW] 🔄 Cached new asset:', url.pathname);
+              console.log('[SW] 💾 Cached:', url.pathname);
             }
           });
         }
 
         return response;
-      }).catch(error => {
-        console.warn('[SW] 🛑 Network fail:', url.pathname, error);
+      }).catch(err => {
+        console.warn('[SW] ❌ Network fail:', err);
 
-        // 📦 OFFLINE FALLBACK für HTML-Dateien
+        // Offline-Fallback für HTML-Dateien
         if (url.pathname.endsWith('.html')) {
           if (url.pathname.startsWith('/game')) {
             return caches.match('/game/game.html'); // Game Offline Fallback
