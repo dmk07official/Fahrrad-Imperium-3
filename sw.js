@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v14';
+const CACHE_NAME = 'my-cf-game-v15';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -28,7 +28,7 @@ const urlsToCache = [
   '/sw.js',
 ];
 
-// INSTALL - Alle Dateien cachen
+// INSTALL - Alles cachen
 self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
@@ -36,7 +36,8 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          const req = new Request(url, { cache: 'reload', redirect: 'follow' }); // fetch mit redirect follow
+          // Fetch mit redirect follow und cache reload
+          const req = new Request(url, { cache: 'reload', redirect: 'follow' });
           const response = await fetch(req);
           if (response.ok) {
             await cache.put(url, response.clone());
@@ -50,55 +51,56 @@ self.addEventListener('install', event => {
       }
     })
   );
-  self.skipWaiting(); // Service Worker sofort aktivieren
+  self.skipWaiting();
 });
 
-// FETCH - Cache zuerst, dann Network
+// FETCH - Cache und Redirect Handling aggressiv anpassen
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
-  
+
   event.respondWith(
     caches.match(request).then(cachedResponse => {
-      // Wenn die Datei im Cache ist, zurückgeben
       if (cachedResponse) {
         console.log('[SW] 🟢 Cache hit:', url.pathname);
         return cachedResponse;
       }
 
-      // Wenn nicht, aus dem Netz holen
-      return fetch(request, { redirect: 'follow' }).then(response => {
-        if (!response || response.status !== 200 || response.redirected) {
+      // Aggressives Fetch mit redirect follow
+      return fetch(request, { redirect: 'follow' })
+        .then(response => {
+          // Sicherstellen, dass die Antwort gültig und nicht redirected ist
+          if (!response || response.status !== 200 || response.redirected) {
+            console.warn('[SW] ⚠️ Redirected Response:', url.pathname);
+            return response; // Wenn es ein Redirect ist, direkt zurückgeben
+          }
+
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
+              cache.put(request, cloned);
+              console.log('[SW] 🔄 Cached new asset:', url.pathname);
+            }
+          });
+
           return response;
-        }
+        })
+        .catch(error => {
+          console.warn('[SW] 🛑 Network fail:', url.pathname, error);
 
-        const cloned = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          // Dateien wie HTML, JS, CSS, Bilder, etc. im Cache speichern
-          if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
-            cache.put(request, cloned);
-            console.log('[SW] 🔄 Cached new asset:', url.pathname);
+          // 📦 OFFLINE FALLBACK
+          if (url.pathname.endsWith('.html')) {
+            if (url.pathname.startsWith('/game')) {
+              return caches.match('/game/game.html'); // Game offline fallback
+            }
+            return caches.match('/index.html'); // Index offline fallback
           }
+
+          return new Response('⚠️ Offline & file not cached', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' }
+          });
         });
-
-        return response;
-      }).catch(error => {
-        console.warn('[SW] 🛑 Network fail:', url.pathname, error);
-
-        // 📦 OFFLINE FALLBACK
-        if (url.pathname.endsWith('.html')) {
-          // Wenn HTML nicht geladen wird, fallback zu Index oder Game HTML
-          if (url.pathname.startsWith('/game')) {
-            return caches.match('/game/game.html');
-          }
-          return caches.match('/index.html');
-        }
-
-        return new Response('⚠️ Offline & file not cached', {
-          status: 503,
-          headers: { 'Content-Type': 'text/plain' }
-        });
-      });
     })
   );
 });
