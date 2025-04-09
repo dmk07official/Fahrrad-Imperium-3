@@ -12,7 +12,6 @@ const urlsToCache = [
   '/game/background-game.mp3',
   '/game/coin.png',
   '/game/coin_disabled.png',
-  '/game/game-server.js',
   '/game/game.css',
   '/game/game.html',
   '/game/game.js',
