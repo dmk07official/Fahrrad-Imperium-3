@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v15';
+const CACHE_NAME = 'my-cf-game-v16';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -36,7 +36,7 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          // Fetch mit redirect follow und cache reload
+          // Aggressiver Fetch mit cache und redirect follow
           const req = new Request(url, { cache: 'reload', redirect: 'follow' });
           const response = await fetch(req);
           if (response.ok) {
@@ -54,27 +54,29 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// FETCH - Cache und Redirect Handling aggressiv anpassen
+// FETCH - Aggressive Redirect-Strategie
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
 
+  // Wir fangen die Requests ab und bearbeiten sie
   event.respondWith(
     caches.match(request).then(cachedResponse => {
+      // Wenn der Cache einen Treffer liefert, verwenden wir ihn
       if (cachedResponse) {
         console.log('[SW] 🟢 Cache hit:', url.pathname);
         return cachedResponse;
       }
 
-      // Aggressives Fetch mit redirect follow
-      return fetch(request, { redirect: 'follow' })
-        .then(response => {
-          // Sicherstellen, dass die Antwort gültig und nicht redirected ist
-          if (!response || response.status !== 200 || response.redirected) {
-            console.warn('[SW] ⚠️ Redirected Response:', url.pathname);
-            return response; // Wenn es ein Redirect ist, direkt zurückgeben
-          }
+      // Aggressiv den Request aus dem Netzwerk holen und Redirects folgen lassen
+      return fetch(request, { redirect: 'follow' }).then(response => {
+        // Wenn es ein Redirect ist, folgen wir ihm.
+        if (response.redirected) {
+          console.log('[SW] 🔄 Followed Redirect:', url.pathname);
+        }
 
+        // Wenn die Antwort gut ist, speichern wir sie im Cache und geben sie zurück
+        if (response && response.status === 200) {
           const cloned = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
@@ -82,30 +84,30 @@ self.addEventListener('fetch', event => {
               console.log('[SW] 🔄 Cached new asset:', url.pathname);
             }
           });
+        }
 
-          return response;
-        })
-        .catch(error => {
-          console.warn('[SW] 🛑 Network fail:', url.pathname, error);
+        return response;
+      }).catch(error => {
+        console.warn('[SW] 🛑 Network fail:', url.pathname, error);
 
-          // 📦 OFFLINE FALLBACK
-          if (url.pathname.endsWith('.html')) {
-            if (url.pathname.startsWith('/game')) {
-              return caches.match('/game/game.html'); // Game offline fallback
-            }
-            return caches.match('/index.html'); // Index offline fallback
+        // 📦 OFFLINE FALLBACK für HTML-Dateien
+        if (url.pathname.endsWith('.html')) {
+          if (url.pathname.startsWith('/game')) {
+            return caches.match('/game/game.html'); // Game Offline Fallback
           }
+          return caches.match('/index.html'); // Index Offline Fallback
+        }
 
-          return new Response('⚠️ Offline & file not cached', {
-            status: 503,
-            headers: { 'Content-Type': 'text/plain' }
-          });
+        return new Response('⚠️ Offline & file not cached', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' }
         });
+      });
     })
   );
 });
 
-// ACTIVATE - Altes Cache löschen
+// ACTIVATE - Entfernen des alten Caches
 self.addEventListener('activate', event => {
   console.log('[SW] Activating...');
   event.waitUntil(
