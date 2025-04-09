@@ -54,7 +54,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// FETCH - Mit Redirects umgehen und Cache nutzen
+// FETCH - Fetch und Redirects ohne follow behandeln
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
@@ -68,34 +68,24 @@ self.addEventListener('fetch', event => {
         return cachedResponse;
       }
 
-      // Wenn kein Cache gefunden wird, fetchen wir die Datei
+      // Wenn keine Cache-Antwort vorhanden ist, fetchen wir den Request
       return fetch(request).then(response => {
         // Wenn die Antwort umgeleitet wurde, loggen wir dies und holen die finale URL
         if (response.redirected) {
           console.log('[SW] 🔄 Redirect detected, URL:', response.url);
           
-          // Versuche, der Weiterleitung zu folgen
-          return fetch(response.url).then(finalResponse => {
-            console.log('[SW] Following redirect, final response:', finalResponse.url);
-
-            if (finalResponse.ok) {
-              // Diese finale Antwort speichern wir im Cache
-              const cloned = finalResponse.clone();
-              caches.open(CACHE_NAME).then(cache => {
-                if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
-                  cache.put(request, cloned);
-                  console.log('[SW] 🔄 Cached final redirected asset:', url.pathname);
-                }
-              });
+          // Versuche, den Response direkt zu verwenden (ohne Follow), da die URL die finale ist
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
+              cache.put(request, cloned);
+              console.log('[SW] 🔄 Cached redirected asset:', url.pathname);
             }
-            return finalResponse;
-          }).catch(err => {
-            console.error('[SW] ❌ Error following redirect:', err);
-            return new Response('Error fetching redirected resource.', { status: 503 });
           });
+          return response; // Gib die weitergeleitete Antwort zurück
         }
 
-        // Keine Weiterleitung, aber trotzdem im Cache speichern
+        // Wenn keine Weiterleitung, speichern wir sie im Cache
         if (response.ok) {
           const cloned = response.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -108,9 +98,9 @@ self.addEventListener('fetch', event => {
 
         return response;
       }).catch(err => {
-        console.error('[SW] ❌ Network fetch failed:', err);
-        
-        // Wenn wir offline sind, bieten wir Fallbacks aus dem Cache an
+        console.error('[SW] ❌ Fetch failed:', err);
+
+        // Wenn offline, versuche Dateien aus dem Cache zu servieren
         if (url.pathname.endsWith('.html')) {
           console.log('[SW] ⚠️ Fallback to cached HTML file');
           if (url.pathname.startsWith('/game')) {
@@ -119,7 +109,7 @@ self.addEventListener('fetch', event => {
           return caches.match('/index.html');
         }
 
-        // Wenn andere Assets fehlen und wir offline sind, geben wir eine Offline-Nachricht zurück
+        // Andere Dateien bei Offline nicht verfügbar, Rückgabe einer Offline-Nachricht
         return new Response('⚠️ Offline & file not cached', {
           status: 503,
           headers: { 'Content-Type': 'text/plain' }
