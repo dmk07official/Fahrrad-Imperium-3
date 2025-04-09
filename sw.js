@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v19';
+also ich habe schon super viel probiert. erstmal als info ich hoste über git repo und cloudflare. index läuft zur zeit auch offline hervorragend wenn sie gecacht wurde. game wird gecacht und wird wenn online beim betreten dieseer url auch aus dem cache geladen nur beim offline betreten meiner game seite kommt diese nicht sondern ich bin offline fehler: const  CACHE_NAME = 'my-cf-game-v10';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -28,98 +28,94 @@ const urlsToCache = [
   '/sw.js',
 ];
 
-// INSTALL - Dateien cachen
+// INSTALL
 self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
-      console.log('[SW] Caching files...');
+      console.log('[SW] Caching files manually to avoid redirects...');
       for (const url of urlsToCache) {
         try {
-          const req = new Request(url, { cache: 'reload' });
-          const response = await fetch(req);
-          console.log(`[SW] Fetching and caching: ${url}`);
-          if (response.ok) {
+          const response = await fetch(url);
+          if (response.ok && !response.redirected) {
             await cache.put(url, response.clone());
-            console.log('[SW] ✅ Cached:', url);
+            console.log('[SW] Cached:', url);
           } else {
-            console.warn('[SW] ⚠️ Skipped:', url, response.status);
+            console.warn('[SW] Skipped (bad or redirected):', url, response.status);
           }
         } catch (err) {
-          console.error('[SW] ❌ Failed to fetch:', url, err);
+          console.error('[SW] Failed to fetch & cache:', url, err);
         }
       }
+    }).catch(err => {
+      console.error('[SW] Error opening cache during install:', err);
     })
   );
-  self.skipWaiting();
+  self.skipWaiting(); // Sofort aktivieren ohne warten
 });
 
-// FETCH - Fetch und Redirects ohne follow behandeln
+// FETCH
 self.addEventListener('fetch', event => {
-  const request = event.request;
-  const url = new URL(request.url);
-  
-  console.log(`[SW] Fetching request: ${url.pathname}`);
+  console.log('[SW] Fetching:', event.request.url);
 
   event.respondWith(
-    caches.match(request).then(cachedResponse => {
+    caches.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Cache hit for:', url.pathname);
+        console.log('[SW] 🟢 Serving from cache:', event.request.url);
         return cachedResponse;
       }
 
-      // Wenn keine Cache-Antwort vorhanden ist, fetchen wir den Request
-      return fetch(request).then(response => {
-        // Wenn die Antwort umgeleitet wurde, loggen wir dies und holen die finale URL
-        if (response.redirected) {
-          console.log('[SW] 🔄 Redirect detected, URL:', response.url);
-          
-          // Versuche, den Response direkt zu verwenden (ohne Follow), da die URL die finale ist
-          const cloned = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
-              cache.put(request, cloned);
-              console.log('[SW] 🔄 Cached redirected asset:', url.pathname);
-            }
-          });
-          return response; // Gib die weitergeleitete Antwort zurück
+      console.log('[SW] 🔄 Not in cache, fetching from network:', event.request.url);
+
+      return fetch(event.request).then(networkResponse => {
+        if (
+          !networkResponse ||
+          networkResponse.status !== 200 ||
+          networkResponse.type !== 'basic' ||
+          networkResponse.redirected
+        ) {
+          console.warn('[SW] ⚠️ Network response invalid or redirected:', event.request.url);
+          return networkResponse;
         }
 
-        // Wenn keine Weiterleitung, speichern wir sie im Cache
-        if (response.ok) {
-          const cloned = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
-              cache.put(request, cloned);
-              console.log('[SW] 💾 Cached:', url.pathname);
-            }
-          });
-        }
+        const responseClone = networkResponse.clone();
 
-        return response;
-      }).catch(err => {
-        console.error('[SW] ❌ Fetch failed:', err);
+        caches.open(CACHE_NAME).then(cache => {
+          if (
+            event.request.url.endsWith('.html') ||
+            event.request.url.endsWith('.css') ||
+            event.request.url.endsWith('.js') ||
+            event.request.url.endsWith('.png') ||
+            event.request.url.endsWith('.mp3')
+          ) {
+            console.log('[SW] 💾 Caching network response:', event.request.url);
+            cache.put(event.request, responseClone).catch(err => {
+              console.error('[SW] ❌ Failed to put in cache:', event.request.url, err);
+            });
+          }
+        });
 
-        // Wenn offline, versuche Dateien aus dem Cache zu servieren
-        if (url.pathname.endsWith('.html')) {
-          console.log('[SW] ⚠️ Fallback to cached HTML file');
+        return networkResponse;
+      }).catch(error => {
+        console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
+
+        // 🧭 CATCH-ALL FALLBACK BEI OFFLINE
+        if (event.request.mode === 'navigate') {
+          const url = new URL(event.request.url);
           if (url.pathname.startsWith('/game')) {
             return caches.match('/game/game.html');
           }
           return caches.match('/index.html');
         }
-
-        // Andere Dateien bei Offline nicht verfügbar, Rückgabe einer Offline-Nachricht
-        return new Response('⚠️ Offline & file not cached', {
-          status: 503,
-          headers: { 'Content-Type': 'text/plain' }
-        });
       });
+    }).catch(cacheError => {
+      console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
     })
   );
 });
 
-// ACTIVATE - Entfernen alter Caches
+
+// ACTIVATE
 self.addEventListener('activate', event => {
   console.log('[SW] Activating new Service Worker...');
   event.waitUntil(
@@ -127,13 +123,13 @@ self.addEventListener('activate', event => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] 🔥 Removing old cache:', key);
+            console.log('[SW] 🧹 Deleting old cache:', key);
             return caches.delete(key);
           }
         })
       );
     }).then(() => {
-      console.log('[SW] ✅ Now controlling clients.');
+      console.log('[SW] ✅ Activation complete. Clients now controlled.');
       return self.clients.claim();
     })
   );
