@@ -1,6 +1,7 @@
-const  CACHE_NAME = 'my-cf-game-v1';
+const  CACHE_NAME = 'my-cf-game-v2';
 const urlsToCache = [
   '/',
+  '/game/',
   '/index.html',
   '/index.css',
   '/index.js',
