@@ -135,7 +135,7 @@ function startGame() {
     src: "index/tap.mp3",
     autoplay: true,
   });
-  window.open('/game/game.html', '_self');
+  location.href = '/game/game.html';
 }
 
 function openDiscord() {
