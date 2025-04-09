@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v18';
+const CACHE_NAME = 'my-cf-game-v19';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -38,6 +38,7 @@ self.addEventListener('install', event => {
         try {
           const req = new Request(url, { cache: 'reload' });
           const response = await fetch(req);
+          console.log(`[SW] Fetching and caching: ${url}`);
           if (response.ok) {
             await cache.put(url, response.clone());
             console.log('[SW] ✅ Cached:', url);
@@ -53,44 +54,48 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// FETCH - Redirects und Cache-Handhabung
+// FETCH - Mit Redirects umgehen und Cache nutzen
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
+  
+  console.log(`[SW] Fetching request: ${url.pathname}`);
 
-  // Wenn es bereits im Cache ist, holen wir die Datei
   event.respondWith(
     caches.match(request).then(cachedResponse => {
-      // Wenn wir den Cache treffen, gibt es die gecachte Version zurück
       if (cachedResponse) {
-        console.log('[SW] 🟢 Cache hit:', url.pathname);
+        console.log('[SW] 🟢 Cache hit for:', url.pathname);
         return cachedResponse;
       }
 
-      // Wenn keine Cache-Datei existiert, fetchen wir die Datei
+      // Wenn kein Cache gefunden wird, fetchen wir die Datei
       return fetch(request).then(response => {
-        // Wenn die Antwort umgeleitet wird, behandeln wir sie
+        // Wenn die Antwort umgeleitet wurde, loggen wir dies und holen die finale URL
         if (response.redirected) {
-          console.log('[SW] 🔄 Redirect detected, fetching final URL:', response.url);
+          console.log('[SW] 🔄 Redirect detected, URL:', response.url);
+          
+          // Versuche, der Weiterleitung zu folgen
           return fetch(response.url).then(finalResponse => {
-            // Wenn die finale Antwort gültig ist, speichern wir sie
+            console.log('[SW] Following redirect, final response:', finalResponse.url);
+
             if (finalResponse.ok) {
+              // Diese finale Antwort speichern wir im Cache
               const cloned = finalResponse.clone();
               caches.open(CACHE_NAME).then(cache => {
                 if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
                   cache.put(request, cloned);
-                  console.log('[SW] 🔄 Cached final asset:', url.pathname);
+                  console.log('[SW] 🔄 Cached final redirected asset:', url.pathname);
                 }
               });
             }
             return finalResponse;
           }).catch(err => {
-            console.warn('[SW] ❌ Failed to fetch final URL:', err);
-            return new Response('Offline Error', { status: 503 });
+            console.error('[SW] ❌ Error following redirect:', err);
+            return new Response('Error fetching redirected resource.', { status: 503 });
           });
         }
 
-        // Wenn keine Umleitung vorhanden ist, speichern wir die Antwort im Cache
+        // Keine Weiterleitung, aber trotzdem im Cache speichern
         if (response.ok) {
           const cloned = response.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -103,16 +108,18 @@ self.addEventListener('fetch', event => {
 
         return response;
       }).catch(err => {
-        console.warn('[SW] ❌ Network fail:', err);
-
-        // Offline-Fallback für HTML-Dateien
+        console.error('[SW] ❌ Network fetch failed:', err);
+        
+        // Wenn wir offline sind, bieten wir Fallbacks aus dem Cache an
         if (url.pathname.endsWith('.html')) {
+          console.log('[SW] ⚠️ Fallback to cached HTML file');
           if (url.pathname.startsWith('/game')) {
-            return caches.match('/game/game.html'); // Game Offline Fallback
+            return caches.match('/game/game.html');
           }
-          return caches.match('/index.html'); // Index Offline Fallback
+          return caches.match('/index.html');
         }
 
+        // Wenn andere Assets fehlen und wir offline sind, geben wir eine Offline-Nachricht zurück
         return new Response('⚠️ Offline & file not cached', {
           status: 503,
           headers: { 'Content-Type': 'text/plain' }
@@ -124,7 +131,7 @@ self.addEventListener('fetch', event => {
 
 // ACTIVATE - Entfernen alter Caches
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating...');
+  console.log('[SW] Activating new Service Worker...');
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
