@@ -22,8 +22,6 @@ const urlsToCache = [
   '/game/tap.png',
   '/game/work.png',
   '/global-css-variables.css',
-  '/robots.txt',
-  '/sitemap.xml',
   '/manifest.json',
   '/sw.js',
 ];
