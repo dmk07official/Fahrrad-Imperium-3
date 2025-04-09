@@ -1,6 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v13';
-
-// Alle Dateien, die gecacht werden sollen
+const CACHE_NAME = 'my-cf-game-v14';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -30,65 +28,96 @@ const urlsToCache = [
   '/sw.js',
 ];
 
-// 🛠 INSTALL
+// INSTALL - Alle Dateien cachen
 self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('[SW] Caching all files...');
-      return cache.addAll(urlsToCache);
-    }).then(() => {
-      console.log('[SW] All files cached successfully.');
-      self.skipWaiting(); // Directly activate without waiting
-    }).catch(err => {
-      console.error('[SW] Error caching files:', err);
+    caches.open(CACHE_NAME).then(async cache => {
+      console.log('[SW] Caching files...');
+      for (const url of urlsToCache) {
+        try {
+          const req = new Request(url, { cache: 'reload', redirect: 'follow' }); // fetch mit redirect follow
+          const response = await fetch(req);
+          if (response.ok) {
+            await cache.put(url, response.clone());
+            console.log('[SW] ✅ Cached:', url);
+          } else {
+            console.warn('[SW] ⚠️ Skipped:', url, response.status);
+          }
+        } catch (err) {
+          console.error('[SW] ❌ Failed to fetch:', url, err);
+        }
+      }
     })
   );
+  self.skipWaiting(); // Service Worker sofort aktivieren
 });
 
-// ⚡️ FETCH
+// FETCH - Cache zuerst, dann Network
 self.addEventListener('fetch', event => {
   const request = event.request;
-
-  // Wenn die Anfrage online nicht verfügbar ist, gebe aus dem Cache zurück
+  const url = new URL(request.url);
+  
   event.respondWith(
     caches.match(request).then(cachedResponse => {
+      // Wenn die Datei im Cache ist, zurückgeben
       if (cachedResponse) {
-        console.log('[SW] Cache hit for:', request.url);
+        console.log('[SW] 🟢 Cache hit:', url.pathname);
         return cachedResponse;
       }
 
-      return fetch(request).then(networkResponse => {
-        if (networkResponse.ok) {
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(request, networkResponse.clone());
-            console.log('[SW] New file cached:', request.url);
-          });
+      // Wenn nicht, aus dem Netz holen
+      return fetch(request, { redirect: 'follow' }).then(response => {
+        if (!response || response.status !== 200 || response.redirected) {
+          return response;
         }
-        return networkResponse;
-      }).catch(() => {
-        console.warn('[SW] No network, serving from cache (if available).');
-        return caches.match(request); // serve from cache on failure
+
+        const cloned = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          // Dateien wie HTML, JS, CSS, Bilder, etc. im Cache speichern
+          if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
+            cache.put(request, cloned);
+            console.log('[SW] 🔄 Cached new asset:', url.pathname);
+          }
+        });
+
+        return response;
+      }).catch(error => {
+        console.warn('[SW] 🛑 Network fail:', url.pathname, error);
+
+        // 📦 OFFLINE FALLBACK
+        if (url.pathname.endsWith('.html')) {
+          // Wenn HTML nicht geladen wird, fallback zu Index oder Game HTML
+          if (url.pathname.startsWith('/game')) {
+            return caches.match('/game/game.html');
+          }
+          return caches.match('/index.html');
+        }
+
+        return new Response('⚠️ Offline & file not cached', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       });
     })
   );
 });
 
-// ♻️ ACTIVATE
+// ACTIVATE - Altes Cache löschen
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating new Service Worker...');
+  console.log('[SW] Activating...');
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', key);
+            console.log('[SW] 🔥 Removing old cache:', key);
             return caches.delete(key);
           }
         })
       );
     }).then(() => {
-      console.log('[SW] Service Worker activated and controlling the clients.');
+      console.log('[SW] ✅ Now controlling clients.');
       return self.clients.claim();
     })
   );
