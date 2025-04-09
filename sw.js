@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v15';
+const CACHE_NAME = 'my-cf-game-v16';
 
 const urlsToCache = [
   '/',
@@ -13,6 +13,7 @@ const urlsToCache = [
   '/game/background-game.mp3',
   '/game/coin.png',
   '/game/coin_disabled.png',
+  '/game/game-server.js',
   '/game/game.css',
   '/game/game.html',
   '/game/game.js',
@@ -22,6 +23,8 @@ const urlsToCache = [
   '/game/tap.png',
   '/game/work.png',
   '/global-css-variables.css',
+  '/robots.txt',
+  '/sitemap.xml',
   '/manifest.json',
   '/sw.js',
 ];
@@ -34,7 +37,8 @@ self.addEventListener('install', event => {
       console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          const req = new Request(url, { cache: 'reload' });
+          // Fetch mit explizitem redirect "follow" setzen
+          const req = new Request(url, { cache: 'reload', redirect: 'follow' });
           const response = await fetch(req);
           if (response.ok) {
             await cache.put(url, response.clone());
@@ -64,7 +68,7 @@ self.addEventListener('fetch', event => {
         return cachedResponse;
       }
 
-      return fetch(request).then(response => {
+      return fetch(request, { redirect: 'follow' }).then(response => {
         if (!response || response.status !== 200 || response.redirected) {
           return response;
         }
