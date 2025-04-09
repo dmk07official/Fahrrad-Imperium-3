@@ -1,4 +1,4 @@
-const  CACHE_NAME = 'my-cf-game-v13';
+const  CACHE_NAME = 'my-cf-game-v14';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -21,8 +21,6 @@ const urlsToCache = [
   '/game/tap.png',
   '/game/work.png',
   '/global-css-variables.css',
-  '/robots.txt',
-  '/sitemap.xml',
   '/manifest.json',
   '/sw.js',
 ];
