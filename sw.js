@@ -1,4 +1,4 @@
-also ich habe schon super viel probiert. erstmal als info ich hoste über git repo und cloudflare. index läuft zur zeit auch offline hervorragend wenn sie gecacht wurde. game wird gecacht und wird wenn online beim betreten dieseer url auch aus dem cache geladen nur beim offline betreten meiner game seite kommt diese nicht sondern ich bin offline fehler: const  CACHE_NAME = 'my-cf-game-v10';
+const  CACHE_NAME = 'my-cf-game-v1';
 const urlsToCache = [
   '/',
   '/index.html',
