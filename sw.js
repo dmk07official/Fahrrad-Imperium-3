@@ -1,4 +1,5 @@
-const  CACHE_NAME = 'my-cf-game-v14';
+const CACHE_NAME = 'my-cf-game-v15';
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -25,107 +26,93 @@ const urlsToCache = [
   '/sw.js',
 ];
 
-// INSTALL
+// 🛠 INSTALL
 self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
-      console.log('[SW] Caching files manually to avoid redirects...');
+      console.log('[SW] Caching files...');
       for (const url of urlsToCache) {
         try {
-          const response = await fetch(url);
-          if (response.ok && !response.redirected) {
+          const req = new Request(url, { cache: 'reload' });
+          const response = await fetch(req);
+          if (response.ok) {
             await cache.put(url, response.clone());
-            console.log('[SW] Cached:', url);
+            console.log('[SW] ✅ Cached:', url);
           } else {
-            console.warn('[SW] Skipped (bad or redirected):', url, response.status);
+            console.warn('[SW] ⚠️ Skipped:', url, response.status);
           }
         } catch (err) {
-          console.error('[SW] Failed to fetch & cache:', url, err);
+          console.error('[SW] ❌ Failed to fetch:', url, err);
         }
       }
-    }).catch(err => {
-      console.error('[SW] Error opening cache during install:', err);
     })
   );
-  self.skipWaiting(); // Sofort aktivieren ohne warten
+  self.skipWaiting();
 });
 
-// FETCH
+// ⚡️ FETCH
 self.addEventListener('fetch', event => {
-  console.log('[SW] Fetching:', event.request.url);
+  const request = event.request;
+  const url = new URL(request.url);
+  const isHTML = request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html');
 
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
+    caches.match(request, { ignoreSearch: true }).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Serving from cache:', event.request.url);
+        console.log('[SW] 🟢 Cache hit:', url.pathname);
         return cachedResponse;
       }
 
-      console.log('[SW] 🔄 Not in cache, fetching from network:', event.request.url);
-
-      return fetch(event.request).then(networkResponse => {
-        if (
-          !networkResponse ||
-          networkResponse.status !== 200 ||
-          networkResponse.type !== 'basic' ||
-          networkResponse.redirected
-        ) {
-          console.warn('[SW] ⚠️ Network response invalid or redirected:', event.request.url);
-          return networkResponse;
+      return fetch(request).then(response => {
+        if (!response || response.status !== 200 || response.redirected) {
+          return response;
         }
 
-        const responseClone = networkResponse.clone();
-
+        const cloned = response.clone();
         caches.open(CACHE_NAME).then(cache => {
-          if (
-            event.request.url.endsWith('.html') ||
-            event.request.url.endsWith('.css') ||
-            event.request.url.endsWith('.js') ||
-            event.request.url.endsWith('.png') ||
-            event.request.url.endsWith('.mp3')
-          ) {
-            console.log('[SW] 💾 Caching network response:', event.request.url);
-            cache.put(event.request, responseClone).catch(err => {
-              console.error('[SW] ❌ Failed to put in cache:', event.request.url, err);
-            });
+          if (/\.(html|css|js|png|mp3)$/.test(url.pathname)) {
+            cache.put(request, cloned);
+            console.log('[SW] 🔄 Cached new asset:', url.pathname);
           }
         });
 
-        return networkResponse;
+        return response;
       }).catch(error => {
-        console.error('[SW] ❌ Fetch failed for:', event.request.url, error);
+        console.warn('[SW] 🛑 Network fail:', url.pathname, error);
 
-        // 🧭 CATCH-ALL FALLBACK BEI OFFLINE
-        if (event.request.mode === 'navigate') {
-          const url = new URL(event.request.url);
+        // 📦 OFFLINE FALLBACK
+        if (isHTML) {
           if (url.pathname.startsWith('/game')) {
             return caches.match('/game/game.html');
           }
           return caches.match('/index.html');
         }
+
+        return new Response('⚠️ Offline & file not cached', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       });
-    }).catch(cacheError => {
-      console.error('[SW] ❌ Cache.match failed:', event.request.url, cacheError);
     })
   );
 });
 
-// ACTIVATE
+// ♻️ ACTIVATE
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating new Service Worker...');
+  console.log('[SW] Activating...');
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] 🧹 Deleting old cache:', key);
+            console.log('[SW] 🔥 Removing old cache:', key);
             return caches.delete(key);
           }
         })
       );
     }).then(() => {
-      console.log('[SW] ✅ Activation complete. Clients now controlled.');
+      console.log('[SW] ✅ Now controlling clients.');
       return self.clients.claim();
     })
   );
