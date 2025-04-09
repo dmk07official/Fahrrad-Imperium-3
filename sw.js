@@ -1,5 +1,7 @@
-const  CACHE_NAME = 'my-cf-game-v3';
+const CACHE_NAME = 'my-cf-game-v2';
 const urlsToCache = [
+  '/',
+  '/game/',
   '/index.html',
   '/index.css',
   '/index.js',
@@ -13,7 +15,7 @@ const urlsToCache = [
   '/game/coin_disabled.png',
   '/game/game-server.js',
   '/game/game.css',
-  '/game/game.html',
+  '/game/game.html', 
   '/game/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
@@ -30,11 +32,15 @@ self.addEventListener('install', event => {
   console.log('[SW] Installing Service Worker...');
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
-      console.log('[SW] Caching files manually to avoid redirects...');
+      console.log('[SW] Caching files manually...');
       for (const url of urlsToCache) {
         try {
           const response = await fetch(url);
           if (response.ok && !response.redirected) {
+            // Check if it's HTML before caching
+            if (url.endsWith('.html')) {
+              console.log('[SW] Caching HTML:', url);
+            }
             await cache.put(url, response.clone());
             console.log('[SW] Cached:', url);
           } else {
@@ -48,7 +54,7 @@ self.addEventListener('install', event => {
       console.error('[SW] Error opening cache during install:', err);
     })
   );
-  self.skipWaiting(); // Sofort aktivieren ohne warten
+  self.skipWaiting(); // Instantly activate the SW without waiting
 });
 
 // FETCH
@@ -110,7 +116,6 @@ self.addEventListener('fetch', event => {
     })
   );
 });
-
 
 // ACTIVATE
 self.addEventListener('activate', event => {
