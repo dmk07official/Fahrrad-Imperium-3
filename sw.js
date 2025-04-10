@@ -1,5 +1,6 @@
 const CACHE_NAME = 'my-cf-game-v-1';
 const urlsToCache = [
+  '/',
   '/index.html',
   '/index.css',
   '/index.js',
@@ -51,51 +52,52 @@ self.addEventListener('install', event => {
 
 // FETCH
 self.addEventListener('fetch', event => {
-  const requestURL = new URL(event.request.url);
-  
-  // Überprüfen, ob es sich um die eigene Domain handelt
-  if (requestURL.origin !== location.origin) return;
+  const request = event.request;
 
-  const cleanPath = requestURL.pathname.replace(/\/+$/, '');  // Entfernen von Slashes, falls vorhanden
+  // Handle navigations (z.B. URL direkt im Browser eingegeben)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('/index.html').then(response => {
+        return response || fetch('/index.html');
+      })
+    );
+    return;
+  }
 
+  // Handle static assets
   event.respondWith(
-    caches.match(cleanPath).then(cachedResponse => {
+    caches.match(request).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Serving from cache:', cleanPath);
-        return cachedResponse;  // Antworte direkt aus dem Cache
+        console.log('[SW] 🟢 Cache hit:', request.url);
+        return cachedResponse;
       }
 
-      console.log('[SW] 🔄 Not cached, fetching:', cleanPath);
+      return fetch(request).then(networkResponse => {
+        if (
+          !networkResponse ||
+          networkResponse.status !== 200 ||
+          networkResponse.type !== 'basic'
+        ) {
+          return networkResponse;
+        }
 
-      return fetch(event.request)
-        .then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            console.warn('[SW] ⚠️ Bad response:', cleanPath);
-            return networkResponse;
+        // Optional: Cache neue Sachen nach Bedarf (nur bestimmte Typen)
+        const responseClone = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          if (request.url.match(/\.(html|js|css|png|mp3)$/)) {
+            cache.put(request, responseClone);
           }
-
-          const responseClone = networkResponse.clone();
-
-          caches.open(CACHE_NAME).then(cache => {
-            // Sicherstellen, dass HTML-Dateien wie `game.html` immer gecacht werden
-            if (cleanPath.endsWith('.html') || cleanPath.endsWith('.css') || cleanPath.endsWith('.js') || cleanPath.endsWith('.png')) {
-              console.log('[SW] 💾 Caching network response:', cleanPath);
-              cache.put(cleanPath, responseClone).catch(err => {
-                console.error('[SW] ❌ Failed to cache:', cleanPath, err);
-              });
-            }
-          });
-
-          return networkResponse;  // Rückgabe der Netzwerkantwort
-        })
-        .catch(error => {
-          console.error('[SW] ❌ Fetch failed for:', cleanPath, error);
-          // Stelle sicher, dass bei Offline-Zugriff die gecachte Version zurückgegeben wird
-          return caches.match(cleanPath);  // Falls offline, die gecachte Version zurückgeben
         });
+
+        return networkResponse;
+      }).catch(() => {
+        // Bei Offline: gib gecachte Version zurück (falls vorhanden)
+        return caches.match(request);
+      });
     })
   );
 });
+
 
 // ACTIVATE
 self.addEventListener('activate', event => {
