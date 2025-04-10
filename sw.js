@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v-4';
+const CACHE_NAME = 'my-cf-game-v-5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -13,9 +13,9 @@ const urlsToCache = [
   '/game/coin.png',
   '/game/coin_disabled.png',
   '/game/game-server.js',
-  'game.css',
-  'game.html',  // Game HTML immer mit rein
-  'game.js',
+  '/game.css',
+  '/game.html',
+  '/game.js',
   '/game/gold-arrow.png',
   '/game/green-arrow.png',
   '/game/prestige.png',
@@ -28,23 +28,24 @@ const urlsToCache = [
 
 // INSTALL
 self.addEventListener('install', event => {
-  console.log('[SW] Installing Service Worker...');
+  console.log('[SW] 🚀 Installing Service Worker...');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      console.log('[SW] Caching files...');
-      for (const url of urlsToCache) {
-        try {
-          const response = await fetch(url);
-          if (response.ok) {
-            await cache.put(url, response.clone());
-            console.log('[SW] ✅ Cached:', url);
-          } else {
-            console.warn('[SW] ⚠️ Skipped:', url, response.status);
+    caches.open(CACHE_NAME).then(cache => {
+      return Promise.all(
+        urlsToCache.map(async url => {
+          try {
+            const response = await fetch(url);
+            if (response && response.ok) {
+              await cache.put(url, response.clone());
+              console.log('[SW] ✅ Cached:', url);
+            } else {
+              console.warn('[SW] ⚠️ Skipped (bad response):', url);
+            }
+          } catch (err) {
+            console.error('[SW] ❌ Failed to fetch for cache:', url, err);
           }
-        } catch (err) {
-          console.error('[SW] ❌ Failed to cache:', url, err);
-        }
-      }
+        })
+      );
     })
   );
   self.skipWaiting();
@@ -52,30 +53,32 @@ self.addEventListener('install', event => {
 
 // FETCH
 self.addEventListener('fetch', event => {
-  const request = event.request;
+  const { request } = event;
 
   event.respondWith(
     caches.match(request).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Serving from cache:', request.url);
+        console.log('[SW] 🟢 Served from cache:', request.url);
         return cachedResponse;
       }
 
       return fetch(request)
         .then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            console.warn('[SW] ⚠️ Bad response:', request.url);
+          if (
+            !networkResponse ||
+            networkResponse.status !== 200 ||
+            networkResponse.type === 'opaque'
+          ) {
+            console.warn('[SW] ⚠️ Bad or opaque response:', request.url);
             return networkResponse;
           }
 
           const responseClone = networkResponse.clone();
 
           caches.open(CACHE_NAME).then(cache => {
-            // Cache nur relevante Sachen
             if (request.url.match(/\.(html|css|js|mp3|png|json)$/)) {
-              console.log('[SW] 💾 Caching:', request.url);
               cache.put(request, responseClone).catch(err => {
-                console.error('[SW] ❌ Failed to cache:', request.url, err);
+                console.error('[SW] ❌ Failed to cache (fetch):', request.url, err);
               });
             }
           });
@@ -83,9 +86,17 @@ self.addEventListener('fetch', event => {
           return networkResponse;
         })
         .catch(err => {
-          console.error('[SW] ❌ Network failed for:', request.url, err);
-          // Nur gecachte Version zurückgeben, wenn verfügbar – sonst nix
-          return caches.match(request);
+          console.error('[SW] ❌ Network failed:', request.url, err);
+          return caches.match(request).then(offlineResponse => {
+            if (offlineResponse) {
+              console.log('[SW] 💾 Served offline from cache:', request.url);
+              return offlineResponse;
+            } else {
+              return new Response('<h1>Offline 😭</h1>', {
+                headers: { 'Content-Type': 'text/html' }
+              });
+            }
+          });
         });
     })
   );
@@ -93,13 +104,13 @@ self.addEventListener('fetch', event => {
 
 // ACTIVATE
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating...');
+  console.log('[SW] ✅ Activating...');
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] 🧹 Removing old cache:', key);
+            console.log('[SW] 🧹 Deleting old cache:', key);
             return caches.delete(key);
           }
         })
