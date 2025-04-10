@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cf-game-v-1';
+const CACHE_NAME = 'my-cf-game-v-2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -54,50 +54,42 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   const request = event.request;
 
-  // Handle navigations (z.B. URL direkt im Browser eingegeben)
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      caches.match('/index.html').then(response => {
-        return response || fetch('/index.html');
-      })
-    );
-    return;
-  }
-
-  // Handle static assets
   event.respondWith(
     caches.match(request).then(cachedResponse => {
       if (cachedResponse) {
-        console.log('[SW] 🟢 Cache hit:', request.url);
+        console.log('[SW] 🟢 Serving from cache:', request.url);
         return cachedResponse;
       }
 
-      return fetch(request).then(networkResponse => {
-        if (
-          !networkResponse ||
-          networkResponse.status !== 200 ||
-          networkResponse.type !== 'basic'
-        ) {
-          return networkResponse;
-        }
-
-        // Optional: Cache neue Sachen nach Bedarf (nur bestimmte Typen)
-        const responseClone = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          if (request.url.match(/\.(html|js|css|png|mp3)$/)) {
-            cache.put(request, responseClone);
+      return fetch(request)
+        .then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200) {
+            console.warn('[SW] ⚠️ Bad response:', request.url);
+            return networkResponse;
           }
-        });
 
-        return networkResponse;
-      }).catch(() => {
-        // Bei Offline: gib gecachte Version zurück (falls vorhanden)
-        return caches.match(request);
-      });
+          const responseClone = networkResponse.clone();
+
+          caches.open(CACHE_NAME).then(cache => {
+            // Cache nur relevante Sachen
+            if (request.url.match(/\.(html|css|js|mp3|png|json)$/)) {
+              console.log('[SW] 💾 Caching:', request.url);
+              cache.put(request, responseClone).catch(err => {
+                console.error('[SW] ❌ Failed to cache:', request.url, err);
+              });
+            }
+          });
+
+          return networkResponse;
+        })
+        .catch(err => {
+          console.error('[SW] ❌ Network failed for:', request.url, err);
+          // Nur gecachte Version zurückgeben, wenn verfügbar – sonst nix
+          return caches.match(request);
+        });
     })
   );
 });
-
 
 // ACTIVATE
 self.addEventListener('activate', event => {
