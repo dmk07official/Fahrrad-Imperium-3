@@ -1,16 +1,59 @@
 document.addEventListener("DOMContentLoaded", function() {
   const fadeIn = document.getElementById("fadeIn");
-  const loadingScreen = document.getElementById("loadingScreen"); // Falls du 'loadingScreen' ansprechen willst
+  
+  function preloadFiles() {
+    const files = ['index/logo.png', 'index/discord-logo.png', 'index/tiktok-logo.png', 'index/main-theme.mp3', 'index/tap.mp3'];
+    const totalFiles = files.length;
+    let loadedFiles = 0;
 
-  loadingScreen.style.display = 'none'; // Hier wird der Ladebildschirm ausgeblendet
-  playTheme(); // Wenn das eine Funktion ist, die du schon hast und Musik startet
+    files.forEach(file => {
+      const fileType = file.split('.').pop();
+      const preloadElement = fileType === 'mp3' ? new Audio() : new Image();
 
-  fadeIn.classList.add('fadeout'); // 'fadeout' animiert den fadeIn Effekt
-  fadeIn.addEventListener("animationend", function() {
-    fadeIn.style.display = "none"; // Versteckt den FadeIn-Element, wenn die Animation endet
-  });
+      if (fileType === 'mp3') {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', file, true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = function() {
+          if (this.status === 200) {
+            const blob = this.response;
+            preloadElement.src = URL.createObjectURL(blob);
+            loadedFiles++;
+            updateLoadingProgress(loadedFiles, totalFiles);
+          }
+        };
+
+        xhr.onerror = function() {
+          console.error(`Error: Failed to load ${file}`);
+        };
+
+        xhr.send();
+      } else {
+        preloadElement.onload = () => {
+          loadedFiles++;
+          updateLoadingProgress(loadedFiles, totalFiles);
+        };
+        preloadElement.src = file;
+      }
+    });
+  }
+
+  function updateLoadingProgress(loadedFiles, totalFiles) {
+    const loadingScreen = document.getElementById('loadingScreen');
+  
+    if (loadedFiles === totalFiles) {
+      loadingScreen.style.display = 'none';
+      playTheme();
+      fadeIn.classList.add('fadeout');
+      fadeIn.addEventListener("animationend", function() {
+        fadeIn.style.display = "none";
+      });
+    }
+  }
+
+  preloadFiles();
 });
-
 
 function playTheme() {
   var sound = new Howl({
@@ -135,7 +178,7 @@ function startGame() {
     src: "index/tap.mp3",
     autoplay: true,
   });
-  location.href = 'game.html';
+  window.open('game/game.html', '_self');
 }
 
 function openDiscord() {
