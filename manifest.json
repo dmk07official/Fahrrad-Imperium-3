@@ -1,8 +1,0 @@
-{
-  "name": "Mein Offline Game",
-  "short_name": "Game",
-  "start_url": "/index.html",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00ff00"
-}
